@@ -1,327 +1,296 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>L'Hôpital Lab — Animación Fluida</title>
-  
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js"></script>
-
-  <style>
-    :root {
-      --bg: #f1f5f9;
-      --surface: #ffffff;
-      --accent: #2563eb;
-      --accent-light: #dbeafe;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
-
-    #app { display: grid; grid-template-rows: 60px 1fr; height: 100vh; padding: 12px; gap: 12px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Hôpital Lab Pro V3 | Proyecto Final MAT-129</title>
     
-    header { background: var(--surface); border-radius: 16px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); }
-    
-    #main-layout { display: grid; grid-template-columns: 360px 1fr; gap: 12px; overflow: hidden; }
+    <!-- Dependencias de Alta Precisión -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js"></script>
 
-    .panel { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-    .panel-header { padding: 14px 20px; background: #f8fafc; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); color: var(--muted); }
-    .panel-body { padding: 20px; flex: 1; overflow-y: auto; }
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --success: #059669;
+            --warning: #d97706;
+            --error: #dc2626;
+            --bg: #f1f5f9;
+        }
 
-    .field { margin-bottom: 16px; }
-    label { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 6px; color: var(--muted); text-transform: uppercase; }
-    input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; background: #f8fafc; transition: all 0.2s; }
-    input:focus { outline: none; border-color: var(--accent); background: white; box-shadow: 0 0 0 3px var(--accent-light); }
-    
-    .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .btn { padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; transition: all 0.2s; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-primary { background: var(--accent); color: white; }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
-    .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
-    .btn-outline:hover { background: #f8fafc; border-color: var(--muted); }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--primary); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-    .canvas-container { position: relative; flex: 1; background: white; overflow: hidden; cursor: crosshair; }
-    canvas { width: 100%; height: 100%; display: block; }
-    
-    #metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 20px; background: #f8fafc; border-top: 1px solid var(--border); }
-    .metric-card { background: white; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid var(--border); transition: transform 0.2s; }
-    .metric-card small { font-size: 0.6rem; color: var(--muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
-    .metric-card b { font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: var(--accent); }
+        header { background: var(--primary); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        main { display: grid; grid-template-columns: 400px 1fr; gap: 1rem; padding: 1rem; flex: 1; overflow: hidden; }
 
-    .step { background: #f8fafc; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--accent); }
-    
-    #overlay-math { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.9); backdrop-filter: blur(8px); padding: 12px 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); pointer-events: none; }
+        .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .card-header { padding: 0.75rem 1rem; background: #f8fafc; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0; }
+        .card-body { padding: 1.25rem; overflow-y: auto; flex: 1; }
 
-    input[type="range"] { -webkit-appearance: none; height: 6px; background: var(--border); border-radius: 5px; }
-    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--accent); border-radius: 50%; cursor: pointer; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-  </style>
+        .input-group { margin-bottom: 1rem; }
+        label { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 0.4rem; color: #475569; text-transform: uppercase; }
+        input { width: 100%; padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; transition: 0.2s; }
+        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        
+        .btn-main { background: var(--accent); color: white; border: none; width: 100%; padding: 0.9rem; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+        .btn-main:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+        /* Panel de Diagnóstico */
+        .status-msg { padding: 1.25rem; border-radius: 10px; font-size: 0.85rem; line-height: 1.5; margin-top: 1rem; border: 1px solid transparent; }
+        .status-msg.ok { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+        .status-msg.warn { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+        .status-msg.err { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+        .deriv-box { margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.5); border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); }
+
+        /* Gráfico y Tooltip */
+        .viz-panel { position: relative; }
+        canvas { width: 100%; height: 100%; background: white; cursor: crosshair; }
+        #formula-overlay { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); padding: 1.25rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; pointer-events: none; min-width: 250px; }
+
+        .slider-box { padding: 1.25rem; background: white; border-top: 1px solid #e2e8f0; }
+        .comparison-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+        .comp-card { padding: 0.8rem; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; }
+        .comp-card b { font-family: 'JetBrains Mono', monospace; font-size: 1rem; }
+    </style>
 </head>
 <body>
 
-<div id="app">
-  <header>
-    <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="background: var(--accent); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">H</div>
-        <h2 style="font-size: 1rem; letter-spacing: -0.02em;">Laboratorio de L'Hôpital <span style="font-weight: 400; color: var(--muted);">— Visualizador Dinámico</span></h2>
-    </div>
-  </header>
+<header>
+    <div style="font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px;">L'HÔPITAL <span style="color: var(--accent);">LAB</span> <small style="font-size: 0.6rem; vertical-align: middle; opacity: 0.7;">PRO V3</small></div>
+    <div style="font-size: 0.75rem; font-weight: 500; opacity: 0.9;">Proyecto Final: MAT-129 | Ingeniería</div>
+</header>
 
-  <div id="main-layout">
-    <div class="panel">
-      <div class="panel-header">Parámetros del Límite</div>
-      <div class="panel-body">
-        <div class="field">
-          <label>Configuración Previa</label>
-          <select id="presets">
-            <option value="sin(x)/x,0">sin(x) / x  → 0</option>
-            <option value="(exp(x)-1)/x,0">(e^x - 1) / x → 0</option>
-            <option value="log(x)/(x-1),1">ln(x) / (x-1) → 1</option>
-            <option value="x/exp(x),inf">x / e^x → ∞</option>
-            <option value="(1-cos(x))/x^2,0">(1 - cos x) / x² → 0</option>
-          </select>
+<main>
+    <!-- Panel de Control -->
+    <div class="card">
+        <div class="card-header">Panel de Diagnóstico Matemático</div>
+        <div class="card-body">
+            <div class="input-group">
+                <label>Numerador f(x)</label>
+                <input type="text" id="f_input" value="sin(x)" spellcheck="false">
+            </div>
+            <div class="input-group">
+                <label>Denominador g(x)</label>
+                <input type="text" id="g_input" value="x" spellcheck="false">
+            </div>
+            <div class="input-group">
+                <label>Punto a</label>
+                <input type="text" id="a_input" value="0" spellcheck="false">
+            </div>
+            <button class="btn-main" onclick="validateAndCalculate()">Analizar con Regla de L'Hôpital</button>
+
+            <div id="diagnostico"></div>
         </div>
-        <div class="field"><label>Numerador f(x)</label><input type="text" id="f_inp" value="sin(x)"></div>
-        <div class="field"><label>Denominador g(x)</label><input type="text" id="g_inp" value="x"></div>
-        <div class="field"><label>Punto de aproximación (a)</label><input type="text" id="a_inp" value="0"></div>
+    </div>
+
+    <!-- Panel de Visualización -->
+    <div class="card viz-panel">
+        <div class="card-header">Convergencia de f/g y f'/g'</div>
+        <canvas id="canvas"></canvas>
+        <div id="formula-overlay"></div>
         
-        <div class="btn-group">
-            <button class="btn btn-primary" id="calc_btn">Calcular</button>
-            <button class="btn btn-outline" id="anim_btn">▶ Animar</button>
+        <div class="slider-box">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.6rem;">
+                <label style="margin:0">Exploración en el entorno de a</label>
+                <span id="x_label" style="font-family: monospace; font-weight: bold; color: var(--accent);">x = 0.500</span>
+            </div>
+            <input type="range" id="x_slider" min="-1" max="1" step="0.001">
+            
+            <div class="comparison-container">
+                <div class="comp-card" style="border-left: 4px solid var(--accent);">
+                    <div style="font-size: 0.6rem; color: #64748b; margin-bottom: 4px;">f(x) / g(x)</div>
+                    <b id="val_orig">-</b>
+                </div>
+                <div class="comp-card" style="border-left: 4px solid var(--success);">
+                    <div style="font-size: 0.6rem; color: #64748b; margin-bottom: 4px;">f'(x) / g'(x)</div>
+                    <b id="val_deriv">-</b>
+                </div>
+            </div>
         </div>
-
-        <div id="steps" style="margin-top: 24px;"></div>
-      </div>
     </div>
-
-    <div class="panel">
-      <div class="panel-header">Gráfica Interactiva (f/g vs f'/g')</div>
-      <div class="canvas-container">
-        <canvas id="plot"></canvas>
-        <div id="overlay-math"></div>
-      </div>
-      
-      <div style="padding: 20px; background: white; border-top: 1px solid var(--border);">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <label style="margin:0">Posición de exploración (x)</label>
-            <b id="x_val_label" style="color: var(--accent); font-family: monospace;">0.00</b>
-        </div>
-        <input type="range" id="x_range" min="-5" max="5" step="0.001" value="0.5" style="width: 100%;">
-      </div>
-
-      <div id="metrics">
-        <div class="metric-card"><small>Original f/g</small><b id="m_q">-</b></div>
-        <div class="metric-card"><small>Derivadas f'/g'</small><b id="m_d">-</b></div>
-        <div class="metric-card" style="border-color: var(--accent); background: var(--accent-light);"><small>Límite Final</small><b id="m_l">-</b></div>
-      </div>
-    </div>
-  </div>
-</div>
+</main>
 
 <script>
-  // Variables de estado
-  const state = {
-    f_js: null, g_js: null, df_js: null, dg_js: null,
-    aStr: "0", aVal: 0, limit: 0,
-    xTarget: 0.5, xCurrent: 0.5,
-    isAnimating: false,
-    zoom: 50
-  };
-
-  const $ = id => document.getElementById(id);
-  const canvas = $('plot');
-  const ctx = canvas.getContext('2d');
-
-  // Inicialización
-  function init() {
-    setupEventListeners();
-    calculate();
-    requestAnimationFrame(renderLoop); // Iniciar bucle de renderizado fluido
-  }
-
-  function setupEventListeners() {
-    $('calc_btn').onclick = calculate;
-    $('anim_btn').onclick = startAnimation;
-    
-    $('x_range').oninput = (e) => {
-      state.xTarget = parseFloat(e.target.value);
-      state.isAnimating = false;
+    const state = {
+        f_raw: "", g_raw: "", df_sym: null, dg_sym: null,
+        a: 0, aStr: "0", limit: 0,
+        compiled: { f: null, g: null, df: null, dg: null }
     };
 
-    $('presets').onchange = (e) => {
-      const [func, a] = e.target.value.split(',');
-      const [f, g] = func.split('/');
-      $('f_inp').value = f; $('g_inp').value = g; $('a_inp').value = a;
-      calculate();
-    };
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
 
-    window.onresize = () => {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-    };
-  }
+    function validateAndCalculate() {
+        const diag = document.getElementById('diagnostico');
+        state.f_raw = document.getElementById('f_input').value;
+        state.g_raw = document.getElementById('g_input').value;
+        state.aStr = document.getElementById('a_input').value;
 
-  function calculate() {
-    try {
-      const f_str = $('f_inp').value;
-      const g_str = $('g_inp').value;
-      state.aStr = $('a_inp').value;
+        // Limpiar estado previo
+        diag.innerHTML = "";
 
-      // 1. Compilar funciones simbólicas a JS puro para máxima velocidad
-      state.f_js = nerdamer(f_str).buildFunction(['x']);
-      state.g_js = nerdamer(g_str).buildFunction(['x']);
-      
-      const df_sym = nerdamer.diff(f_str, 'x');
-      const dg_sym = nerdamer.diff(g_str, 'x');
-      state.df_js = df_sym.buildFunction(['x']);
-      state.dg_js = dg_sym.buildFunction(['x']);
+        try {
+            // 1. Parseo y validación de sintaxis
+            const f_node = nerdamer(state.f_raw);
+            const g_node = nerdamer(state.g_raw);
+            state.a = state.aStr === 'inf' ? 1000 : parseFloat(state.aStr);
 
-      // 2. Punto a
-      state.aVal = state.aStr === 'inf' ? 10 : parseFloat(state.aStr);
+            // 2. Evaluación de límites laterales numéricos
+            const eps = 0.0001;
+            const fa = parseFloat(nerdamer(state.f_raw, {x: state.a}).evaluate().text());
+            const ga = parseFloat(nerdamer(state.g_raw, {x: state.a}).evaluate().text());
 
-      // 3. Calcular límite numérico preciso
-      const eps = 0.0000001;
-      const t = state.aStr === 'inf' ? 1000000 : state.aVal + eps;
-      state.limit = state.df_js(t) / state.dg_js(t);
+            // 3. Verificación de Hipótesis (Indeterminación)
+            const isIndeterminate = (Math.abs(fa) < 0.02 && Math.abs(ga) < 0.02) || 
+                                     (Math.abs(fa) > 50 && Math.abs(ga) > 50);
 
-      // 4. UI
-      $('steps').innerHTML = `
-        <div class="step"><b>Derivadas:</b><br>f'(x) = ${df_sym.text()}<br>g'(x) = ${dg_sym.text()}</div>
-      `;
-      if (window.katex) {
-        katex.render(`\\lim_{x \\to ${state.aStr}} \\frac{f(x)}{g(x)} = ${state.limit.toFixed(4)}`, $('overlay-math'));
-      }
-      $('m_l').innerText = state.limit.toFixed(4);
+            if (!isIndeterminate) {
+                diag.innerHTML = `
+                    <div class="status-msg warn">
+                        <b>Hipótesis no cumplida:</b> No se detecta indeterminación $\\frac{0}{0}$ o $\\frac{\\infty}{\\infty}$.<br>
+                        Evaluación directa: $f(a)/g(a) \\approx ${(fa/ga).toFixed(4)}$.<br>
+                        <i>La Regla de L'Hôpital no es aplicable.</i>
+                    </div>`;
+                renderLaTeX(false);
+            } else {
+                // 4. Proceso Simbólico
+                state.df_sym = nerdamer.diff(state.f_raw, 'x');
+                state.dg_sym = nerdamer.diff(state.g_raw, 'x');
+                
+                state.compiled.f = nerdamer(state.f_raw).buildFunction(['x']);
+                state.compiled.g = nerdamer(state.g_raw).buildFunction(['x']);
+                state.compiled.df = state.df_sym.buildFunction(['x']);
+                state.compiled.dg = state.dg_sym.buildFunction(['x']);
 
-      // Ajustar Slider
-      const r = $('x_range');
-      if (state.aStr === 'inf') {
-        r.min = 1; r.max = 20; r.value = 2;
-      } else {
-        r.min = state.aVal - 4; r.max = state.aVal + 4; r.value = state.aVal + 1.5;
-      }
-      state.xTarget = parseFloat(r.value);
-      state.xCurrent = state.xTarget;
-      
-    } catch (e) {
-      console.error(e);
-      alert("Error en la fórmula. Asegúrate de usar 'x' como variable.");
+                const testX = state.aStr === 'inf' ? 1000000 : state.a + 0.000001;
+                state.limit = state.compiled.df(testX) / state.compiled.dg(testX);
+
+                diag.innerHTML = `
+                    <div class="status-msg ok">
+                        <b>✓ Indeterminación confirmada.</b><br>
+                        Aplicando Regla de L'Hôpital:<br>
+                        <div class="deriv-box">
+                            $f'(x) = ${state.df_sym.toTeX()}$<br>
+                            $g'(x) = ${state.dg_sym.toTeX()}$
+                        </div>
+                        <b>Veredicto:</b> El límite existe y es igual a <b>${state.limit.toFixed(4)}</b> gracias a la Regla de L'Hôpital.
+                    </div>`;
+                
+                renderLaTeX(true);
+                setupSlider();
+            }
+            // Renderizar LaTeX en el diagnóstico
+            diag.querySelectorAll('.status-msg').forEach(el => {
+                const text = el.innerHTML;
+                el.innerHTML = text.replace(/\$(.*?)\$/g, (m, tex) => katex.renderToString(tex));
+            });
+
+        } catch (e) {
+            diag.innerHTML = `
+                <div class="status-msg err">
+                    <b>⚠ Error de Entrada:</b> No se pudo procesar la expresión.<br>
+                    <small>${e.message}</small><br>
+                    Asegúrate de usar 'x' como variable y sintaxis correcta (ej. x^2, sin(x)).
+                </div>`;
+        }
     }
-  }
 
-  function startAnimation() {
-    state.isAnimating = true;
-    state.xTarget = state.aVal + (state.aStr === 'inf' ? 18 : 0.001);
-    // Resetear posición para que se vea el viaje
-    state.xCurrent = state.aVal - (state.aStr === 'inf' ? 0 : 3.5);
-  }
-
-  // Bucle de renderizado a 60fps
-  function renderLoop() {
-    // 1. Suavizado de movimiento (Lerp)
-    const lerpFactor = 0.08;
-    state.xCurrent += (state.xTarget - state.xCurrent) * lerpFactor;
-    
-    if (Math.abs(state.xCurrent - state.xTarget) < 0.001) {
-        state.isAnimating = false;
+    function renderLaTeX(isLHopital) {
+        const overlay = document.getElementById('formula-overlay');
+        if (!isLHopital) {
+            overlay.innerHTML = "Evaluación Directa";
+            return;
+        }
+        const tex = `
+            \\begin{aligned}
+            &\\lim_{x \\to ${state.aStr}} \\frac{f(x)}{g(x)} = \\lim_{x \\to ${state.aStr}} \\frac{${state.df_sym.toTeX()}}{${state.dg_sym.toTeX()}} \\\\
+            &\\text{Resultado: } \\mathbf{${state.limit.toFixed(4)}} \\\\
+            &\\lim_{x \\to ${state.aStr}} \\frac{f(x)}{g(x)} = ${state.limit.toFixed(4)}
+            \\end{aligned}
+        `;
+        katex.render(tex, overlay);
     }
 
-    // 2. Actualizar UI
-    $('x_val_label').innerText = state.xCurrent.toFixed(3);
-    if (!state.isAnimating) $('x_range').value = state.xCurrent;
-
-    try {
-        const q = state.f_js(state.xCurrent) / state.g_js(state.xCurrent);
-        const d = state.df_js(state.xCurrent) / state.dg_js(state.xCurrent);
-        $('m_q').innerText = isFinite(q) ? q.toFixed(4) : "Indet.";
-        $('m_d').innerText = isFinite(d) ? d.toFixed(4) : "Indet.";
-    } catch(e) {}
-
-    // 3. Dibujar
-    draw();
-
-    requestAnimationFrame(renderLoop);
-  }
-
-  function draw() {
-    const w = canvas.width = canvas.offsetWidth;
-    const h = canvas.height = canvas.offsetHeight;
-    ctx.clearRect(0, 0, w, h);
-
-    const centerX = w / 2;
-    const centerY = h / 2;
-    const zoom = 60;
-
-    // Re-centrar vista en el punto de interés
-    const offsetX = (state.aStr === 'inf' ? state.xCurrent - 5 : state.aVal);
-    const offsetY = state.limit;
-
-    const toX = val => centerX + (val - offsetX) * zoom;
-    const toY = val => centerY - (val - offsetY) * zoom;
-
-    // Rejilla simple
-    ctx.strokeStyle = "#f1f5f9";
-    ctx.beginPath();
-    for(let i=-20; i<=20; i++) {
-        ctx.moveTo(toX(i), 0); ctx.lineTo(toX(i), h);
-        ctx.moveTo(0, toY(i)); ctx.lineTo(w, toY(i));
+    function setupSlider() {
+        const s = document.getElementById('x_slider');
+        if (state.aStr === 'inf') {
+            s.min = 1; s.max = 50; s.value = 5;
+        } else {
+            s.min = state.a - 3; s.max = state.a + 3; s.value = state.a + 0.8;
+        }
+        updateFromSlider();
     }
-    ctx.stroke();
 
-    // Ejes
-    ctx.strokeStyle = "#cbd5e1";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, toY(0)); ctx.lineTo(w, toY(0));
-    ctx.moveTo(toX(0), 0); ctx.lineTo(toX(0), h);
-    ctx.stroke();
+    function updateFromSlider() {
+        const x = parseFloat(document.getElementById('x_slider').value);
+        const v_orig = state.compiled.f(x) / state.compiled.g(x);
+        const v_deriv = state.compiled.df(x) / state.compiled.dg(x);
 
-    // Función f/g (Azul)
-    drawGraph(x => state.f_js(x) / state.g_js(x), "#2563eb", 3, toX, toY, w, offsetX);
-    
-    // Función f'/g' (Verde)
-    drawGraph(x => state.df_js(x) / state.dg_js(x), "#10b981", 2, toX, toY, w, offsetX);
+        document.getElementById('val_orig').innerText = isFinite(v_orig) ? v_orig.toFixed(5) : "Indet.";
+        document.getElementById('val_deriv').innerText = isFinite(v_deriv) ? v_deriv.toFixed(5) : "Indet.";
+        document.getElementById('x_label').innerText = `x = ${x.toFixed(3)}`;
+        
+        draw(x);
+    }
 
-    // Punto Explorador
-    const curY = state.f_js(state.xCurrent) / state.g_js(state.xCurrent);
-    if (isFinite(curY)) {
-        ctx.fillStyle = "#2563eb";
+    function draw(xPoint) {
+        const w = canvas.width = canvas.offsetWidth;
+        const h = canvas.height = canvas.offsetHeight;
+        ctx.clearRect(0,0,w,h);
+        
+        const zoom = 60;
+        const centerX = w/2;
+        const centerY = h/2;
+        const offX = state.aStr === 'inf' ? xPoint - 5 : state.a;
+        const offY = state.limit;
+
+        const toX = x => centerX + (x - offX) * zoom;
+        const toY = y => centerY - (y - offY) * zoom;
+
+        // Ejes
+        ctx.strokeStyle = "#f1f5f9";
         ctx.beginPath();
-        ctx.arc(toX(state.xCurrent), toY(curY), 8, 0, Math.PI*2);
-        ctx.fill();
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 3;
+        for(let i=-20; i<20; i++) {
+            ctx.moveTo(toX(i), 0); ctx.lineTo(toX(i), h);
+            ctx.moveTo(0, toY(i)); ctx.lineTo(w, toY(i));
+        }
         ctx.stroke();
+
+        // Curvas
+        const plot = (fn, color, width) => {
+            ctx.strokeStyle = color; ctx.lineWidth = width; ctx.beginPath();
+            let first = true;
+            for(let px=0; px<w; px+=2) {
+                const xVal = offX + (px - centerX)/zoom;
+                try {
+                    const yVal = fn(xVal);
+                    if(isFinite(yVal) && Math.abs(yVal) < 50) {
+                        if(first) ctx.moveTo(px, toY(yVal)); else ctx.lineTo(px, toY(yVal));
+                        first = false;
+                    } else first = true;
+                } catch(e) { first = true; }
+            }
+            ctx.stroke();
+        };
+
+        plot(x => state.compiled.f(x)/state.compiled.g(x), "#2563eb", 3);
+        plot(x => state.compiled.df(x)/state.compiled.dg(x), "#059669", 2);
+
+        // Indicador de Punto
+        const py = state.compiled.f(xPoint)/state.compiled.g(xPoint);
+        if(isFinite(py)) {
+            ctx.fillStyle = "#2563eb"; ctx.beginPath();
+            ctx.arc(toX(xPoint), toY(py), 7, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = "white"; ctx.lineWidth = 2; ctx.stroke();
+        }
     }
-  }
 
-  function drawGraph(fn, color, width, toX, toY, w, offsetX) {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = width;
-    ctx.beginPath();
-    let started = false;
-
-    for (let px = 0; px < w; px += 3) {
-      const x = offsetX + (px - w/2) / 60;
-      try {
-        const y = fn(x);
-        if (isFinite(y) && Math.abs(y) < 50) {
-          const py = toY(y);
-          if (!started) { ctx.moveTo(px, py); started = true; }
-          else { ctx.lineTo(px, py); }
-        } else { started = false; }
-      } catch(e) { started = false; }
-    }
-    ctx.stroke();
-  }
-
-  setTimeout(init, 500);
+    document.getElementById('x_slider').oninput = updateFromSlider;
+    window.onload = validateAndCalculate;
 </script>
 </body>
 </html>
