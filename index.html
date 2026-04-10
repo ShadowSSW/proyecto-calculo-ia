@@ -1,296 +1,1201 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>L'Hôpital Lab Pro V3 | Proyecto Final MAT-129</title>
-    
-    <!-- Dependencias de Alta Precisión -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>L'Hôpital Lab Pro | Proyecto Final MAT-129 · PUCMM</title>
 
-    <style>
-        :root {
-            --primary: #0f172a;
-            --accent: #2563eb;
-            --success: #059669;
-            --warning: #d97706;
-            --error: #dc2626;
-            --bg: #f1f5f9;
-        }
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" onload="window.__katexReady=true"></script>
+<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js"></script>
 
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--primary); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+<style>
+/* ══════════════════════════════════════════════════════
+   DESIGN TOKENS
+══════════════════════════════════════════════════════ */
+:root {
+  --navy:      #0f172a;
+  --navy2:     #1e293b;
+  --navy3:     #334155;
+  --blue:      #2563eb;
+  --blue2:     #3b82f6;
+  --blue3:     #60a5fa;
+  --green:     #059669;
+  --amber:     #d97706;
+  --red:       #dc2626;
+  --bg:        #f1f5f9;
+  --bg2:       #e2e8f0;
+  --surface:   #ffffff;
+  --border:    #e2e8f0;
+  --text:      #0f172a;
+  --muted:     #64748b;
+  --r:         12px;
+  --sha:       0 4px 24px rgba(15,23,42,.12);
+  --sha2:      0 1px 4px rgba(15,23,42,.07);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);}
 
-        header { background: var(--primary); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        main { display: grid; grid-template-columns: 400px 1fr; gap: 1rem; padding: 1rem; flex: 1; overflow: hidden; }
+/* ══════════════════════════════════════════════════════
+   SPA VIEWS
+══════════════════════════════════════════════════════ */
+.view{display:none;height:100vh;overflow:hidden;}
+.view.active{display:flex;flex-direction:column;}
+#view-lab{flex-direction:row !important;}
 
-        .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .card-header { padding: 0.75rem 1rem; background: #f8fafc; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0; }
-        .card-body { padding: 1.25rem; overflow-y: auto; flex: 1; }
+/* ══════════════════════════════════════════════════════
+   HOME
+══════════════════════════════════════════════════════ */
+#view-home{
+  background:linear-gradient(135deg,#0f172a 0%,#1b3560 50%,#0f172a 100%);
+  align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+#view-home::before{
+  content:"";position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(37,99,235,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(37,99,235,.07) 1px,transparent 1px);
+  background-size:56px 56px;
+  animation:gridScroll 25s linear infinite;
+}
+@keyframes gridScroll{from{background-position:0 0}to{background-position:56px 56px}}
+.home-glow{
+  position:absolute;pointer-events:none;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(37,99,235,.22) 0%,transparent 70%);
+}
+.home-glow.a{width:700px;height:700px;top:-200px;left:-200px;}
+.home-glow.b{width:500px;height:500px;bottom:-100px;right:-100px;}
 
-        .input-group { margin-bottom: 1rem; }
-        label { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 0.4rem; color: #475569; text-transform: uppercase; }
-        input { width: 100%; padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; transition: 0.2s; }
-        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-        
-        .btn-main { background: var(--accent); color: white; border: none; width: 100%; padding: 0.9rem; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
-        .btn-main:hover { background: #1d4ed8; transform: translateY(-1px); }
+.home-card{
+  position:relative;z-index:2;
+  max-width:700px;width:92%;
+  padding:50px 56px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:24px;
+  backdrop-filter:blur(18px);
+  box-shadow:0 32px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);
+  text-align:center;
+}
+.home-eyebrow{
+  display:inline-block;
+  font-size:.64rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--blue3);
+  background:rgba(37,99,235,.15);
+  border:1px solid rgba(96,165,250,.25);
+  border-radius:999px;padding:4px 14px;margin-bottom:22px;
+}
+.home-title{
+  font-size:clamp(1.9rem,3.8vw,3rem);
+  font-weight:800;line-height:1.08;letter-spacing:-.045em;color:#fff;margin-bottom:8px;
+}
+.home-title .accent{color:var(--blue2);}
+.home-sub{font-size:.95rem;color:rgba(255,255,255,.5);margin-bottom:5px;}
+.home-course{font-size:.72rem;color:rgba(255,255,255,.3);margin-bottom:34px;}
 
-        /* Panel de Diagnóstico */
-        .status-msg { padding: 1.25rem; border-radius: 10px; font-size: 0.85rem; line-height: 1.5; margin-top: 1rem; border: 1px solid transparent; }
-        .status-msg.ok { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
-        .status-msg.warn { background: #fffbeb; color: #92400e; border-color: #fde68a; }
-        .status-msg.err { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
-        .deriv-box { margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.5); border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); }
+.members-card{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--r);
+  padding:14px 20px;margin-bottom:30px;
+}
+.members-lbl{
+  font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;
+  color:rgba(255,255,255,.35);font-weight:700;margin-bottom:10px;
+}
+.members-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;}
+.mchip{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(37,99,235,.13);
+  border:1px solid rgba(96,165,250,.18);
+  border-radius:999px;padding:5px 12px;
+  font-size:.72rem;font-weight:500;color:rgba(255,255,255,.75);
+}
+.mchip .av{
+  width:19px;height:19px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--blue),var(--blue3));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.52rem;font-weight:800;color:#fff;
+}
 
-        /* Gráfico y Tooltip */
-        .viz-panel { position: relative; }
-        canvas { width: 100%; height: 100%; background: white; cursor: crosshair; }
-        #formula-overlay { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); padding: 1.25rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; pointer-events: none; min-width: 250px; }
+.home-btns{display:flex;gap:12px;justify-content:center;}
+.hbtn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 26px;border-radius:var(--r);
+  font-size:.84rem;font-weight:700;cursor:pointer;border:none;
+  transition:all .2s cubic-bezier(.4,0,.2,1);
+  letter-spacing:-.01em;
+}
+.hbtn-primary{
+  background:var(--blue);color:#fff;
+  box-shadow:0 0 0 0 rgba(37,99,235,.5);
+}
+.hbtn-primary:hover{background:var(--blue2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,.55);}
+.hbtn-ghost{
+  background:rgba(255,255,255,.07);color:rgba(255,255,255,.82);
+  border:1px solid rgba(255,255,255,.12);
+}
+.hbtn-ghost:hover{background:rgba(255,255,255,.12);transform:translateY(-2px);}
 
-        .slider-box { padding: 1.25rem; background: white; border-top: 1px solid #e2e8f0; }
-        .comparison-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
-        .comp-card { padding: 0.8rem; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; }
-        .comp-card b { font-family: 'JetBrains Mono', monospace; font-size: 1rem; }
-    </style>
+/* ══════════════════════════════════════════════════════
+   TOPBAR (shared by Teoría)
+══════════════════════════════════════════════════════ */
+.top-bar{
+  height:50px;flex-shrink:0;
+  background:var(--navy);
+  display:flex;align-items:center;padding:0 24px;gap:14px;
+  box-shadow:var(--sha);
+}
+.back-btn{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;color:rgba(255,255,255,.75);
+  font-size:.72rem;font-weight:600;padding:5px 11px;cursor:pointer;transition:.16s;
+}
+.back-btn:hover{background:rgba(255,255,255,.13);color:#fff;}
+.top-title{font-size:.8rem;font-weight:700;color:rgba(255,255,255,.88);letter-spacing:-.01em;}
+.top-badge{
+  margin-left:auto;font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--blue3);background:rgba(37,99,235,.2);
+  border:1px solid rgba(96,165,250,.3);border-radius:999px;padding:3px 10px;
+}
+
+/* ══════════════════════════════════════════════════════
+   TEORÍA
+══════════════════════════════════════════════════════ */
+.teoria-body{
+  flex:1;overflow-y:auto;
+  padding:28px 36px;
+  display:flex;flex-direction:column;gap:18px;
+  max-width:860px;margin:0 auto;width:100%;
+}
+.tcard{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);box-shadow:var(--sha2);overflow:hidden;
+}
+.tcard-head{
+  padding:11px 18px;background:#f8fafc;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:9px;
+}
+.tcard-icon{
+  width:26px;height:26px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;
+}
+.tcard-head h2{font-size:.76rem;font-weight:700;color:var(--navy3);text-transform:uppercase;letter-spacing:.07em;}
+.tcard-body{padding:18px 22px;}
+.tcard-body p{font-size:.85rem;color:#334155;line-height:1.75;margin-bottom:9px;}
+.tcard-body p:last-child{margin-bottom:0;}
+
+.theorem-block{
+  background:linear-gradient(135deg,#eff6ff,#dbeafe);
+  border:1px solid #93c5fd;border-radius:var(--r);
+  padding:18px 22px;position:relative;margin-bottom:12px;
+}
+.theorem-block::before{
+  content:"";position:absolute;left:0;top:10%;bottom:10%;
+  width:4px;background:var(--blue);border-radius:4px;
+}
+.th-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;}
+.theorem-formula{text-align:center;margin:10px 0;}
+
+.hypo-list{list-style:none;display:flex;flex-direction:column;gap:9px;}
+.hypo-list li{display:flex;gap:10px;align-items:flex-start;font-size:.83rem;color:#334155;line-height:1.6;}
+.hypo-list li::before{
+  content:"";flex-shrink:0;width:6px;height:6px;border-radius:50%;
+  background:var(--blue);margin-top:7px;
+}
+
+.step-block{
+  background:#f8fafc;border:1px solid var(--border);
+  border-radius:10px;padding:13px 17px;margin-bottom:9px;
+}
+.step-hdr{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.step-num{
+  width:20px;height:20px;border-radius:50%;background:var(--blue);
+  color:#fff;font-size:.62rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.step-label{font-size:.74rem;font-weight:700;color:var(--navy3);}
+.step-body{font-size:.83rem;color:#475569;line-height:1.7;}
+.step-math{text-align:center;margin:7px 0;}
+
+.concl-block{
+  background:linear-gradient(135deg,#f0fdf4,#dcfce7);
+  border:1px solid #86efac;border-radius:10px;
+  padding:13px 17px;display:flex;gap:9px;align-items:flex-start;
+  font-size:.84rem;color:#166534;line-height:1.65;
+}
+.concl-block .ck{font-size:1rem;flex-shrink:0;margin-top:2px;}
+
+.warn-block{
+  background:#fefce8;border:1px solid #fde68a;border-radius:10px;
+  padding:12px 16px;font-size:.79rem;color:#92400e;line-height:1.65;margin-top:10px;
+}
+
+.indet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.indet-cell{padding:12px 16px;border-radius:10px;}
+.indet-cell.blue{background:#eff6ff;border:1px solid #bfdbfe;}
+.indet-cell.green{background:#f0fdf4;border:1px solid #bbf7d0;}
+.indet-cell-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;}
+.indet-cell.blue .indet-cell-label{color:var(--blue);}
+.indet-cell.green .indet-cell-label{color:var(--green);}
+.indet-cell-body{font-size:.79rem;line-height:1.75;}
+.indet-cell.blue .indet-cell-body{color:#1e40af;}
+.indet-cell.green .indet-cell-body{color:#166534;}
+
+/* ══════════════════════════════════════════════════════
+   LAB SIDEBAR
+══════════════════════════════════════════════════════ */
+.lab-sidebar{
+  width:360px;flex-shrink:0;
+  background:var(--navy);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sidebar-top{
+  padding:12px 16px 10px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  flex-shrink:0;display:flex;align-items:center;gap:8px;
+}
+.s-logo{font-size:.84rem;font-weight:800;letter-spacing:-.02em;color:#fff;}
+.s-logo span{color:var(--blue2);}
+.s-logo small{font-size:.48rem;vertical-align:middle;opacity:.45;}
+.s-scroll{
+  flex:1;overflow-y:auto;
+  padding:12px 13px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.s-scroll::-webkit-scrollbar{width:3px;}
+.s-scroll::-webkit-scrollbar-track{background:transparent;}
+.s-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+
+.s-sec{font-size:.56rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.28);padding:0 3px;margin-top:4px;}
+.s-field{display:flex;flex-direction:column;gap:3px;}
+.s-lbl{font-size:.61rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);}
+.s-inp{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);
+  border-radius:8px;color:#fff;
+  font-family:'JetBrains Mono',monospace;font-size:.84rem;
+  padding:7px 10px;width:100%;transition:.15s;
+}
+.s-inp:focus{outline:none;border-color:var(--blue2);box-shadow:0 0 0 3px rgba(37,99,235,.2);background:rgba(255,255,255,.09);}
+.s-inp-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.s-sel{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);
+  border-radius:8px;color:#fff;font-size:.76rem;padding:7px 9px;
+  width:100%;cursor:pointer;transition:.15s;
+}
+.s-sel:focus{outline:none;border-color:var(--blue2);}
+.s-sel option{background:var(--navy2);color:#fff;}
+.s-hint{font-size:.64rem;color:rgba(255,255,255,.25);line-height:1.55;}
+.s-hint code{background:rgba(255,255,255,.07);border-radius:3px;padding:1px 4px;font-family:monospace;}
+
+.s-calc{
+  background:var(--blue);color:#fff;border:none;border-radius:9px;
+  padding:10px;font-size:.8rem;font-weight:700;
+  cursor:pointer;transition:.2s;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.s-calc:hover{background:var(--blue2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(37,99,235,.45);}
+.s-calc:active{transform:translateY(0);}
+
+/* Diagnostic box */
+.diag-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;}
+.diag-box-head{
+  padding:7px 12px;background:rgba(255,255,255,.04);
+  border-bottom:1px solid rgba(255,255,255,.05);
+  font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);
+}
+.diag-box-body{padding:9px 11px;display:flex;flex-direction:column;gap:6px;}
+.diag-idle{font-size:.73rem;color:rgba(255,255,255,.22);text-align:center;padding:10px 0;font-style:italic;}
+
+/* Diag step */
+.ds{border-radius:8px;padding:8px 10px;font-size:.73rem;line-height:1.6;border:1px solid transparent;color:rgba(255,255,255,.82);}
+.ds.info{background:rgba(37,99,235,.12);border-color:rgba(37,99,235,.25);}
+.ds.ok  {background:rgba(5,150,105,.12);border-color:rgba(5,150,105,.3);color:rgba(134,239,172,.88);}
+.ds.warn{background:rgba(217,119,6,.12);border-color:rgba(217,119,6,.3);color:rgba(253,230,138,.88);}
+.ds.err {background:rgba(220,38,38,.12);border-color:rgba(220,38,38,.3);color:rgba(252,165,165,.88);}
+.ds-head{font-weight:700;display:flex;align-items:center;gap:5px;margin-bottom:4px;font-size:.74rem;}
+.ds-num{
+  width:16px;height:16px;border-radius:50%;flex-shrink:0;
+  background:rgba(37,99,235,.65);color:#fff;
+  font-size:.52rem;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+}
+.ds-num.g{background:rgba(5,150,105,.65);}
+.ds-line{margin:2px 0;font-size:.71rem;opacity:.92;}
+.ds-math{margin:5px 0 2px;text-align:center;}
+.ds-concl{margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.08);font-weight:700;font-size:.75rem;}
+
+/* Result & Error strips */
+.res-strip{
+  background:linear-gradient(135deg,rgba(37,99,235,.2),rgba(37,99,235,.08));
+  border:1px solid rgba(37,99,235,.3);border-radius:9px;
+  padding:10px 13px;text-align:center;
+}
+.res-strip .rs-lbl{font-size:.56rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.38);font-weight:700;margin-bottom:4px;}
+.res-strip .rs-val{font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.03em;}
+.res-strip .rs-sub{font-size:.62rem;color:rgba(255,255,255,.38);margin-top:2px;}
+.err-strip{
+  background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.28);
+  border-radius:9px;padding:9px 12px;
+  font-size:.73rem;color:rgba(252,165,165,.88);line-height:1.5;
+}
+
+.s-footer{padding:9px 13px;border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;}
+.s-back{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;color:rgba(255,255,255,.5);
+  font-size:.7rem;font-weight:600;padding:8px;cursor:pointer;transition:.16s;width:100%;
+}
+.s-back:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.75);}
+
+/* ══════════════════════════════════════════════════════
+   LAB RIGHT
+══════════════════════════════════════════════════════ */
+.lab-right{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+
+.r-topbar{
+  height:46px;flex-shrink:0;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 18px;gap:12px;
+  box-shadow:var(--sha2);
+}
+.r-title{font-size:.76rem;font-weight:700;color:var(--navy3);text-transform:uppercase;letter-spacing:.07em;}
+.legend-row{display:flex;gap:10px;margin-left:auto;}
+.leg{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--muted);font-weight:500;}
+.leg-line{width:22px;height:2.5px;border-radius:3px;}
+.leg-dash{width:22px;height:1px;border-radius:1px;border-top:2px dashed;}
+
+.canvas-wrap{flex:1;position:relative;overflow:hidden;min-height:0;}
+canvas{display:block;width:100%;height:100%;}
+
+/* Formula overlay */
+#formula-overlay{
+  display:none;position:absolute;top:12px;right:12px;
+  background:rgba(255,255,255,.97);backdrop-filter:blur(10px);
+  padding:14px 18px;border-radius:var(--r);
+  box-shadow:var(--sha);border:1px solid var(--border);
+  pointer-events:none;min-width:230px;
+}
+#formula-overlay .ovl-lbl{font-size:.57rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:7px;}
+
+/* Tooltip */
+#tooltip{
+  position:absolute;background:var(--navy);color:#fff;
+  padding:6px 10px;border-radius:7px;font-size:.7rem;
+  pointer-events:none;display:none;z-index:100;
+  box-shadow:var(--sha);white-space:nowrap;
+}
+
+/* Bottom bar */
+.lab-bottom{
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:11px 18px;flex-shrink:0;
+  box-shadow:0 -1px 4px rgba(0,0,0,.04);
+}
+.sl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.sl-head span{font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+#x_label{
+  font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:700;color:var(--blue);
+  background:rgba(37,99,235,.08);padding:2px 9px;border-radius:6px;
+}
+#x_slider{width:100%;height:4px;accent-color:var(--blue);cursor:pointer;margin-bottom:10px;}
+
+.metrics-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.mc{
+  padding:9px 12px;border-radius:10px;
+  border:1px solid var(--border);background:var(--bg);
+  text-align:center;
+}
+.mc:last-child{border-color:rgba(37,99,235,.3);background:rgba(37,99,235,.04);}
+.mc-lbl{
+  min-height:20px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:4px;font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);
+}
+.mc-val{font-family:'JetBrains Mono',monospace;font-size:.9rem;font-weight:700;color:var(--text);}
+.mc:last-child .mc-val{color:var(--blue);}
+
+/* Scrollbars */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:10px;}
+
+/* KaTeX */
+.katex{font-size:1em;}
+.katex-display{margin:.15em 0 !important;}
+</style>
 </head>
 <body>
 
-<header>
-    <div style="font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px;">L'HÔPITAL <span style="color: var(--accent);">LAB</span> <small style="font-size: 0.6rem; vertical-align: middle; opacity: 0.7;">PRO V3</small></div>
-    <div style="font-size: 0.75rem; font-weight: 500; opacity: 0.9;">Proyecto Final: MAT-129 | Ingeniería</div>
-</header>
+<!-- ════════ HOME ════════ -->
+<div class="view active" id="view-home">
+  <div class="home-glow a"></div>
+  <div class="home-glow b"></div>
+  <div class="home-card">
+    <span class="home-eyebrow">Proyecto Final · MAT-129 · PUCMM</span>
+    <h1 class="home-title">L'Hôpital <span class="accent">Lab</span><br>Ingeniería en el Límite</h1>
+    <p class="home-sub">Una exploración interactiva y pedagógica de la Regla de L'Hôpital</p>
+    <p class="home-course">Cálculo Diferencial · Ingeniería en Ciencias de la Computación</p>
 
-<main>
-    <!-- Panel de Control -->
-    <div class="card">
-        <div class="card-header">Panel de Diagnóstico Matemático</div>
-        <div class="card-body">
-            <div class="input-group">
-                <label>Numerador f(x)</label>
-                <input type="text" id="f_input" value="sin(x)" spellcheck="false">
-            </div>
-            <div class="input-group">
-                <label>Denominador g(x)</label>
-                <input type="text" id="g_input" value="x" spellcheck="false">
-            </div>
-            <div class="input-group">
-                <label>Punto a</label>
-                <input type="text" id="a_input" value="0" spellcheck="false">
-            </div>
-            <button class="btn-main" onclick="validateAndCalculate()">Analizar con Regla de L'Hôpital</button>
-
-            <div id="diagnostico"></div>
-        </div>
+    <div class="members-card">
+      <div class="members-lbl">Integrantes del equipo</div>
+      <div class="members-chips" id="members-chips"></div>
     </div>
 
-    <!-- Panel de Visualización -->
-    <div class="card viz-panel">
-        <div class="card-header">Convergencia de f/g y f'/g'</div>
-        <canvas id="canvas"></canvas>
-        <div id="formula-overlay"></div>
-        
-        <div class="slider-box">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.6rem;">
-                <label style="margin:0">Exploración en el entorno de a</label>
-                <span id="x_label" style="font-family: monospace; font-weight: bold; color: var(--accent);">x = 0.500</span>
-            </div>
-            <input type="range" id="x_slider" min="-1" max="1" step="0.001">
-            
-            <div class="comparison-container">
-                <div class="comp-card" style="border-left: 4px solid var(--accent);">
-                    <div style="font-size: 0.6rem; color: #64748b; margin-bottom: 4px;">f(x) / g(x)</div>
-                    <b id="val_orig">-</b>
-                </div>
-                <div class="comp-card" style="border-left: 4px solid var(--success);">
-                    <div style="font-size: 0.6rem; color: #64748b; margin-bottom: 4px;">f'(x) / g'(x)</div>
-                    <b id="val_deriv">-</b>
-                </div>
-            </div>
-        </div>
+    <div class="home-btns">
+      <button class="hbtn hbtn-ghost" onclick="navigate('teoria')">
+        📖 &nbsp;Explorar Teoría
+      </button>
+      <button class="hbtn hbtn-primary" onclick="navigate('lab')">
+        ⚗️ &nbsp;Ir al Laboratorio
+      </button>
     </div>
-</main>
+  </div>
+</div>
+
+<!-- ════════ TEORÍA ════════ -->
+<div class="view" id="view-teoria">
+  <div class="top-bar">
+    <button class="back-btn" onclick="navigate('home')">← Volver</button>
+    <span class="top-title">L'Hôpital Lab · Marco Teórico</span>
+    <span class="top-badge">MAT-129</span>
+  </div>
+
+  <div class="teoria-body">
+
+    <!-- Definición -->
+    <div class="tcard">
+      <div class="tcard-head">
+        <div class="tcard-icon" style="background:#eff6ff;">📐</div>
+        <h2>Definición Formal del Teorema</h2>
+      </div>
+      <div class="tcard-body">
+        <div class="theorem-block">
+          <div class="th-label">Regla de L'Hôpital — Guillaume de l'Hôpital (1696)</div>
+          <p style="font-size:.82rem;color:#1e3a8a;margin-bottom:10px;">
+            Sean <em>f</em> y <em>g</em> funciones diferenciables en un entorno de <em>a</em> (excepto posiblemente en <em>a</em>). Si se cumplen las hipótesis:
+          </p>
+          <div class="theorem-formula" id="thm-formula"></div>
+          <p style="font-size:.74rem;color:#1e40af;margin-top:8px;text-align:center;">
+            siempre que el límite del lado derecho exista (finito o infinito).
+          </p>
+        </div>
+        <p>La regla se aplica iterativamente: si tras derivar el cociente sigue siendo indeterminado, se vuelven a derivar <em>f</em> y <em>g</em> hasta obtener convergencia.</p>
+      </div>
+    </div>
+
+    <!-- Hipótesis -->
+    <div class="tcard">
+      <div class="tcard-head">
+        <div class="tcard-icon" style="background:#fefce8;">⚠️</div>
+        <h2>Hipótesis del Teorema</h2>
+      </div>
+      <div class="tcard-body">
+        <ul class="hypo-list">
+          <li><em>f</em> y <em>g</em> son diferenciables en un entorno abierto de <em>a</em>, excepto posiblemente en <em>a</em> mismo.</li>
+          <li>El cociente presenta una indeterminación <span id="hypo-00"></span> o <span id="hypo-ii"></span> cuando <em>x</em> tiende a <em>a</em>.</li>
+          <li>La derivada del denominador <span id="hypo-gp"></span> en ese entorno (excepto quizás en <em>a</em>).</li>
+          <li>El límite <span id="hypo-lim"></span> existe — puede ser finito, +∞ o −∞.</li>
+        </ul>
+        <div class="warn-block">
+          <strong>⚠ Advertencia crítica:</strong> Usar L'Hôpital sin verificar la indeterminación es un error conceptual grave. Si f(a)/g(a) no es 0/0 ni ∞/∞, la regla no aplica y el resultado sería incorrecto.
+        </div>
+      </div>
+    </div>
+
+    <!-- Ejemplo -->
+    <div class="tcard">
+      <div class="tcard-head">
+        <div class="tcard-icon" style="background:#f0fdf4;">✏️</div>
+        <h2>Ejemplo Resuelto: <span id="ex-title-inline" style="font-weight:500;"></span></h2>
+      </div>
+      <div class="tcard-body">
+        <p>Resolvemos el límite fundamental trigonométrico con L'Hôpital.</p>
+
+        <div class="step-block">
+          <div class="step-hdr"><div class="step-num">1</div><div class="step-label">Verificar la indeterminación</div></div>
+          <div class="step-body">
+            Evaluamos en <em>x</em> = 0:
+            <div class="step-math" id="ex-step1"></div>
+            El resultado 0/0 confirma la indeterminación. ✓
+          </div>
+        </div>
+
+        <div class="step-block">
+          <div class="step-hdr"><div class="step-num">2</div><div class="step-label">Derivar numerador y denominador por separado</div></div>
+          <div class="step-body">
+            <div class="step-math" id="ex-step2"></div>
+          </div>
+        </div>
+
+        <div class="step-block">
+          <div class="step-hdr"><div class="step-num">3</div><div class="step-label">Aplicar L'Hôpital y evaluar</div></div>
+          <div class="step-body">
+            <div class="step-math" id="ex-step3"></div>
+            Ahora la sustitución directa funciona: cos(0) = 1.
+          </div>
+        </div>
+
+        <div class="concl-block">
+          <span class="ck">✓</span>
+          <div>
+            <div id="ex-concl"></div>
+            <div style="margin-top:5px;font-size:.78rem;">Este es el límite fundamental del cálculo trigonométrico, confirmado en <strong>una sola iteración</strong> de L'Hôpital.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tipos -->
+    <div class="tcard">
+      <div class="tcard-head">
+        <div class="tcard-icon" style="background:#fdf4ff;">🔬</div>
+        <h2>Tipos de Indeterminación</h2>
+      </div>
+      <div class="tcard-body">
+        <div class="indet-grid">
+          <div class="indet-cell blue">
+            <div class="indet-cell-label">Formas directas (L'Hôpital aplica)</div>
+            <div class="indet-cell-body" id="indet-direct"></div>
+          </div>
+          <div class="indet-cell green">
+            <div class="indet-cell-label">Reducibles (transformar primero)</div>
+            <div class="indet-cell-body">
+              0·∞ → reorganizar como cociente<br>
+              ∞ − ∞ → factorizar o racionalizar<br>
+              0⁰, 1^∞, ∞⁰ → logaritmo + L'Hôpital
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:16px;"></div>
+  </div>
+</div>
+
+<!-- ════════ LABORATORIO ════════ -->
+<div class="view" id="view-lab">
+
+  <!-- Sidebar -->
+  <aside class="lab-sidebar">
+    <div class="sidebar-top">
+      <div class="s-logo">L'HÔPITAL <span>LAB</span> <small>PRO</small></div>
+      <div style="margin-left:auto;font-size:.55rem;color:rgba(255,255,255,.28);font-weight:700;">MAT-129</div>
+    </div>
+
+    <div class="s-scroll">
+      <div class="s-field">
+        <label class="s-lbl">Ejemplo predefinido</label>
+        <select class="s-sel" id="preset-sel">
+          <option value="">— Expresión propia —</option>
+          <option value="sin(x)|x|0|-4|4" selected>sin(x) / x  →  0</option>
+          <option value="exp(x)-1|x|0|-3|3">(eˣ−1) / x  →  0</option>
+          <option value="1-cos(x)|x^2|0|-3|3">(1−cos x) / x²  →  0</option>
+          <option value="x-sin(x)|x^3|0|-1.5|1.5">x − sin(x) / x³  →  0</option>
+          <option value="log(x)|x-1|1|0.1|3">ln(x) / (x−1)  →  1</option>
+          <option value="x^2-1|x-1|1|-1|4">(x²−1) / (x−1)  →  1</option>
+          <option value="x|exp(x)|inf|0|14">x / eˣ  →  +∞</option>
+          <option value="tan(x)-x|x^3|0|-1.3|1.3">tan(x)−x / x³  →  0</option>
+        </select>
+      </div>
+
+      <span class="s-sec">Funciones</span>
+      <div class="s-field">
+        <label class="s-lbl">Numerador f(x)</label>
+        <input class="s-inp" type="text" id="f_input" value="sin(x)" spellcheck="false" autocomplete="off" />
+      </div>
+      <div class="s-field">
+        <label class="s-lbl">Denominador g(x)</label>
+        <input class="s-inp" type="text" id="g_input" value="x" spellcheck="false" autocomplete="off" />
+      </div>
+      <div class="s-field">
+        <label class="s-lbl">Punto a <span style="opacity:.45;font-size:.9em;">(número o "inf")</span></label>
+        <input class="s-inp" type="text" id="a_input" value="0" spellcheck="false" />
+      </div>
+      <div class="s-inp-row">
+        <div class="s-field">
+          <label class="s-lbl">x mín</label>
+          <input class="s-inp" type="number" id="xmin_input" value="-4" step="any" />
+        </div>
+        <div class="s-field">
+          <label class="s-lbl">x máx</label>
+          <input class="s-inp" type="number" id="xmax_input" value="4" step="any" />
+        </div>
+      </div>
+      <p class="s-hint">
+        Potencia: <code>^</code> · Logaritmo natural: <code>log</code> o <code>ln</code> · Funciones: <code>sin</code> <code>cos</code> <code>exp</code>
+      </p>
+
+      <button class="s-calc" id="calc-btn">⟹ &nbsp;Calcular Límite</button>
+
+      <span class="s-sec">Diagnóstico</span>
+      <div class="diag-box">
+        <div class="diag-box-head">Evaluación paso a paso</div>
+        <div class="diag-box-body" id="diag-out">
+          <div class="diag-idle">Presiona "Calcular Límite" para iniciar el análisis.</div>
+        </div>
+      </div>
+
+      <div id="result-strip" style="display:none;"></div>
+      <div id="err-strip" style="display:none;"></div>
+    </div>
+
+    <div class="s-footer">
+      <button class="s-back" onclick="navigate('home')">← Volver a la Portada</button>
+    </div>
+  </aside>
+
+  <!-- Right panel -->
+  <div class="lab-right">
+    <div class="r-topbar">
+      <span class="r-title">Convergencia de f/g y f'/g'</span>
+      <div class="legend-row">
+        <span class="leg"><span class="leg-line" style="background:#2563eb"></span>f(x)/g(x)</span>
+        <span class="leg"><span class="leg-line" style="background:#059669"></span>f'(x)/g'(x)</span>
+        <span class="leg"><span class="leg-dash" style="border-color:#d97706"></span>Límite L</span>
+      </div>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="canvas"></canvas>
+      <div id="formula-overlay">
+        <div class="ovl-lbl">Resultado L'Hôpital</div>
+        <div id="ovl-math"></div>
+      </div>
+      <div id="tooltip"></div>
+    </div>
+
+    <div class="lab-bottom">
+      <div class="sl-head">
+        <span>Exploración en el entorno de <em>a</em></span>
+        <span id="x_label">x = —</span>
+      </div>
+      <input type="range" id="x_slider" min="-4" max="4" step="0.001" value="0.5" />
+      <div class="metrics-row">
+        <div class="mc">
+          <div class="mc-lbl" id="mc0"></div>
+          <div class="mc-val" id="val_orig">—</div>
+        </div>
+        <div class="mc">
+          <div class="mc-lbl" id="mc1"></div>
+          <div class="mc-val" id="val_deriv">—</div>
+        </div>
+        <div class="mc">
+          <div class="mc-lbl">Límite exacto</div>
+          <div class="mc-val" id="val_limit">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
-    const state = {
-        f_raw: "", g_raw: "", df_sym: null, dg_sym: null,
-        a: 0, aStr: "0", limit: 0,
-        compiled: { f: null, g: null, df: null, dg: null }
-    };
+"use strict";
 
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
+/* ── Config ──────────────────────────────────────── */
+const MEMBERS = [
+  "Carlos Rodríguez",
+  "Integrante B",
+  "Integrante C",
+];
 
-    function validateAndCalculate() {
-        const diag = document.getElementById('diagnostico');
-        state.f_raw = document.getElementById('f_input').value;
-        state.g_raw = document.getElementById('g_input').value;
-        state.aStr = document.getElementById('a_input').value;
+/* ── Router ──────────────────────────────────────── */
+function navigate(view) {
+  ["home","teoria","lab"].forEach(v => {
+    document.getElementById("view-"+v).classList.toggle("active", v===view);
+  });
+  if (view==="lab") requestAnimationFrame(()=>requestAnimationFrame(drawPlot));
+  if (view==="teoria") renderTeoria();
+}
 
-        // Limpiar estado previo
-        diag.innerHTML = "";
+/* ── KaTeX ───────────────────────────────────────── */
+function waitK(fn) {
+  if (window.__katexReady && window.katex) fn();
+  else setTimeout(()=>waitK(fn), 50);
+}
+function K(tex, node, display) {
+  if (!node) return;
+  try { katex.render(tex, node, {throwOnError:false, displayMode:!!display}); }
+  catch(_) { node.textContent = tex; }
+}
 
-        try {
-            // 1. Parseo y validación de sintaxis
-            const f_node = nerdamer(state.f_raw);
-            const g_node = nerdamer(state.g_raw);
-            state.a = state.aStr === 'inf' ? 1000 : parseFloat(state.aStr);
+/* ── Members ─────────────────────────────────────── */
+function buildMembers() {
+  const wrap = document.getElementById("members-chips");
+  MEMBERS.forEach(m => {
+    const initials = m.split(" ").map(w=>w[0]).slice(0,2).join("");
+    const c = document.createElement("div");
+    c.className = "mchip";
+    c.innerHTML = `<div class="av">${initials}</div>${m}`;
+    wrap.appendChild(c);
+  });
+}
 
-            // 2. Evaluación de límites laterales numéricos
-            const eps = 0.0001;
-            const fa = parseFloat(nerdamer(state.f_raw, {x: state.a}).evaluate().text());
-            const ga = parseFloat(nerdamer(state.g_raw, {x: state.a}).evaluate().text());
+/* ── Teoría render ───────────────────────────────── */
+let _teoriaRendered = false;
+function renderTeoria() {
+  if (_teoriaRendered) return;
+  waitK(()=>{
+    K("\\displaystyle\\lim_{x\\to a}\\frac{f(x)}{g(x)}=\\lim_{x\\to a}\\frac{f'(x)}{g'(x)}", document.getElementById("thm-formula"), true);
+    K("\\tfrac{0}{0}", document.getElementById("hypo-00"), false);
+    K("\\tfrac{\\infty}{\\infty}", document.getElementById("hypo-ii"), false);
+    K("g'(x)\\neq 0", document.getElementById("hypo-gp"), false);
+    K("\\displaystyle\\lim_{x\\to a}\\frac{f'(x)}{g'(x)}", document.getElementById("hypo-lim"), false);
+    K("\\displaystyle\\lim_{x\\to 0}\\frac{\\sin x}{x}", document.getElementById("ex-title-inline"), false);
+    K("\\dfrac{\\sin(0)}{0}=\\dfrac{0}{0}", document.getElementById("ex-step1"), true);
+    K("f(x)=\\sin x\\;\\Rightarrow\\;f'(x)=\\cos x\\qquad g(x)=x\\;\\Rightarrow\\;g'(x)=1", document.getElementById("ex-step2"), true);
+    K("\\lim_{x\\to 0}\\frac{\\sin x}{x}\\;=\\;\\lim_{x\\to 0}\\frac{\\cos x}{1}\\;=\\;\\frac{\\cos 0}{1}\\;=\\;1", document.getElementById("ex-step3"), true);
+    K("\\therefore\\quad\\lim_{x\\to 0}\\dfrac{\\sin x}{x}=1", document.getElementById("ex-concl"), true);
+    K("\\dfrac{0}{0}\\quad\\text{y}\\quad\\dfrac{\\infty}{\\infty}", document.getElementById("indet-direct"), true);
+    _teoriaRendered = true;
+  });
+}
 
-            // 3. Verificación de Hipótesis (Indeterminación)
-            const isIndeterminate = (Math.abs(fa) < 0.02 && Math.abs(ga) < 0.02) || 
-                                     (Math.abs(fa) > 50 && Math.abs(ga) > 50);
+/* ── Lab State ───────────────────────────────────── */
+const ST = {
+  ready:false, fRaw:"sin(x)", gRaw:"x",
+  aStr:"0", aNum:0, aIsInf:false,
+  xMin:-4, xMax:4,
+  fFn:null, gFn:null,
+  dfFns:[], dgFns:[],
+  dfSyms:[], dgSyms:[],
+  limitVal:null, hops:0,
+};
 
-            if (!isIndeterminate) {
-                diag.innerHTML = `
-                    <div class="status-msg warn">
-                        <b>Hipótesis no cumplida:</b> No se detecta indeterminación $\\frac{0}{0}$ o $\\frac{\\infty}{\\infty}$.<br>
-                        Evaluación directa: $f(a)/g(a) \\approx ${(fa/ga).toFixed(4)}$.<br>
-                        <i>La Regla de L'Hôpital no es aplicable.</i>
-                    </div>`;
-                renderLaTeX(false);
-            } else {
-                // 4. Proceso Simbólico
-                state.df_sym = nerdamer.diff(state.f_raw, 'x');
-                state.dg_sym = nerdamer.diff(state.g_raw, 'x');
-                
-                state.compiled.f = nerdamer(state.f_raw).buildFunction(['x']);
-                state.compiled.g = nerdamer(state.g_raw).buildFunction(['x']);
-                state.compiled.df = state.df_sym.buildFunction(['x']);
-                state.compiled.dg = state.dg_sym.buildFunction(['x']);
+/* ── Math helpers ────────────────────────────────── */
+function norm(s){ return (s||"").trim().replace(/\*\*/g,"^").replace(/\bln\s*\(/gi,"log("); }
+function parseA(str){
+  const s=(str||"").trim().toLowerCase();
+  if(["inf","+inf","infinity","+infinity","∞"].includes(s)) return {value:1e9,isInf:true};
+  const n=parseFloat(s.replace(",","."));
+  if(!isFinite(n)) throw new Error("Punto 'a' inválido. Usa un número o 'inf'.");
+  return {value:n,isInf:false};
+}
+function nEval(expr,x){
+  try{const v=nerdamer(norm(expr),{x:String(x)}).evaluate().text();const n=parseFloat(v);return isFinite(n)?n:NaN;}catch(_){return NaN;}
+}
+function buildFn(expr){
+  try{const fn=nerdamer(norm(expr)).buildFunction(["x"]);return x=>{try{const v=fn(x);return isFinite(v)?v:NaN;}catch(_){return NaN;}};}
+  catch(_){return ()=>NaN;}
+}
+function diffStr(expr){
+  const e=norm(expr);
+  try{if(typeof nerdamer.diff==="function") return nerdamer.diff(nerdamer(e),"x").text();}catch(_){}
+  try{return nerdamer("diff("+e+",x)").text();}catch(err){throw new Error("No se pudo derivar '"+e+"'");}
+}
+function ratio(f,g){return x=>{const fv=f(x),gv=g(x);return(isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300)?fv/gv:NaN;};}
+function fmt(n,p=6){
+  if(!isFinite(n)) return "—";
+  if(Math.abs(n)<1e-11&&n!==0) return "≈ 0";
+  if(Math.abs(n)>5e7) return n>0?"+∞":"−∞";
+  return +n.toPrecision(p)+"";
+}
 
-                const testX = state.aStr === 'inf' ? 1000000 : state.a + 0.000001;
-                state.limit = state.compiled.df(testX) / state.compiled.dg(testX);
+/* ── Indetermination check ───────────────────────── */
+function checkIndet(F,G,a,isInf){
+  if(isInf){const f=nEval(F,1e8),g=nEval(G,1e8);return{ok:Math.abs(f)>1e4&&Math.abs(g)>1e4};}
+  const h=1e-6;
+  const f1=nEval(F,a+h),g1=nEval(G,a+h),f2=nEval(F,a-h),g2=nEval(G,a-h);
+  const sm=z=>Math.abs(z)<5e-4, bg=z=>Math.abs(z)>1e4;
+  return{ok:(sm(f1)&&sm(g1))||(sm(f2)&&sm(g2))||(bg(f1)&&bg(g1))||(bg(f2)&&bg(g2))};
+}
 
-                diag.innerHTML = `
-                    <div class="status-msg ok">
-                        <b>✓ Indeterminación confirmada.</b><br>
-                        Aplicando Regla de L'Hôpital:<br>
-                        <div class="deriv-box">
-                            $f'(x) = ${state.df_sym.toTeX()}$<br>
-                            $g'(x) = ${state.dg_sym.toTeX()}$
-                        </div>
-                        <b>Veredicto:</b> El límite existe y es igual a <b>${state.limit.toFixed(4)}</b> gracias a la Regla de L'Hôpital.
-                    </div>`;
-                
-                renderLaTeX(true);
-                setupSlider();
-            }
-            // Renderizar LaTeX en el diagnóstico
-            diag.querySelectorAll('.status-msg').forEach(el => {
-                const text = el.innerHTML;
-                el.innerHTML = text.replace(/\$(.*?)\$/g, (m, tex) => katex.renderToString(tex));
-            });
+/* ── Diagnostic renderer ─────────────────────────── */
+function renderDiag(steps){
+  const out=document.getElementById("diag-out");
+  out.innerHTML="";
+  steps.forEach(s=>{
+    const d=document.createElement("div");
+    d.className="ds "+s.type;
+    let h=`<div class="ds-head">`;
+    if(s.num) h+=`<span class="ds-num ${s.type==="ok"?"g":""}">${s.num}</span>`;
+    else if(s.icon) h+=`<span>${s.icon}</span>`;
+    h+=`<span>${s.title}</span></div>`;
+    (s.lines||[]).forEach(l=>{h+=`<div class="ds-line">${l}</div>`;});
+    if(s.math) h+=`<div class="ds-math" data-m="${encodeURIComponent(s.math)}"></div>`;
+    (s.mlines||[]).forEach(m=>{h+=`<div class="ds-math" data-m="${encodeURIComponent(m)}"></div>`;});
+    if(s.concl) h+=`<div class="ds-concl">→ ${s.concl}</div>`;
+    d.innerHTML=h;
+    d.querySelectorAll("[data-m]").forEach(m=>{
+      waitK(()=>K(decodeURIComponent(m.getAttribute("data-m")),m,true));
+    });
+    out.appendChild(d);
+  });
+}
 
-        } catch (e) {
-            diag.innerHTML = `
-                <div class="status-msg err">
-                    <b>⚠ Error de Entrada:</b> No se pudo procesar la expresión.<br>
-                    <small>${e.message}</small><br>
-                    Asegúrate de usar 'x' como variable y sintaxis correcta (ej. x^2, sin(x)).
-                </div>`;
-        }
+/* ── Main calculation ────────────────────────────── */
+function validateAndCalculate(){
+  const resStrip=document.getElementById("result-strip");
+  const errStrip=document.getElementById("err-strip");
+  resStrip.style.display="none";
+  errStrip.style.display="none";
+  document.getElementById("formula-overlay").style.display="none";
+  document.getElementById("diag-out").innerHTML=`<div class="diag-idle">Analizando…</div>`;
+
+  ST.fRaw=norm(document.getElementById("f_input").value);
+  ST.gRaw=norm(document.getElementById("g_input").value);
+  ST.xMin=parseFloat(document.getElementById("xmin_input").value)||(-4);
+  ST.xMax=parseFloat(document.getElementById("xmax_input").value)||(4);
+  ST.ready=false; ST.limitVal=null; ST.hops=0;
+  ST.dfFns=[]; ST.dgFns=[]; ST.dfSyms=[]; ST.dgSyms=[];
+
+  try { nerdamer(ST.fRaw); nerdamer(ST.gRaw); }
+  catch(e){ showErr("Expresión inválida: "+e.message); return; }
+
+  let aInfo;
+  try { aInfo=parseA(document.getElementById("a_input").value); }
+  catch(e){ showErr(e.message); return; }
+  ST.aNum=aInfo.value; ST.aStr=document.getElementById("a_input").value.trim(); ST.aIsInf=aInfo.isInf;
+
+  ST.fFn=buildFn(ST.fRaw); ST.gFn=buildFn(ST.gRaw);
+
+  const a=ST.aNum, isInf=ST.aIsInf;
+  const lp=isInf?"\\infty":ST.aStr;
+  const steps=[];
+
+  // Evaluate f and g at a
+  let fVal,gVal;
+  if(isInf){fVal=nEval(ST.fRaw,1e8);gVal=nEval(ST.gRaw,1e8);}
+  else{
+    const h=1e-7;
+    const f1=nEval(ST.fRaw,a+h),f2=nEval(ST.fRaw,a-h);
+    const g1=nEval(ST.gRaw,a+h),g2=nEval(ST.gRaw,a-h);
+    fVal=(isFinite(f1)&&isFinite(f2))?(f1+f2)/2:(isFinite(f1)?f1:f2);
+    gVal=(isFinite(g1)&&isFinite(g2))?(g1+g2)/2:(isFinite(g1)?g1:g2);
+  }
+
+  const fSm=Math.abs(fVal)<5e-4, gSm=Math.abs(gVal)<5e-4;
+  const fBg=Math.abs(fVal)>1e4,  gBg=Math.abs(gVal)>1e4;
+  const isZZ=fSm&&gSm, isII=fBg&&gBg, isInd=isZZ||isII;
+
+  steps.push({
+    type:"info", icon:"🔍", title:`Evaluación en x → ${isInf?"∞":ST.aStr}`,
+    lines:[
+      `f(${isInf?"∞":ST.aStr}) → <strong>${isZZ?"0":(fBg?"∞":fmt(fVal))}</strong>`,
+      `g(${isInf?"∞":ST.aStr}) → <strong>${gSm?"0":(gBg?"∞":fmt(gVal))}</strong>`,
+    ]
+  });
+
+  if(!isInd){
+    if(Math.abs(gVal)<1e-9){
+      steps.push({type:"err",icon:"✗",title:"Límite diverge — L'Hôpital no aplica",
+        lines:["El denominador → 0 pero el numerador no. El límite es ±∞."]});
+      renderDiag(steps); drawPlot(); return;
     }
+    const direct=fVal/gVal;
+    steps.push({
+      type:"warn",icon:"ℹ",title:"Sin indeterminación — evaluación directa",
+      math:`\\lim_{x\\to ${lp}}\\frac{f}{g}=\\frac{${fmt(fVal)}}{${fmt(gVal)}}=${fmt(direct)}`,
+      lines:["No se cumple 0/0 ni ∞/∞. <strong>L'Hôpital no es aplicable.</strong>"],
+      concl:`Límite directo = ${fmt(direct,8)}`
+    });
+    ST.limitVal=direct; ST.hops=0;
+    ST.dfFns=[()=>NaN]; ST.dgFns=[()=>NaN];
+    finalize(steps,lp); return;
+  }
 
-    function renderLaTeX(isLHopital) {
-        const overlay = document.getElementById('formula-overlay');
-        if (!isLHopital) {
-            overlay.innerHTML = "Evaluación Directa";
-            return;
-        }
-        const tex = `
-            \\begin{aligned}
-            &\\lim_{x \\to ${state.aStr}} \\frac{f(x)}{g(x)} = \\lim_{x \\to ${state.aStr}} \\frac{${state.df_sym.toTeX()}}{${state.dg_sym.toTeX()}} \\\\
-            &\\text{Resultado: } \\mathbf{${state.limit.toFixed(4)}} \\\\
-            &\\lim_{x \\to ${state.aStr}} \\frac{f(x)}{g(x)} = ${state.limit.toFixed(4)}
-            \\end{aligned}
-        `;
-        katex.render(tex, overlay);
+  steps.push({
+    type:"info", icon:"⚡",
+    title:`Indeterminación ${isZZ?"0/0":"∞/∞"} confirmada ✓`,
+    math:`\\lim_{x\\to ${lp}}\\frac{${ST.fRaw}}{${ST.gRaw}}=\\frac{${isZZ?"0":"\\infty"}}{${isZZ?"0":"\\infty"}}`,
+    lines:["Condición de L'Hôpital cumplida. Procedemos iterativamente."]
+  });
+
+  // Iterative derivation
+  let F=ST.fRaw, G=ST.gRaw, limitVal=NaN;
+  const MAX=8;
+
+  for(let k=0;k<MAX;k++){
+    let dF,dG;
+    try{dF=diffStr(F);dG=diffStr(G);}
+    catch(e){steps.push({type:"err",icon:"✗",title:"Error al derivar",lines:[e.message]});break;}
+    if(dF==="0"&&dG==="0"){steps.push({type:"err",icon:"✗",title:"Derivadas nulas",lines:["Imposible continuar."]});break;}
+
+    ST.dfSyms.push(dF); ST.dgSyms.push(dG);
+    const dfFn=buildFn(dF), dgFn=buildFn(dG);
+    ST.dfFns.push(dfFn); ST.dgFns.push(dgFn);
+
+    steps.push({
+      type:"info", num:k+1,
+      title:`Aplicación ${k+1} de L'Hôpital`,
+      mlines:[`f^{(${k+1})}(x)=${dF}`, `g^{(${k+1})}(x)=${dG}`]
+    });
+
+    F=dF; G=dG;
+
+    const nowIndet=checkIndet(F,G,a,isInf);
+    const sx=isInf?1e8:a+(a===0?1e-7:1e-7*Math.abs(a));
+    const r=dfFn(sx)/dgFn(sx);
+
+    if(!nowIndet.ok||isFinite(r)){
+      if(isInf){
+        limitVal=dfFn(1e12)/dgFn(1e12);
+        if(!isFinite(limitVal)) limitVal=dfFn(1e9)/dgFn(1e9);
+      } else {
+        const h=1e-10;
+        const ra=dfFn(a+h)/dgFn(a+h), rb=dfFn(a-h)/dgFn(a-h);
+        limitVal=(isFinite(ra)&&isFinite(rb))?(ra+rb)/2:(isFinite(ra)?ra:rb);
+      }
+      ST.hops=k+1; break;
     }
+    limitVal=r; ST.hops=k+1;
+  }
 
-    function setupSlider() {
-        const s = document.getElementById('x_slider');
-        if (state.aStr === 'inf') {
-            s.min = 1; s.max = 50; s.value = 5;
-        } else {
-            s.min = state.a - 3; s.max = state.a + 3; s.value = state.a + 0.8;
-        }
-        updateFromSlider();
+  ST.limitVal=limitVal;
+  steps.push({
+    type:"ok", icon:"🎯",
+    title:`Resultado — ${ST.hops} iteración(es)`,
+    math:`\\lim_{x\\to ${lp}}\\frac{f(x)}{g(x)}=${fmt(limitVal,8)}`,
+    concl:`Límite = ${fmt(limitVal,8)}`
+  });
+
+  finalize(steps,lp);
+}
+
+function showErr(msg){
+  const e=document.getElementById("err-strip");
+  e.style.display="block";
+  e.innerHTML=`<div class="err-strip">⚠ ${msg}</div>`;
+  document.getElementById("diag-out").innerHTML=`<div class="diag-idle">Corrige el error y vuelve a intentarlo.</div>`;
+}
+
+function finalize(steps,lp){
+  renderDiag(steps);
+
+  const resStrip=document.getElementById("result-strip");
+  if(ST.limitVal!==null&&isFinite(ST.limitVal)){
+    resStrip.style.display="block";
+    resStrip.innerHTML=`
+      <div class="res-strip">
+        <div class="rs-lbl">Límite exacto</div>
+        <div class="rs-val">${fmt(ST.limitVal,8)}</div>
+        <div class="rs-sub">${ST.hops>0?ST.hops+" aplicación(es) de L'Hôpital":"Evaluación directa"}</div>
+      </div>`;
+  }
+
+  ST.ready=true;
+  setupSlider();
+  drawPlot();
+  renderOverlay(lp);
+  updateMetricLabels();
+}
+
+function renderOverlay(lp){
+  if(ST.limitVal===null||!isFinite(ST.limitVal)) return;
+  const dfS=ST.dfSyms[0]||"f'";
+  const dgS=ST.dgSyms[0]||"g'";
+  const tex=`\\lim_{x\\to ${lp}}\\dfrac{f}{g}=\\lim_{x\\to ${lp}}\\dfrac{${dfS}}{${dgS}}=${fmt(ST.limitVal,6)}`;
+  waitK(()=>{
+    K(tex, document.getElementById("ovl-math"), false);
+    document.getElementById("formula-overlay").style.display="block";
+  });
+}
+
+/* ── Slider ──────────────────────────────────────── */
+function setupSlider(){
+  const s=document.getElementById("x_slider");
+  s.min=ST.xMin; s.max=ST.xMax;
+  const xc=ST.aIsInf?Math.min(ST.xMax-0.5,10):ST.aNum;
+  s.value=xc+0.5;
+  updateSlider();
+}
+
+function updateSlider(){
+  if(!ST.ready) return;
+  const x=parseFloat(document.getElementById("x_slider").value);
+  document.getElementById("x_label").textContent=`x = ${x.toFixed(4)}`;
+
+  const fR=ST.fFn&&ST.gFn?ST.fFn(x)/ST.gFn(x):NaN;
+  const dfFn=ST.dfFns[ST.dfFns.length-1], dgFn=ST.dgFns[ST.dgFns.length-1];
+  const dR=dfFn&&dgFn?dfFn(x)/dgFn(x):NaN;
+
+  document.getElementById("val_orig").textContent=isFinite(fR)?fmt(fR,6):"Indefinido";
+  document.getElementById("val_deriv").textContent=isFinite(dR)?fmt(dR,6):"Indefinido";
+  document.getElementById("val_limit").textContent=ST.limitVal!==null&&isFinite(ST.limitVal)?fmt(ST.limitVal,6):"—";
+
+  drawPlot(x);
+}
+
+function updateMetricLabels(){
+  waitK(()=>{
+    K("\\tfrac{f}{g}", document.getElementById("mc0"), false);
+    K("\\tfrac{f'}{g'}", document.getElementById("mc1"), false);
+  });
+}
+
+/* ── Draw ────────────────────────────────────────── */
+function drawPlot(xMark){
+  const canvas=document.getElementById("canvas");
+  const rect=canvas.getBoundingClientRect();
+  if(!rect.width||!rect.height) return;
+  const dpr=devicePixelRatio||1;
+  canvas.width=rect.width*dpr; canvas.height=rect.height*dpr;
+  const ctx=canvas.getContext("2d");
+  ctx.scale(dpr,dpr);
+  const W=rect.width, H=rect.height;
+
+  let xMin=ST.xMin, xMax=ST.xMax;
+  if(xMax<=xMin){xMin=-4;xMax=4;}
+  const pad={l:50,r:18,t:16,b:34};
+
+  const fR=x=>{if(!ST.fFn||!ST.gFn) return NaN;const fv=ST.fFn(x),gv=ST.gFn(x);return(isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300)?fv/gv:NaN;};
+  const dfL=ST.dfFns[ST.dfFns.length-1], dgL=ST.dgFns[ST.dgFns.length-1];
+  const dR=x=>{if(!dfL||!dgL) return NaN;const fv=dfL(x),gv=dgL(x);return(isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300)?fv/gv:NaN;};
+
+  // Y range
+  const ys=[];
+  for(let i=0;i<=500;i++){
+    const x=xMin+(i/500)*(xMax-xMin);
+    const q=fR(x),d=dR(x);
+    if(isFinite(q)) ys.push(q);
+    if(isFinite(d)) ys.push(d);
+  }
+  if(ST.limitVal!==null&&isFinite(ST.limitVal)) ys.push(ST.limitVal);
+  let yMin=ys.length?Math.min(...ys):-2, yMax=ys.length?Math.max(...ys):2;
+  if(!isFinite(yMin)||!isFinite(yMax)){yMin=-2;yMax=2;}
+  if(yMax-yMin<1e-8){yMin-=1;yMax+=1;}
+  const yp=(yMax-yMin)*.12; yMin-=yp; yMax+=yp;
+
+  const sx=x=>pad.l+((x-xMin)/(xMax-xMin))*(W-pad.l-pad.r);
+  const sy=y=>pad.t+(1-(y-yMin)/(yMax-yMin))*(H-pad.t-pad.b);
+
+  // BG
+  ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,W,H);
+
+  // Grid
+  const nt=v=>{const p=Math.pow(10,Math.floor(Math.log10(v)));const f=v/p;return f<1.5?p:f<3.5?2*p:f<7.5?5*p:10*p;};
+  const gxS=nt((xMax-xMin)/7), gyS=nt((yMax-yMin)/6);
+
+  ctx.strokeStyle="#f1f5f9"; ctx.lineWidth=1;
+  for(let gx=Math.ceil(xMin/gxS)*gxS;gx<=xMax;gx+=gxS){
+    ctx.beginPath();ctx.moveTo(sx(gx),pad.t);ctx.lineTo(sx(gx),H-pad.b);ctx.stroke();
+  }
+  for(let gy=Math.ceil(yMin/gyS)*gyS;gy<=yMax;gy+=gyS){
+    ctx.beginPath();ctx.moveTo(pad.l,sy(gy));ctx.lineTo(W-pad.r,sy(gy));ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle="#cbd5e1"; ctx.lineWidth=1.5;
+  if(yMin<0&&yMax>0){ctx.beginPath();ctx.moveTo(pad.l,sy(0));ctx.lineTo(W-pad.r,sy(0));ctx.stroke();}
+  if(xMin<0&&xMax>0){ctx.beginPath();ctx.moveTo(sx(0),pad.t);ctx.lineTo(sx(0),H-pad.b);ctx.stroke();}
+
+  // Tick labels
+  ctx.fillStyle="#94a3b8"; ctx.font=`10px "JetBrains Mono",monospace`;
+  for(let gx=Math.ceil(xMin/gxS)*gxS;gx<=xMax;gx+=gxS){
+    if(Math.abs(gx)<gxS*.01) continue;
+    const s=+gx.toPrecision(3)+"";
+    ctx.fillText(s,sx(gx)-ctx.measureText(s).width/2,H-pad.b+13);
+  }
+  for(let gy=Math.ceil(yMin/gyS)*gyS;gy<=yMax;gy+=gyS){
+    if(Math.abs(gy)<gyS*.01) continue;
+    ctx.fillText(+gy.toPrecision(3)+"",2,sy(gy)+3);
+  }
+
+  // Limit horizontal line
+  if(ST.limitVal!==null&&isFinite(ST.limitVal)){
+    ctx.save();
+    ctx.strokeStyle="rgba(217,119,6,.5)"; ctx.lineWidth=1.3; ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(pad.l,sy(ST.limitVal));ctx.lineTo(W-pad.r,sy(ST.limitVal));ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle="rgba(217,119,6,.75)"; ctx.font=`10px "JetBrains Mono",monospace`;
+    ctx.fillText("L="+fmt(ST.limitVal,4),pad.l+5,sy(ST.limitVal)-4);
+    ctx.restore();
+  }
+
+  // Vertical line at a
+  const aLine=ST.aIsInf?xMax-.015*(xMax-xMin):ST.aNum;
+  ctx.save();
+  ctx.strokeStyle="rgba(100,116,139,.38)"; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(sx(aLine),pad.t);ctx.lineTo(sx(aLine),H-pad.b);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Curves
+  function curve(fn,color,lw){
+    ctx.strokeStyle=color; ctx.lineWidth=lw;
+    ctx.lineJoin="round"; ctx.lineCap="round";
+    ctx.beginPath(); let go=false;
+    for(let i=0;i<=700;i++){
+      const x=xMin+(i/700)*(xMax-xMin), y=fn(x);
+      if(!isFinite(y)){go=false;continue;}
+      go?ctx.lineTo(sx(x),sy(y)):(ctx.moveTo(sx(x),sy(y)),go=true);
     }
+    ctx.stroke();
+  }
+  curve(fR,"#2563eb",2.8);
+  curve(dR,"#059669",2.0);
 
-    function updateFromSlider() {
-        const x = parseFloat(document.getElementById('x_slider').value);
-        const v_orig = state.compiled.f(x) / state.compiled.g(x);
-        const v_deriv = state.compiled.df(x) / state.compiled.dg(x);
-
-        document.getElementById('val_orig').innerText = isFinite(v_orig) ? v_orig.toFixed(5) : "Indet.";
-        document.getElementById('val_deriv').innerText = isFinite(v_deriv) ? v_deriv.toFixed(5) : "Indet.";
-        document.getElementById('x_label').innerText = `x = ${x.toFixed(3)}`;
-        
-        draw(x);
+  // Marker
+  if(xMark!==undefined&&isFinite(xMark)){
+    ctx.save();
+    ctx.strokeStyle="rgba(217,119,6,.65)"; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(sx(xMark),pad.t);ctx.lineTo(sx(xMark),H-pad.b);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+    const qm=fR(xMark);
+    if(isFinite(qm)){
+      ctx.fillStyle="#2563eb";
+      ctx.beginPath();ctx.arc(sx(xMark),sy(qm),6,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle="#fff"; ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(sx(xMark),sy(qm),6,0,Math.PI*2);ctx.stroke();
     }
+  }
+}
 
-    function draw(xPoint) {
-        const w = canvas.width = canvas.offsetWidth;
-        const h = canvas.height = canvas.offsetHeight;
-        ctx.clearRect(0,0,w,h);
-        
-        const zoom = 60;
-        const centerX = w/2;
-        const centerY = h/2;
-        const offX = state.aStr === 'inf' ? xPoint - 5 : state.a;
-        const offY = state.limit;
+/* ── Tooltip ─────────────────────────────────────── */
+function initTooltip(){
+  const canvas=document.getElementById("canvas");
+  const tip=document.getElementById("tooltip");
+  canvas.addEventListener("mousemove",e=>{
+    if(!ST.ready||ST.limitVal===null){tip.style.display="none";return;}
+    const rect=canvas.getBoundingClientRect();
+    const cx=e.clientX-rect.left;
+    const x=ST.xMin+(cx/rect.width)*(ST.xMax-ST.xMin);
+    const fv=ST.fFn&&ST.gFn?ST.fFn(x)/ST.gFn(x):NaN;
+    tip.style.display="block";
+    tip.style.left=(cx+14)+"px";
+    tip.style.top=(e.clientY-rect.top-34)+"px";
+    tip.textContent=isFinite(fv)
+      ?`x=${x.toFixed(3)}  │  f/g≈${fmt(fv,5)}  │  L=${fmt(ST.limitVal,5)}`
+      :`x=${x.toFixed(3)}  │  —  │  L=${fmt(ST.limitVal,5)}`;
+  });
+  canvas.addEventListener("mouseleave",()=>{tip.style.display="none";});
+}
 
-        const toX = x => centerX + (x - offX) * zoom;
-        const toY = y => centerY - (y - offY) * zoom;
+/* ── Preset ──────────────────────────────────────── */
+document.getElementById("preset-sel").addEventListener("change",function(){
+  if(!this.value) return;
+  const [f,g,a,xmin,xmax]=this.value.split("|");
+  document.getElementById("f_input").value=f;
+  document.getElementById("g_input").value=g;
+  document.getElementById("a_input").value=a;
+  if(xmin) document.getElementById("xmin_input").value=xmin;
+  if(xmax) document.getElementById("xmax_input").value=xmax;
+});
 
-        // Ejes
-        ctx.strokeStyle = "#f1f5f9";
-        ctx.beginPath();
-        for(let i=-20; i<20; i++) {
-            ctx.moveTo(toX(i), 0); ctx.lineTo(toX(i), h);
-            ctx.moveTo(0, toY(i)); ctx.lineTo(w, toY(i));
-        }
-        ctx.stroke();
+/* ── Events ──────────────────────────────────────── */
+document.getElementById("x_slider").addEventListener("input",updateSlider);
+document.getElementById("calc-btn").addEventListener("click",validateAndCalculate);
 
-        // Curvas
-        const plot = (fn, color, width) => {
-            ctx.strokeStyle = color; ctx.lineWidth = width; ctx.beginPath();
-            let first = true;
-            for(let px=0; px<w; px+=2) {
-                const xVal = offX + (px - centerX)/zoom;
-                try {
-                    const yVal = fn(xVal);
-                    if(isFinite(yVal) && Math.abs(yVal) < 50) {
-                        if(first) ctx.moveTo(px, toY(yVal)); else ctx.lineTo(px, toY(yVal));
-                        first = false;
-                    } else first = true;
-                } catch(e) { first = true; }
-            }
-            ctx.stroke();
-        };
+new ResizeObserver(()=>{if(ST.ready) drawPlot(parseFloat(document.getElementById("x_slider").value));})
+  .observe(document.getElementById("canvas").parentElement);
 
-        plot(x => state.compiled.f(x)/state.compiled.g(x), "#2563eb", 3);
-        plot(x => state.compiled.df(x)/state.compiled.dg(x), "#059669", 2);
-
-        // Indicador de Punto
-        const py = state.compiled.f(xPoint)/state.compiled.g(xPoint);
-        if(isFinite(py)) {
-            ctx.fillStyle = "#2563eb"; ctx.beginPath();
-            ctx.arc(toX(xPoint), toY(py), 7, 0, Math.PI*2); ctx.fill();
-            ctx.strokeStyle = "white"; ctx.lineWidth = 2; ctx.stroke();
-        }
-    }
-
-    document.getElementById('x_slider').oninput = updateFromSlider;
-    window.onload = validateAndCalculate;
+/* ── Init ────────────────────────────────────────── */
+window.addEventListener("load",()=>{
+  buildMembers();
+  initTooltip();
+  waitK(()=>{
+    renderTeoria();
+    validateAndCalculate();
+  });
+});
 </script>
 </body>
 </html>
