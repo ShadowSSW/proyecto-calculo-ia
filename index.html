@@ -3,1418 +3,1174 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Regla de L'Hôpital — Laboratorio</title>
+  <title>Regla de L'Hôpital — Laboratorio Interactivo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" onload="window._katexReady=true"></script>
   <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js"></script>
   <style>
+    /* ─── Design Tokens ───────────────────────────── */
     :root {
-      --paper: #f4f6f9;
-      --surface: #ffffff;
-      --border: #dfe6ef;
-      --border-strong: #c5d0de;
-      --text: #1a2332;
-      --muted: #5c6b7e;
-      --accent: #1a4b7a;
-      --accent-soft: #e8eef5;
-      --curve-q: #1a4b7a;
-      --curve-d: #2a6d45;
-      --marker: #c45c26;
-      --error: #a12d2d;
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --radius-sm: 10px;
-      --shadow: 0 8px 28px rgba(26, 35, 50, 0.06);
+      --bg:         #eef1f7;
+      --surface:    #ffffff;
+      --surface2:   #f7f9fc;
+      --border:     #e0e8f2;
+      --border2:    #c4d0e4;
+      --text:       #17243a;
+      --muted:      #586a84;
+      --accent:     #1b4f8a;
+      --accent2:    #2563b0;
+      --accent-bg:  #e8f0fb;
+      --green:      #196642;
+      --green-bg:   #ecf7f2;
+      --amber-bg:   #fef9ec;
+      --red:        #991b1b;
+      --red-bg:     #fff1f1;
+      --curve-f:    #1b4f8a;
+      --curve-d:    #196642;
+      --marker:     #b45309;
+      --r-sm:  7px;
+      --r-md:  13px;
+      --r-lg:  18px;
+      --sha-sm: 0 2px 8px rgba(20,34,58,.06);
+      --sha-md: 0 6px 24px rgba(20,34,58,.10);
     }
-    * { box-sizing: border-box; }
+
+    /* ─── Reset ───────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
     body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "Source Sans 3", system-ui, sans-serif;
-      background: var(--paper);
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: var(--bg);
       color: var(--text);
-      line-height: 1.5;
-      font-size: 15px;
+      font-size: 13.5px;
+      line-height: 1.55;
     }
-    .app {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0.8rem 0.8rem 1rem;
-    }
-    .hero {
+
+    /* ─── App Shell ───────────────────────────────── */
+    #app {
+      height: 100vh;
+      overflow: hidden;
       display: grid;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-      padding: 1.35rem 1.5rem;
+      grid-template-rows: 42px 1fr;
+      gap: 7px;
+      padding: 7px;
+    }
+
+    /* ─── Topbar ──────────────────────────────────── */
+    #topbar {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow);
+      border-radius: var(--r-md);
+      box-shadow: var(--sha-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
     }
-    @media (min-width: 720px) {
-      .hero {
-        grid-template-columns: 1fr auto;
-        align-items: center;
-        gap: 1.5rem;
-      }
-    }
-    .hero h1 {
-      font-family: "Source Serif 4", Georgia, serif;
-      font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+    #topbar h1 {
+      font-family: "Lora", Georgia, serif;
+      font-size: 0.9rem;
       font-weight: 700;
-      letter-spacing: -0.025em;
-      margin: 0;
       color: var(--accent);
-      line-height: 1.2;
+      letter-spacing: -.015em;
     }
-    .hero p {
-      color: var(--muted);
-      margin: 0.25rem 0 0;
-      font-size: 0.85rem;
-      max-width: 30rem;
-    }
-    .hero-badge {
-      justify-self: end;
-      font-size: 0.65rem;
+    .badge-row { display: flex; gap: 6px; }
+    .badge {
+      font-size: 0.6rem;
       font-weight: 600;
-      letter-spacing: 0.1em;
+      letter-spacing: .08em;
       text-transform: uppercase;
       color: var(--accent);
-      background: var(--accent-soft);
-      padding: 0.3rem 0.6rem;
+      background: var(--accent-bg);
+      border: 1px solid var(--border);
       border-radius: 999px;
-      border: 1px solid var(--border);
-      white-space: nowrap;
+      padding: 2px 8px;
     }
-    .layout {
+
+    /* ─── Main Grid 27/73 ─────────────────────────── */
+    #main {
       display: grid;
-      gap: 0.8rem;
-      align-items: start;
-      grid-template-columns: 1fr;
-    }
-    @media (min-width: 1200px) {
-      .layout {
-        grid-template-columns: 280px 1fr 280px;
-        gap: 1rem;
-      }
-    }
-    @media (min-width: 960px) and (max-width: 1199px) {
-      .layout {
-        grid-template-columns: 1fr 2fr 1fr;
-        gap: 0.8rem;
-      }
-    }
-    .stack {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow);
+      grid-template-columns: 27% 1fr;
+      gap: 7px;
+      height: 100%;
+      min-height: 0;
       overflow: hidden;
     }
-    .panel__head {
-      padding: 0.85rem 1.15rem;
-      border-bottom: 1px solid var(--border);
-      background: #fafbfd;
+
+    /* ─── Columns ─────────────────────────────────── */
+    #left, #right {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
     }
-    .panel__head h2 {
-      font-family: "Source Serif 4", Georgia, serif;
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin: 0;
-      color: var(--accent);
-    }
-    .panel__body {
-      padding: 1.1rem 1.2rem 1.25rem;
-    }
-    .theorem {
-      padding: 1.15rem 1.2rem;
-      border-radius: var(--radius-lg);
+
+    /* ─── Card ────────────────────────────────────── */
+    .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      box-shadow: var(--shadow);
+      border-radius: var(--r-lg);
+      box-shadow: var(--sha-sm);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .card.grow {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 13px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .card-head h2 {
+      font-family: "Lora", Georgia, serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .card-body {
+      padding: 11px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    /* ─── Theorem ─────────────────────────────────── */
+    #theorem {
+      padding: 9px 13px 9px 17px;
       position: relative;
     }
-    .theorem::before {
+    #theorem::before {
       content: "";
       position: absolute;
-      left: 0;
-      top: 12%;
-      bottom: 12%;
-      width: 4px;
-      border-radius: 4px;
+      left: 0; top: 10%; bottom: 10%;
+      width: 3px;
       background: var(--accent);
+      border-radius: 3px;
     }
-    .theorem .inner { padding-left: 0.85rem; }
-    .theorem .katex-display { margin: 0.35rem 0 0 !important; }
-    .microcopy {
-      font-size: 0.82rem;
+    #thm-katex { margin-bottom: 3px; }
+    #theorem p {
+      font-size: 0.69rem;
       color: var(--muted);
-      margin: 0.65rem 0 0;
+      line-height: 1.5;
     }
+
+    /* ─── Form ────────────────────────────────────── */
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+    .field { display: flex; flex-direction: column; gap: 3px; }
     label {
-      display: block;
-      font-size: 0.78rem;
+      font-size: 0.67rem;
       font-weight: 600;
       color: var(--muted);
-      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
     }
-    input[type="text"],
-    input[type="number"],
-    select {
+    input[type="text"], input[type="number"], select {
       width: 100%;
-      font-family: "JetBrains Mono", ui-monospace, monospace;
-      font-size: 0.86rem;
-      padding: 0.6rem 0.75rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem;
+      padding: 4px 8px;
+      height: 28px;
       border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: #fafbfd;
+      border-radius: var(--r-sm);
+      background: var(--surface2);
       color: var(--text);
-      transition: border-color 0.15s ease, background 0.15s ease;
+      transition: border-color .14s, box-shadow .14s;
     }
-    input:hover, select:hover { background: var(--surface); }
     input:focus, select:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-soft);
+      border-color: var(--accent2);
+      box-shadow: 0 0 0 3px rgba(37,99,176,.11);
       background: var(--surface);
     }
     input[type="range"] {
       width: 100%;
-      height: 6px;
+      height: 4px;
       accent-color: var(--accent);
-      border-radius: 999px;
+      cursor: pointer;
     }
-    .input-compact {
-      padding: 0.3rem 0;
-    }
-    .input-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.6rem;
-      align-items: start;
-    }
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-    .input-group label {
+
+    /* ─── Buttons ─────────────────────────────────── */
+    .btn-row { display: flex; gap: 5px; }
+    .btn {
+      font-family: "DM Sans", sans-serif;
       font-size: 0.75rem;
       font-weight: 600;
-      color: var(--muted);
-      margin-bottom: 0.2rem;
-    }
-    .range-inputs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.3rem;
-    }
-    .grid-2 {
-      display: grid;
-      gap: 0.85rem;
-    }
-    @media (min-width: 520px) {
-      .grid-2.cols-2 { grid-template-columns: 1fr 1fr; }
-    }
-    .btn-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    .btn {
-      font-family: "Source Sans 3", sans-serif;
-      font-size: 0.86rem;
-      font-weight: 600;
-      padding: 0.55rem 1rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-strong);
+      padding: 4px 10px;
+      height: 28px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border2);
       background: var(--surface);
       color: var(--accent);
       cursor: pointer;
-      transition: background 0.15s ease, transform 0.1s ease;
+      transition: background .13s, transform .09s;
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 4px;
     }
-    .btn:active { transform: scale(0.98); }
-    .btn:hover { background: var(--accent-soft); }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-    .btn-primary:hover { filter: brightness(1.06); background: var(--accent); }
-    .hint-soft {
-      font-size: 0.8rem;
+    .btn:hover { background: var(--accent-bg); }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); }
+
+    /* ─── Hint ────────────────────────────────────── */
+    .hint {
+      font-size: 0.68rem;
       color: var(--muted);
-      margin-top: 0.65rem;
-      line-height: 1.45;
+      line-height: 1.5;
     }
-    .metrics {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.55rem;
-    }
-    @media (min-width: 400px) {
-      .metrics { grid-template-columns: repeat(3, 1fr); }
-    }
-    .metric {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.55rem 0.65rem;
-    }
-    .metric span {
-      display: block;
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-    }
-    .metric strong {
+    .hint code {
       font-family: "JetBrains Mono", monospace;
-      font-weight: 500;
-      font-size: 0.8rem;
-      word-break: break-all;
+      background: var(--accent-bg);
+      border-radius: 3px;
+      padding: 0 3px;
     }
-    .x-readout {
-      margin-top: 0.45rem;
-      font-size: 0.92rem;
-      color: var(--text);
+
+    /* ─── Error strip ─────────────────────────────── */
+    #error-strip {
+      display: none;
+      background: var(--red-bg);
+      border: 1px solid #fca5a5;
+      border-radius: var(--r-sm);
+      padding: 5px 9px;
+      font-size: 0.72rem;
+      color: var(--red);
     }
-    .x-readout strong { font-family: "JetBrains Mono", monospace; font-weight: 500; }
-    .viz-wrap {
-      padding: 1rem 1.1rem 1.2rem;
+
+    /* ─── Diagnostic Card ─────────────────────────── */
+    #diag-card {
+      flex: 1;
+      min-height: 0;
     }
-    .viz-head {
+    #diag-toggle {
       display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
+      padding: 6px 13px;
+      background: var(--accent-bg);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+      flex-shrink: 0;
     }
-    .viz-head h2 {
-      font-family: "Source Serif 4", Georgia, serif;
-      font-size: 1.05rem;
-      margin: 0;
+    #diag-toggle h3 {
+      font-size: 0.75rem;
+      font-weight: 600;
       color: var(--accent);
     }
-    .viz-head span {
-      font-size: 0.82rem;
+    #diag-toggle .arr { font-size: .65rem; color: var(--muted); transition: transform .2s; }
+    #diag-body {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+    }
+    .diag-empty {
+      padding: 18px 13px;
+      text-align: center;
       color: var(--muted);
+      font-size: 0.74rem;
     }
-    .canvas-shell {
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: #fafbfd;
-      position: relative;
+
+    /* ─── Diag Blocks ─────────────────────────────── */
+    .db {
+      margin: 7px;
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      border-left: 3px solid var(--border2);
+      background: var(--surface2);
+      padding: 8px 11px;
+      font-size: 0.76rem;
+      line-height: 1.6;
     }
-    canvas {
-      width: 100%;
-      height: min(42vh, 340px);
-      min-height: 260px;
-      display: block;
-    }
-    .legend-chips {
+    .db.info  { border-left-color: var(--accent2); background: var(--accent-bg); }
+    .db.ok    { border-left-color: var(--green);   background: var(--green-bg); }
+    .db.warn  { border-left-color: #d97706;         background: var(--amber-bg); }
+    .db.err   { border-left-color: var(--red);      background: var(--red-bg); }
+    .db-title {
+      font-weight: 600;
+      font-size: 0.75rem;
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.85rem;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 4px;
+    }
+    .snum {
+      width: 17px; height: 17px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .snum.g { background: var(--green); }
+    .db-math { margin: 5px 0; text-align: center; }
+    .db-line { margin: 2px 0; font-size: 0.73rem; }
+    .db-concl {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(0,0,0,.08);
+      font-weight: 600;
+      font-size: 0.76rem;
+    }
+
+    /* ─── Right / Viz ─────────────────────────────── */
+    #viz-card { min-height: 0; }
+    .viz-inner {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      padding: 9px 13px 11px;
+    }
+
+    /* Canvas */
+    .canvas-wrap {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      background: #fafbfd;
+      overflow: hidden;
+    }
+    canvas { display: block; width: 100%; height: 100%; }
+
+    /* Overlay */
+    #result-overlay {
+      display: none;
+      position: absolute;
+      top: 9px; right: 9px;
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 7px 12px;
+      box-shadow: var(--sha-md);
+      min-width: 170px;
+      text-align: center;
+    }
+    .ovl-label {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    #ovl-hops {
+      font-size: 0.66rem;
+      color: var(--green);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* Legend */
+    .legend-row {
+      display: flex;
+      gap: 7px;
+      align-items: center;
     }
     .chip {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      font-size: 0.78rem;
+      gap: 4px;
+      font-size: 0.7rem;
       color: var(--muted);
-      padding: 0.35rem 0.65rem;
-      background: #f4f7fb;
+      padding: 2px 7px;
+      background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 999px;
     }
-    .chip i {
-      width: 18px;
-      height: 3px;
-      border-radius: 2px;
-      flex-shrink: 0;
-    }
-    .chip i.dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
-    .status-ok {
-      color: var(--curve-d);
-      font-size: 0.88rem;
-      margin-top: 0.55rem;
-      font-weight: 500;
-    }
-    .status-err { color: var(--error); font-size: 0.88rem; margin-top: 0.45rem; }
-    .steps {
-      font-family: "JetBrains Mono", monospace;
-      font-size: 0.74rem;
-      line-height: 1.45;
-      background: #f4f7fb;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.65rem 0.75rem;
-      margin-top: 0.65rem;
-      white-space: pre-wrap;
-      color: var(--text);
-      max-height: 160px;
-      overflow-y: auto;
-    }
-    .evaluation-panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      margin-top: 0.75rem;
-      overflow: hidden;
-    }
-    .evaluation-header {
-      background: var(--accent-soft);
-      padding: 0.6rem 1rem;
+    .cline { width: 15px; height: 2px; border-radius: 2px; }
+    .cdot  { width: 7px;  height: 7px; border-radius: 50%; }
+
+    /* Slider section */
+    #slider-sec { flex-shrink: 0; }
+    .sl-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      cursor: pointer;
-      user-select: none;
+      margin-bottom: 4px;
     }
-    .evaluation-header h3 {
-      margin: 0;
-      font-size: 0.85rem;
-      font-weight: 600;
+    .sl-head span { font-size: 0.7rem; color: var(--muted); font-weight: 500; }
+    #xval-badge {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.76rem;
       color: var(--accent);
-    }
-    .evaluation-toggle {
-      background: none;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      padding: 0.2rem;
+      background: var(--accent-bg);
+      padding: 1px 7px;
       border-radius: 4px;
-      transition: all 0.2s ease;
+      font-weight: 500;
     }
-    .evaluation-toggle:hover {
-      background: var(--border);
+
+    /* Metric cards */
+    #metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      flex-shrink: 0;
     }
-    .evaluation-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
+    .mc {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 7px 9px;
+      text-align: center;
     }
-    .evaluation-content.expanded {
-      max-height: 400px;
-      overflow-y: auto;
+    .mc:last-child {
+      border-color: var(--accent);
+      background: var(--accent-bg);
     }
-    .evaluation-alert {
-      background: #f8f9fa;
-      border: none;
-      border-left: 4px solid var(--accent);
-      border-radius: 0;
-      padding: 1rem 1.25rem;
-      font-family: "Source Sans 3", sans-serif;
-      font-size: 0.9rem;
-      line-height: 1.6;
+    .mc-lbl {
+      min-height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 3px;
     }
-    .evaluation-alert.info {
-      border-left-color: #0d6efd;
-      background: #f0f7ff;
-    }
-    .evaluation-alert.warning {
-      border-left-color: #ffc107;
-      background: #fffbf0;
-    }
-    .evaluation-alert.success {
-      border-left-color: #198754;
-      background: #f0fff4;
-    }
-    .evaluation-alert .math-expression {
-      font-family: "Source Serif 4", Georgia, serif;
-      font-style: italic;
-      margin: 0.5rem 0;
-    }
-    .evaluation-alert .conclusion {
-      font-weight: 600;
-      font-size: 0.95rem;
-      margin-top: 0.75rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid #e9ecef;
-      color: var(--accent);
-    }
-    .evaluation-alert .step-item {
-      margin: 0.5rem 0;
-      padding-left: 1rem;
-      position: relative;
-    }
-    .evaluation-alert .step-item::before {
-      content: "•";
-      position: absolute;
-      left: 0;
+    .mc-lbl-text {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
       color: var(--muted);
     }
-    .result-overlay {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 0.8rem 1rem;
-      box-shadow: var(--shadow);
-      z-index: 10;
-      min-width: 200px;
-      max-width: 300px;
-    }
-    .result-overlay .result-math {
-      font-family: "Source Serif 4", Georgia, serif;
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
+    .mc-val {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.86rem;
+      font-weight: 500;
       color: var(--text);
-      text-align: center;
     }
-    .result-overlay .result-math .katex-display {
-      margin: 0.3rem 0;
-    }
-    .result-overlay .status-ok {
-      font-size: 0.75rem;
-      text-align: center;
-      margin: 0;
-    }
-    code { font-family: "JetBrains Mono", monospace; font-size: 0.85em; }
+    .mc:last-child .mc-val { color: var(--accent); font-weight: 700; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+
+    /* KaTeX */
     .katex { font-size: 1em; }
+    .katex-display { margin: .15em 0 !important; }
+
     .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="hero">
-      <div>
-        <h1>Regla de L'Hôpital</h1>
-        <p>Cuando el cociente <span class="tex" data-tex="\frac{f}{g}"></span> llega como <span class="tex" data-tex="\frac{0}{0}"></span> o <span class="tex" data-tex="\frac{\infty}{\infty}"></span>, el límite suele coincidir con el cociente de las derivadas <span class="tex" data-tex="\frac{f'}{g'}"></span>. Explora cómo, al acercar <span class="tex" data-tex="x"></span> al punto, el cociente se alinea con ese valor.</p>
-      </div>
-      <div class="hero-badge">Cálculo diferencial</div>
-    </header>
+<div id="app">
 
-    <div class="layout">
-      <div class="stack">
-        <section class="theorem" aria-labelledby="th-title">
-          <div class="inner">
-            <p id="th-title" class="sr-only">Teorema</p>
-            <p class="tex display" style="margin:0;" data-tex="\displaystyle \lim_{x\to a}\frac{f(x)}{g(x)}=\lim_{x\to a}\frac{f'(x)}{g'(x)}"></p>
-            <p class="microcopy">Bajo las hipótesis habituales del teorema en un entorno del punto <span class="tex" data-tex="a"></span>.</p>
-          </div>
-        </section>
-
-        <div class="panel">
-          <div class="panel__head"><h2>Modelo</h2></div>
-          <div class="panel__body">
-            <label for="preset">Ejemplo o expresión propia</label>
-            <select id="preset" aria-label="Elegir ejemplo"></select>
-
-            <div class="input-compact" style="margin-top:0.6rem;">
-              <div class="input-row">
-                <div class="input-group">
-                  <label for="finput">f(x)</label>
-                  <input type="text" id="finput" spellcheck="false" autocomplete="off" placeholder="sin(x)" />
-                </div>
-                <div class="input-group">
-                  <label for="ginput">g(x)</label>
-                  <input type="text" id="ginput" spellcheck="false" autocomplete="off" placeholder="x" />
-                </div>
-              </div>
-              
-              <div class="input-row" style="margin-top:0.5rem;">
-                <div class="input-group">
-                  <label for="apoint">Punto a</label>
-                  <input type="text" id="apoint" value="0" placeholder="0, 1, +∞" />
-                </div>
-                <div class="input-group">
-                  <label>Eje x</label>
-                  <div class="range-inputs">
-                    <input type="number" id="xmin" step="any" value="-1.5" placeholder="min" aria-label="mínimo x" />
-                    <input type="number" id="xmax" step="any" value="1.5" placeholder="max" aria-label="máximo x" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <p class="hint-soft">Potencia con <code>^</code>. Funciones: <code>sin</code>, <code>cos</code>, <code>exp</code>, <code>log</code> (neperiano; también puedes escribir <code>ln</code>).</p>
-
-            <div class="btn-row" style="margin-top:0.85rem;">
-              <button type="button" class="btn btn-primary" id="btnCalc">Obtener límite</button>
-              <button type="button" class="btn" id="btnPlay">Animar</button>
-              <button type="button" class="btn" id="btnStop">Pausa</button>
-            </div>
-
-            <div class="evaluation-panel">
-              <div class="evaluation-header" id="evalHeader">
-                <h3>📊 Evaluación del límite</h3>
-                <button class="evaluation-toggle" id="evalToggle">▼</button>
-              </div>
-              <div class="evaluation-content" id="evalContent">
-                <div class="evaluation-alert" id="stepsOut" aria-live="polite" style="display: none;"></div>
-              </div>
-            </div>
-            <p class="status-err" id="errorOut"></p>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="panel panel--viz">
-        <div class="viz-wrap">
-          <div class="viz-head">
-            <h2>Cocientes en el plano</h2>
-            <span>Recta en <span class="tex" data-tex="a"></span> · punto en <span class="tex" data-tex="x"></span></span>
-          </div>
-          <div class="canvas-shell">
-            <canvas id="plot" width="920" height="320" aria-label="Gráfica de cocientes"></canvas>
-            <div class="result-overlay" id="resultOverlay" style="display: none;">
-              <div class="result-math" id="resultMath"></div>
-              <p class="status-ok" id="resultOut"></p>
-            </div>
-          </div>
-          <div class="legend-chips">
-            <span class="chip"><i style="background:var(--curve-q)"></i><span class="tex" data-tex="\frac{f}{g}"></span></span>
-            <span class="chip"><i style="background:var(--curve-d)"></i><span class="tex" data-tex="\frac{f'}{g'}"></span></span>
-            <span class="chip"><i class="dot" style="background:var(--marker)"></i><span class="tex" data-tex="x"></span></span>
-          </div>
-          
-          <div style="margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border);">
-            <h3 style="font-family: 'Source Serif 4', Georgia, serif; font-size: 0.95rem; font-weight: 600; margin: 0 0 0.85rem 0; color: var(--accent);">Acercamiento a <span class="tex" data-tex="a"></span></h3>
-            <label for="xpos"><span class="tex" data-tex="x"></span> en el entorno del límite</label>
-            <input type="range" id="xpos" min="0" max="1000" value="500" step="0.05" />
-            <p class="x-readout"><span class="tex" data-tex="x ="></span> <strong id="xval">—</strong></p>
-
-            <div class="metrics" style="margin-top:0.75rem;">
-              <div class="metric"><span><span class="tex" data-tex="\frac{f}{g}"></span></span><strong id="qv">—</strong></div>
-              <div class="metric"><span><span class="tex" data-tex="\frac{f'}{g'}"></span></span><strong id="dv">—</strong></div>
-              <div class="metric"><span>Límite</span><strong id="lv">—</strong></div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <!-- Topbar -->
+  <header id="topbar">
+    <h1>Regla de L'Hôpital &mdash; Laboratorio Interactivo</h1>
+    <div class="badge-row">
+      <span class="badge">Cálculo Diferencial</span>
+      <span class="badge">PUCMM</span>
     </div>
+  </header>
+
+  <!-- Main -->
+  <div id="main">
+
+    <!-- ══ LEFT ══════════════════════════════════════ -->
+    <div id="left">
+
+      <!-- Theorem -->
+      <div class="card" id="theorem">
+        <div id="thm-katex"></div>
+        <p>Si <span id="thm-indet"></span> y <span id="thm-cond"></span>, el límite de la razón iguala el de sus derivadas.</p>
+      </div>
+
+      <!-- Inputs -->
+      <div class="card">
+        <div class="card-head"><h2>Modelo</h2></div>
+        <div class="card-body">
+
+          <div class="field">
+            <label for="preset">Ejemplo predefinido</label>
+            <select id="preset"></select>
+          </div>
+
+          <div class="row-2">
+            <div class="field">
+              <label for="finput">f(x) — numerador</label>
+              <input type="text" id="finput" spellcheck="false" autocomplete="off" placeholder="sin(x)" />
+            </div>
+            <div class="field">
+              <label for="ginput">g(x) — denominador</label>
+              <input type="text" id="ginput" spellcheck="false" autocomplete="off" placeholder="x" />
+            </div>
+          </div>
+
+          <div class="row-3">
+            <div class="field">
+              <label for="apoint">Punto a</label>
+              <input type="text" id="apoint" value="0" placeholder="0, +∞" />
+            </div>
+            <div class="field">
+              <label for="xmin">x mín</label>
+              <input type="number" id="xmin" value="-3" step="any" />
+            </div>
+            <div class="field">
+              <label for="xmax">x máx</label>
+              <input type="number" id="xmax" value="3" step="any" />
+            </div>
+          </div>
+
+          <p class="hint">Potencia: <code>^</code> · ln: <code>log</code> o <code>ln</code> · Fns: <code>sin</code> <code>cos</code> <code>exp</code></p>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btnCalc">⟹ Calcular límite</button>
+            <button class="btn" id="btnPlay">▶ Animar</button>
+            <button class="btn" id="btnStop">⏸</button>
+          </div>
+
+          <div id="error-strip"></div>
+        </div>
+      </div>
+
+      <!-- Diagnostic -->
+      <div class="card grow" id="diag-card">
+        <div id="diag-toggle">
+          <h3>📐 Evaluación del límite</h3>
+          <span class="arr">▼</span>
+        </div>
+        <div id="diag-body">
+          <div class="diag-empty">Ingresa funciones y presiona <strong>Calcular límite</strong>.</div>
+        </div>
+      </div>
+
+    </div>
+    <!-- /LEFT -->
+
+    <!-- ══ RIGHT ══════════════════════════════════════ -->
+    <div id="right">
+
+      <div class="card grow" id="viz-card">
+        <div class="card-head">
+          <h2>Cocientes en el plano &nbsp;<span id="viz-sub" style="font-weight:400;font-family:'DM Sans',sans-serif;font-size:0.73rem;color:var(--muted)">f(x)/g(x) vs f'(x)/g'(x)</span></h2>
+          <div class="legend-row">
+            <span class="chip"><span class="cline" style="background:var(--curve-f)"></span>f/g</span>
+            <span class="chip"><span class="cline" style="background:var(--curve-d)"></span>f'/g'</span>
+            <span class="chip"><span class="cdot" style="background:var(--marker)"></span>x</span>
+          </div>
+        </div>
+        <div class="viz-inner">
+
+          <div class="canvas-wrap">
+            <canvas id="plot" aria-label="Gráfica interactiva"></canvas>
+            <div id="result-overlay">
+              <div class="ovl-label">Límite exacto</div>
+              <div id="ovl-math"></div>
+              <div id="ovl-hops"></div>
+            </div>
+          </div>
+
+          <div id="slider-sec">
+            <div class="sl-head">
+              <span>Acercamiento a <em>a</em> — arrastra para explorar</span>
+              <span id="xval-badge">x = —</span>
+            </div>
+            <input type="range" id="xpos" min="0" max="1000" value="500" step="0.1" />
+          </div>
+
+          <div id="metrics">
+            <div class="mc">
+              <div class="mc-lbl" id="lbl-fg"></div>
+              <div class="mc-val" id="qv">—</div>
+            </div>
+            <div class="mc">
+              <div class="mc-lbl" id="lbl-dfg"></div>
+              <div class="mc-val" id="dv">—</div>
+            </div>
+            <div class="mc">
+              <div class="mc-lbl"><span class="mc-lbl-text">Límite</span></div>
+              <div class="mc-val" id="lv">—</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    <!-- /RIGHT -->
+
   </div>
+</div>
 
-  <script>
-    (function () {
-      const presets = [
-        {
-          name: "Propia (editar campos)",
-          f: "",
-          g: "",
-          a: "0",
-          xmin: -1.5,
-          xmax: 1.5,
-        },
-        {
-          name: "sin(x) / x  en 0",
-          f: "sin(x)",
-          g: "x",
-          a: "0",
-          xmin: -3,
-          xmax: 3,
-        },
-        {
-          name: "(exp(x)-1) / x  en 0",
-          f: "exp(x)-1",
-          g: "x",
-          a: "0",
-          xmin: -2,
-          xmax: 2,
-        },
-        {
-          name: "log(x) / (x-1)  en 1",
-          f: "log(x)",
-          g: "x-1",
-          a: "1",
-          xmin: 0.1,
-          xmax: 2,
-        },
-        {
-          name: "(x^2-1) / (x-1)  en 1",
-          f: "x^2-1",
-          g: "x-1",
-          a: "1",
-          xmin: -1,
-          xmax: 3,
-        },
-        {
-          name: "x / exp(x)  en +∞",
-          f: "x",
-          g: "exp(x)",
-          a: "+infinity",
-          xmin: 0,
-          xmax: 12,
-        },
-      ];
+<script>
+(function () {
+  "use strict";
 
-      const el = {
-        preset: document.getElementById("preset"),
-        finput: document.getElementById("finput"),
-        ginput: document.getElementById("ginput"),
-        apoint: document.getElementById("apoint"),
-        xmin: document.getElementById("xmin"),
-        xmax: document.getElementById("xmax"),
-        btnCalc: document.getElementById("btnCalc"),
-        btnPlay: document.getElementById("btnPlay"),
-        btnStop: document.getElementById("btnStop"),
-        stepsOut: document.getElementById("stepsOut"),
-        resultOut: document.getElementById("resultOut"),
-        errorOut: document.getElementById("errorOut"),
-        xpos: document.getElementById("xpos"),
-        xval: document.getElementById("xval"),
-        qv: document.getElementById("qv"),
-        dv: document.getElementById("dv"),
-        lv: document.getElementById("lv"),
-        plot: document.getElementById("plot"),
-        resultOverlay: document.getElementById("resultOverlay"),
-        resultMath: document.getElementById("resultMath"),
-        evalHeader: document.getElementById("evalHeader"),
-        evalToggle: document.getElementById("evalToggle"),
-        evalContent: document.getElementById("evalContent"),
-      };
+  /* ── Presets ─────────────────────────────────────── */
+  const PRESETS = [
+    { name: "— Expresión propia —",      f: "",           g: "",       a: "0",         xmin:-3,   xmax:3   },
+    { name: "sin(x) / x  →  0",         f: "sin(x)",     g: "x",      a: "0",         xmin:-5,   xmax:5   },
+    { name: "(eˣ−1) / x  →  0",        f: "exp(x)-1",   g: "x",      a: "0",         xmin:-3,   xmax:3   },
+    { name: "(1−cos x) / x²  →  0",     f: "1-cos(x)",   g: "x^2",    a: "0",         xmin:-3,   xmax:3   },
+    { name: "ln(x) / (x−1)  →  1",      f: "log(x)",     g: "x-1",    a: "1",         xmin:0.1,  xmax:3   },
+    { name: "(x²−1) / (x−1)  →  1",     f: "x^2-1",      g: "x-1",    a: "1",         xmin:-1,   xmax:4   },
+    { name: "x / eˣ  →  +∞",           f: "x",          g: "exp(x)", a: "+infinity", xmin:0,    xmax:14  },
+    { name: "tan(x)−x / x³  →  0",      f: "tan(x)-x",   g: "x^3",    a: "0",         xmin:-1.3, xmax:1.3 },
+  ];
 
-      let state = {
-        fRaw: "sin(x)",
-        gRaw: "x",
-        aNum: 0,
-        aIsInfinity: false,
-        f0: "sin(x)",
-        g0: "x",
-        fLast: "sin(x)",
-        gLast: "cos(x)",
-        hops: 1,
-        limitVal: null,
-        animId: null,
-        animStart: null,
-        animating: false,
-        slideFloat: 500,
-        drawXSmooth: null,
-      };
+  /* ── Refs ────────────────────────────────────────── */
+  const $ = id => document.getElementById(id);
+  const el = {
+    preset:$("preset"), finput:$("finput"), ginput:$("ginput"),
+    apoint:$("apoint"), xmin:$("xmin"), xmax:$("xmax"),
+    btnCalc:$("btnCalc"), btnPlay:$("btnPlay"), btnStop:$("btnStop"),
+    diagToggle:$("diag-toggle"), diagBody:$("diag-body"),
+    errorStrip:$("error-strip"),
+    xpos:$("xpos"), xvalBadge:$("xval-badge"),
+    qv:$("qv"), dv:$("dv"), lv:$("lv"),
+    plot:$("plot"),
+    resultOverlay:$("result-overlay"), ovlMath:$("ovl-math"), ovlHops:$("ovl-hops"),
+    vizSub:$("viz-sub"),
+  };
 
-      function normalizeExpr(s) {
-        if (!s || typeof s !== "string") return "";
-        let t = s.trim();
-        t = t.replace(/\*\*/g, "^");
-        t = t.replace(/\bln\s*\(/gi, "log(");
-        return t;
+  /* ── State ───────────────────────────────────────── */
+  let S = {
+    f0:"sin(x)", g0:"x",
+    fLast:"sin(x)", gLast:"cos(x)",
+    aNum:0, aIsInf:false,
+    limitVal:null, hops:0,
+    animId:null, animStart:null, animating:false,
+    slideFloat:500, drawSmooth:null,
+  };
+
+  /* ── KaTeX ───────────────────────────────────────── */
+  function K(tex, node, display) {
+    if (!window.katex || !node) return;
+    try { katex.render(tex, node, { throwOnError:false, displayMode:!!display }); }
+    catch(_) { node.textContent = tex; }
+  }
+
+  function renderStatic() {
+    K("\\displaystyle\\lim_{x\\to a}\\frac{f(x)}{g(x)}=\\lim_{x\\to a}\\frac{f'(x)}{g'(x)}", $("thm-katex"), false);
+    K("\\tfrac{0}{0}\\text{ ó }\\tfrac{\\infty}{\\infty}", $("thm-indet"), false);
+    K("g'(x)\\neq 0", $("thm-cond"), false);
+    K("\\dfrac{f}{g}", $("lbl-fg"), false);
+    K("\\dfrac{f'}{g'}", $("lbl-dfg"), false);
+  }
+
+  /* ── Build presets ───────────────────────────────── */
+  function buildPresets() {
+    PRESETS.forEach((p,i) => {
+      const o = document.createElement("option");
+      o.value = i; o.textContent = p.name;
+      el.preset.appendChild(o);
+    });
+    el.preset.value = "1";
+  }
+
+  function applyPreset(i) {
+    const p = PRESETS[i];
+    if (p.f) el.finput.value = p.f;
+    if (p.g) el.ginput.value = p.g;
+    el.apoint.value = p.a;
+    el.xmin.value = p.xmin;
+    el.xmax.value = p.xmax;
+    el.xpos.value = p.a === "+infinity" ? "870" : "500";
+    S.slideFloat = parseFloat(el.xpos.value);
+    S.drawSmooth = null;
+  }
+
+  /* ── Expr helpers ────────────────────────────────── */
+  function norm(s) {
+    if (!s) return "";
+    return s.trim().replace(/\*\*/g,"^").replace(/\bln\s*\(/gi,"log(");
+  }
+
+  function parseA(str) {
+    const s = (str||"").trim().toLowerCase();
+    if (["infinity","+infinity","inf","+inf","∞","+∞"].includes(s))
+      return {value:Infinity, isInf:true};
+    const n = parseFloat(s.replace(",","."));
+    if (!isFinite(n)) throw new Error("Punto a inválido. Usa un número o \"+infinity\".");
+    return {value:n, isInf:false};
+  }
+
+  function nNum(ev) {
+    try {
+      const e = typeof ev==="string" ? nerdamer(ev) : ev;
+      const t = e.text ? e.text() : String(e);
+      let n = parseFloat(t);
+      if (isFinite(n)) return n;
+      if (e.evaluate) {
+        const ev2 = e.evaluate();
+        const t2 = ev2.text ? ev2.text() : String(ev2);
+        n = parseFloat(t2);
+        if (isFinite(n)) return n;
       }
+    } catch(_) {}
+    return NaN;
+  }
 
-      function parseA(str) {
-        const s = String(str).trim().toLowerCase();
-        if (s === "+infinity" || s === "infinity" || s === "inf" || s === "+inf") {
-          return { value: Infinity, isInf: true };
-        }
-        const n = parseFloat(s.replace(",", "."));
-        if (!Number.isFinite(n)) throw new Error('Punto a no válido. Usa un número o "+infinity".');
-        return { value: n, isInf: false };
-      }
+  function evalAt(expr, xv) {
+    try {
+      const ex = norm(expr);
+      if (!ex) return NaN;
+      return nNum(nerdamer(ex,{x:xv}).evaluate());
+    } catch(_) { return NaN; }
+  }
 
-      function renderTex() {
-        document.querySelectorAll(".tex").forEach((node) => {
-          const t = node.getAttribute("data-tex");
-          if (typeof katex !== "undefined" && t) {
-            try {
-              katex.render(t, node, { throwOnError: false, displayMode: node.classList.contains("display") });
-            } catch (_) {}
-          }
+  function ratioAt(f, g, x) {
+    const fn = evalAt(f,x), gn = evalAt(g,x);
+    if (!isFinite(fn)||!isFinite(gn)||Math.abs(gn)<1e-300) return NaN;
+    return fn/gn;
+  }
+
+  function diffStr(expr) {
+    const ex = norm(expr);
+    if (!ex) throw new Error("Expresión vacía.");
+    try {
+      if (typeof nerdamer.diff==="function")
+        return nerdamer.diff(nerdamer(ex),"x").text();
+    } catch(_) {}
+    try { return nerdamer("diff("+ex+",x)").text(); }
+    catch(e) { throw new Error("No se pudo derivar «"+ex+"»"); }
+  }
+
+  function fmt(n) {
+    if (n===null||n===undefined||!isFinite(n)) return "—";
+    const ax = Math.abs(n);
+    if (ax < 1e-11 && n!==0) return "≈ 0";
+    if (ax > 5e7) return n>0 ? "+∞" : "−∞";
+    return +n.toPrecision(7) + "";
+  }
+
+  /* ── Indetermination check ───────────────────────── */
+  function checkIndet(F, G, a, isInf) {
+    if (isInf) {
+      const x = 1e9;
+      return { ok: Math.abs(evalAt(F,x))>1e5 && Math.abs(evalAt(G,x))>1e5, zz:false, ii:true };
+    }
+    const h = 1e-7;
+    const small = z => Math.abs(z)<5e-5;
+    const big   = z => Math.abs(z)>1e5;
+    const f1=evalAt(F,a+h), g1=evalAt(G,a+h);
+    const f2=evalAt(F,a-h), g2=evalAt(G,a-h);
+    const zz = (small(f1)&&small(g1)) || (small(f2)&&small(g2));
+    const ii = (big(f1)&&big(g1))     || (big(f2)&&big(g2));
+    return {ok:zz||ii, zz, ii};
+  }
+
+  /* ── Core compute ────────────────────────────────── */
+  function compute(fIn, gIn, aInfo) {
+    let F = norm(fIn), G = norm(gIn);
+    if (!F||!G) throw new Error("f(x) y g(x) no pueden estar vacíos.");
+    try { nerdamer(F); nerdamer(G); }
+    catch(_) { throw new Error("Expresión inválida — revisa la sintaxis."); }
+
+    const a = aInfo.value, isInf = aInfo.isInf;
+    const lp = isInf ? "\\infty" : String(a);
+    const blocks = [];
+
+    // Evaluate at a
+    let fVal, gVal;
+    if (isInf) {
+      fVal = evalAt(F,1e9); gVal = evalAt(G,1e9);
+    } else {
+      const h=1e-8;
+      const f1=evalAt(F,a+h),f2=evalAt(F,a-h);
+      const g1=evalAt(G,a+h),g2=evalAt(G,a-h);
+      fVal = (isFinite(f1)&&isFinite(f2))?(f1+f2)/2:(isFinite(f1)?f1:f2);
+      gVal = (isFinite(g1)&&isFinite(g2))?(g1+g2)/2:(isFinite(g1)?g1:g2);
+    }
+
+    const fSmall = Math.abs(fVal)<5e-5, gSmall = Math.abs(gVal)<5e-5;
+    const fBig   = Math.abs(fVal)>1e5,  gBig   = Math.abs(gVal)>1e5;
+    const isZZ = fSmall && gSmall;
+    const isII = fBig && gBig;
+    const isInd = isZZ || isII;
+
+    // Block 1 — initial evaluation
+    blocks.push({
+      type:"info", icon:"🔍",
+      title:`Evaluación en x → ${isInf?"∞":a}`,
+      lines:[
+        `Numerador: <strong>f → ${isZZ?"0":(fBig?"∞":fmt(fVal))}</strong>`,
+        `Denominador: <strong>g → ${gSmall?"0":(gBig?"∞":fmt(gVal))}</strong>`,
+      ]
+    });
+
+    // No indetermination
+    if (!isInd) {
+      if (Math.abs(gVal)<1e-10) {
+        blocks.push({
+          type:"err", icon:"✗",
+          title:"El límite diverge — L'Hôpital no aplica",
+          lines:["El denominador tiende a 0 pero el numerador no. El límite diverge a ±∞."]
         });
+        return { blocks, fPlot:F, gPlot:G, fLast:F, gLast:G, hops:0, limitVal:null };
       }
+      const direct = isFinite(fVal)&&isFinite(gVal) ? fVal/gVal : NaN;
+      blocks.push({
+        type:"ok", icon:"✓",
+        title:"Límite directo — sin indeterminación",
+        math:`\\lim_{x\\to ${lp}}\\frac{f}{g} = \\frac{${fmt(fVal)}}{${fmt(gVal)}} = ${fmt(direct)}`,
+        lines:["No se cumple <strong>0/0</strong> ni <strong>∞/∞</strong>. El límite se obtiene por sustitución directa."],
+        concl:`Límite = ${fmt(direct)}`
+      });
+      return { blocks, fPlot:F, gPlot:G, fLast:F, gLast:G, hops:0, limitVal:direct };
+    }
 
-      function nerdNum(ev) {
-        try {
-          const e = typeof ev === "string" ? nerdamer(ev) : ev;
-          let t = e.text ? e.text() : String(e);
-          let n = parseFloat(t);
-          if (Number.isFinite(n)) return n;
-          if (e.evaluate) {
-            const ev2 = e.evaluate();
-            t = ev2.text ? ev2.text() : nerdamer(ev2).text();
-            n = parseFloat(t);
-            if (Number.isFinite(n)) return n;
-          }
-        } catch (_) {}
-        return NaN;
-      }
+    // Indetermination found
+    const indType = isZZ ? "0/0" : "\\infty/\\infty";
+    blocks.push({
+      type:"warn", icon:"⚠",
+      title:`Indeterminación ${isZZ?"0/0":"∞/∞"} detectada`,
+      math:`\\lim_{x\\to ${lp}}\\frac{${F}}{${G}} = \\frac{${isZZ?"0":"\\infty"}}{${isZZ?"0":"\\infty"}}\\quad\\Rightarrow\\quad\\text{Aplicamos L'Hôpital}`,
+      lines:[]
+    });
 
-      function evalAt(exprStr, xVal) {
-        try {
-          const ex = normalizeExpr(exprStr);
-          if (!ex) return NaN;
-          const v = nerdamer(ex, { x: xVal }).evaluate();
-          return nerdNum(v);
-        } catch (e) {
-          return NaN;
-        }
-      }
+    const MAX = 8;
+    let k = 0, lastVal = NaN;
 
-      function ratioAt(fStr, gStr, xVal) {
-        const fn = evalAt(fStr, xVal);
-        const gn = evalAt(gStr, xVal);
-        if (!Number.isFinite(fn) || !Number.isFinite(gn)) return NaN;
-        if (Math.abs(gn) < 1e-300) return NaN;
-        return fn / gn;
-      }
+    for (; k<MAX; k++) {
+      const dF = diffStr(F), dG = diffStr(G);
+      if (dF==="0"&&dG==="0") throw new Error("Derivadas nulas — imposible continuar.");
 
-      function isRoughIndeterminate(fStr, gStr, a, isInf) {
-        const eps = 1e-7;
+      blocks.push({
+        type:"info", icon:String(k+1), isStep:true,
+        title:`Aplicación ${k+1} de L'Hôpital`,
+        math:`f^{(${k+1})}(x) = ${dF}\\qquad g^{(${k+1})}(x) = ${dG}`,
+        lines:[]
+      });
+
+      F = dF; G = dG;
+
+      const indNow = checkIndet(F,G,a,isInf);
+      const sx = isInf ? 1e8 : a+(a===0?1e-7:1e-7*Math.abs(a));
+      const r = ratioAt(F,G,sx);
+
+      if (!indNow.ok || !isFinite(r)) {
+        // Evaluate limit
         if (isInf) {
-          const x = 1e9;
-          const fn = Math.abs(evalAt(fStr, x));
-          const gn = Math.abs(evalAt(gStr, x));
-          const big = fn > 1e6 && gn > 1e6;
-          return big;
-        }
-        const x1 = a + eps;
-        const x2 = a - eps;
-        const f1 = evalAt(fStr, x1);
-        const g1 = evalAt(gStr, x1);
-        const f2 = evalAt(fStr, x2);
-        const g2 = evalAt(gStr, x2);
-        const small = (z) => Math.abs(z) < 1e-5;
-        const z01 = small(f1) && small(g1);
-        const z02 = small(f2) && small(g2);
-        return z01 || z02;
-      }
-
-      function diffStr(exprStr) {
-        const ex = normalizeExpr(exprStr);
-        if (!ex) throw new Error("Expresión vacía al derivar.");
-        try {
-          if (typeof nerdamer.diff === "function") {
-            return nerdamer.diff(nerdamer(ex), "x").text();
-          }
-        } catch (_) {}
-        try {
-          return nerdamer("diff(" + ex + ", x)").text();
-        } catch (e2) {
-          throw new Error("No se pudo derivar «" + ex + "».");
-        }
-      }
-
-      function fmt(n) {
-        if (n === null || n === undefined) return "—";
-        if (!Number.isFinite(n)) return "—";
-        const ax = Math.abs(n);
-        if (ax < 1e-12 && n !== 0) return "tiende a 0";
-        if (ax > 1e6) return "tiende a infinito";
-        if (ax < 1e-4 && ax > 0) return "aproximadamente 0";
-        return Number(n.toPrecision(8)).toString();
-      }
-      
-      function fmtMath(n) {
-        if (n === null || n === undefined) return "—";
-        if (!Number.isFinite(n)) return "—";
-        const ax = Math.abs(n);
-        if (ax > 1e6) return "10^" + Math.floor(Math.log10(ax));
-        if (ax < 1e-4 && ax > 0) return "10^" + Math.floor(Math.log10(ax));
-        return Number(n.toPrecision(8)).toString();
-      }
-
-      function computeLHospitale(fIn, gIn, aInfo) {
-        const lines = [];
-        let F = normalizeExpr(fIn);
-        let G = normalizeExpr(gIn);
-        if (!F || !G) throw new Error("Numerador y denominador no pueden estar vacíos.");
-
-        try {
-          nerdamer(F);
-          nerdamer(G);
-        } catch (e0) {
-          throw new Error("No se pudieron interpretar el numerador o el denominador.");
-        }
-
-        // Evaluar numerador y denominador por separado primero
-        const limitPoint = aInfo.isInf ? "\\infty" : aInfo.value;
-        const htmlContent = [];
-        
-        htmlContent.push('<div class="step-item">Vamos a evaluar el límite de cada parte por separado:</div>');
-        htmlContent.push('<div class="math-expression">');
-        htmlContent.push('$$\\lim_{x \\to ' + limitPoint + '} ' + F + '$$');
-        htmlContent.push('$$\\lim_{x \\to ' + limitPoint + '} ' + G + '$$');
-        htmlContent.push('</div>');
-
-        let fVal, gVal;
-        if (aInfo.isInf) {
-          const xL = 1e8;
-          fVal = evalAt(F, xL);
-          gVal = evalAt(G, xL);
+          lastVal = ratioAt(F,G,1e13);
+          if (!isFinite(lastVal)) lastVal = ratioAt(F,G,1e10);
         } else {
-          const h = 1e-8;
-          const f1 = evalAt(F, aInfo.value + h);
-          const f2 = evalAt(F, aInfo.value - h);
-          const g1 = evalAt(G, aInfo.value + h);
-          const g2 = evalAt(G, aInfo.value - h);
-          fVal = (Number.isFinite(f1) && Number.isFinite(f2)) ? (f1 + f2) / 2 : f1 || f2;
-          gVal = (Number.isFinite(g1) && Number.isFinite(g2)) ? (g1 + g2) / 2 : g1 || g2;
+          const h=1e-10;
+          const ra=ratioAt(F,G,a+h), rb=ratioAt(F,G,a-h);
+          lastVal = (isFinite(ra)&&isFinite(rb))?(ra+rb)/2:(isFinite(ra)?ra:rb);
         }
-
-        htmlContent.push('<div class="step-item">El numerador <strong>' + fmt(fVal) + '</strong></div>');
-        htmlContent.push('<div class="step-item">El denominador <strong>' + fmt(gVal) + '</strong></div>');
-
-        // Verificar si es una indeterminación
-        const isZeroZero = Math.abs(fVal) < 1e-6 && Math.abs(gVal) < 1e-6;
-        const isInfInf = Math.abs(fVal) > 1e6 && Math.abs(gVal) > 1e6;
-        const isIndeterminate = isZeroZero || isInfInf;
-
-        if (!isIndeterminate) {
-          if (Math.abs(gVal) < 1e-10) {
-            htmlContent.push('<div class="conclusion">❌ El denominador tiende a 0 pero el numerador no. El límite diverge a infinito. L\'Hôpital no es aplicable aquí.</div>');
-            const result = {
-              htmlContent: htmlContent.join(''),
-              fOriginal: normalizeExpr(fIn),
-              gOriginal: normalizeExpr(gIn),
-              fPlot: normalizeExpr(fIn),
-              gPlot: normalizeExpr(gIn),
-              fLast: F,
-              gLast: G,
-              hops: 0,
-              limitVal: null,
-              useHtml: true
-            };
-            throw new Error("HTML_RESULT:" + JSON.stringify(result));
-          } else if (Math.abs(fVal) < 1e-10) {
-            htmlContent.push('<div class="conclusion">✅ El numerador tiende a 0 pero el denominador no. El límite es <strong>0</strong>. L\'Hôpital no es necesario.</div>');
-            return {
-              htmlContent: htmlContent.join(''),
-              fOriginal: normalizeExpr(fIn),
-              gOriginal: normalizeExpr(gIn),
-              fPlot: normalizeExpr(fIn),
-              gPlot: normalizeExpr(gIn),
-              fLast: F,
-              gLast: G,
-              hops: 0,
-              limitVal: 0,
-              useHtml: true
-            };
-          } else {
-            const directLimit = fVal / gVal;
-            htmlContent.push('<div class="conclusion">✅ No es una indeterminación. El límite directo es <strong>' + fmtMath(directLimit) + '</strong>. L\'Hôpital no es necesario.</div>');
-            return {
-              htmlContent: htmlContent.join(''),
-              fOriginal: normalizeExpr(fIn),
-              gOriginal: normalizeExpr(gIn),
-              fPlot: normalizeExpr(fIn),
-              gPlot: normalizeExpr(gIn),
-              fLast: F,
-              gLast: G,
-              hops: 0,
-              limitVal: directLimit,
-              useHtml: true
-            };
-          }
-        }
-
-        htmlContent.push('<div class="step-item">🔍 Detectamos una indeterminación del tipo <strong>' + (isZeroZero ? "0/0" : "∞/∞") + '</strong>. ¡Perfecto para aplicar L\'Hôpital!</div>');
-        
-        // Mostrar las primeras derivadas
-        const firstDF = diffStr(F);
-        const firstDG = diffStr(G);
-        htmlContent.push('<div class="step-item">📐 Vamos a derivar:</div>');
-        htmlContent.push('<div class="math-expression">');
-        htmlContent.push('$$f\'(x) = ' + firstDF + '$$<br><br>$$g\'(x) = ' + firstDG + '$$');
-        htmlContent.push('</div>');
-
-        const maxIter = 12;
-        let k = 0;
-        let lastRatio = null;
-
-        for (; k < maxIter; k++) {
-          const indet =
-            aInfo.isInf
-              ? isRoughIndeterminate(F, G, aInfo.value, true)
-              : isRoughIndeterminate(F, G, aInfo.value, false);
-
-          let sampleX;
-          if (aInfo.isInf) sampleX = 1e8;
-          else sampleX = aInfo.value + (aInfo.value === 0 ? 1e-7 : 1e-7 * Math.abs(aInfo.value));
-
-          const r = ratioAt(F, G, sampleX);
-          lines.push("Paso " + k + ":  F=" + F + "   G=" + G);
-          if (!indet && Number.isFinite(r)) {
-            lastRatio = r;
-            lines.push("→ Cociente estable en muestra numérica: " + fmt(r));
-            break;
-          }
-          const dF = diffStr(F);
-          const dG = diffStr(G);
-          if (dF === "0" && dG === "0") throw new Error("Derivadas nulas; no se puede continuar.");
-          lines.push("→ Indeterminación persiste. Derivamos: F'=" + dF + ", G'=" + dG);
-          F = dF;
-          G = dG;
-          const r2 = ratioAt(F, G, sampleX);
-          lastRatio = r2;
-        }
-
-        let finalVal = lastRatio;
-        if (aInfo.isInf) {
-          const xL = 1e12;
-          finalVal = ratioAt(F, G, xL);
-        } else {
-          const h = 1e-10;
-          const rA = ratioAt(F, G, aInfo.value + h);
-          const rB = ratioAt(F, G, aInfo.value - h);
-          if (Number.isFinite(rA) && Number.isFinite(rB)) finalVal = (rA + rB) / 2;
-          else finalVal = rA || rB || lastRatio;
-        }
-
-        htmlContent.push('<div class="conclusion">🎯 Después de ' + k + ' aplicación(es) de L\'Hôpital, el límite es <strong>' + fmtMath(finalVal) + '</strong></div>');
-        
-        return {
-          htmlContent: htmlContent.join(''),
-          fOriginal: normalizeExpr(fIn),
-          gOriginal: normalizeExpr(gIn),
-          fPlot: normalizeExpr(fIn),
-          gPlot: normalizeExpr(gIn),
-          fLast: F,
-          gLast: G,
-          hops: k,
-          limitVal: finalVal,
-          useHtml: true
-        };
+        break;
       }
+      lastVal = r;
+    }
 
-      function applyPresetIndex(i) {
-        const p = presets[i];
-        if (p.f) el.finput.value = p.f;
-        if (p.g) el.ginput.value = p.g;
-        el.apoint.value = p.a;
-        el.xmin.value = p.xmin;
-        el.xmax.value = p.xmax;
-        if (p.a === "+infinity") {
-          el.xpos.value = "850";
-        } else {
-          el.xpos.value = "500";
-        }
-        state.slideFloat = parseFloat(el.xpos.value);
-        state.drawXSmooth = null;
+    // Refine
+    let finalVal = lastVal;
+    if (isInf) {
+      const v = ratioAt(F,G,1e13);
+      if (isFinite(v)) finalVal = v;
+    } else {
+      const h=1e-11;
+      const ra=ratioAt(F,G,a+h), rb=ratioAt(F,G,a-h);
+      if (isFinite(ra)&&isFinite(rb)) finalVal=(ra+rb)/2;
+      else finalVal = isFinite(ra)?ra:rb;
+    }
+
+    blocks.push({
+      type:"ok", icon:"🎯",
+      title:`Resultado final — ${k+1} aplicación(es)`,
+      math:`\\lim_{x\\to ${lp}}\\frac{f(x)}{g(x)} = ${fmt(finalVal)}`,
+      lines:[],
+      concl:`Límite = ${fmt(finalVal)}`
+    });
+
+    return { blocks, fPlot:norm(fIn), gPlot:norm(gIn), fLast:F, gLast:G, hops:k+1, limitVal:finalVal };
+  }
+
+  /* ── Render diagnostic ───────────────────────────── */
+  function renderDiag(blocks) {
+    const body = el.diagBody;
+    body.innerHTML = "";
+    blocks.forEach(b => {
+      const div = document.createElement("div");
+      div.className = "db " + b.type;
+
+      let html = `<div class="db-title">`;
+      if (b.isStep) html += `<span class="snum">${b.icon}</span>`;
+      else           html += `<span>${b.icon}</span>`;
+      html += `<span>${b.title}</span></div>`;
+
+      if (b.math) html += `<div class="db-math" data-math="${encodeURIComponent(b.math)}"></div>`;
+      (b.lines||[]).forEach(l => { html += `<div class="db-line">${l}</div>`; });
+      if (b.concl) html += `<div class="db-concl">→ ${b.concl}</div>`;
+
+      div.innerHTML = html;
+      div.querySelectorAll("[data-math]").forEach(m => {
+        K(decodeURIComponent(m.getAttribute("data-math")), m, true);
+      });
+      body.appendChild(div);
+    });
+  }
+
+  /* ── Error display ───────────────────────────────── */
+  function showErr(msg) {
+    el.errorStrip.textContent = "⚠ " + msg;
+    el.errorStrip.style.display = "block";
+  }
+  function clearErr() {
+    el.errorStrip.style.display = "none";
+    el.errorStrip.textContent = "";
+  }
+
+  /* ── Run ─────────────────────────────────────────── */
+  function runCalc() {
+    clearErr();
+    el.resultOverlay.style.display = "none";
+
+    const fRaw = norm(el.finput.value), gRaw = norm(el.ginput.value);
+    let aInfo;
+    try { aInfo = parseA(el.apoint.value); }
+    catch(e) { showErr(e.message); return; }
+
+    S.aNum=aInfo.value; S.aIsInf=aInfo.isInf;
+
+    let res;
+    try { res = compute(fRaw, gRaw, aInfo); }
+    catch(e) { showErr(e.message); return; }
+
+    renderDiag(res.blocks);
+    S.f0=res.fPlot; S.g0=res.gPlot;
+    S.fLast=res.fLast; S.gLast=res.gLast;
+    S.limitVal=res.limitVal; S.hops=res.hops;
+
+    if (res.limitVal!==null && isFinite(res.limitVal)) {
+      const lp = aInfo.isInf ? "\\infty" : String(aInfo.value);
+      el.ovlMath.innerHTML = "";
+      K(`\\lim_{x\\to ${lp}}\\dfrac{f}{g} = ${fmt(res.limitVal)}`, el.ovlMath, false);
+      el.ovlHops.textContent = res.hops>0
+        ? `${res.hops} aplicación(es) de L'Hôpital`
+        : "Evaluación directa";
+      el.resultOverlay.style.display = "block";
+    }
+
+    el.lv.textContent = res.limitVal!==null ? fmt(res.limitVal) : "∄";
+    el.vizSub.textContent = `${fRaw||"f"} / ${gRaw||"g"}  —  a = ${aInfo.isInf?"+∞":aInfo.value}`;
+
+    drawPlot(); updateMetrics(); startAnim();
+  }
+
+  /* ── Slider ──────────────────────────────────────── */
+  function xFromSlider(t) {
+    const xMin=parseFloat(el.xmin.value), xMax=parseFloat(el.xmax.value);
+    if (!isFinite(xMin)||!isFinite(xMax)||xMax<=xMin) return 0;
+    if (S.aIsInf) return xMin+(t/1000)*(xMax-xMin);
+    const a=S.aNum, span=(xMax-xMin)*0.38;
+    const L=Math.max(xMin,a-span), R=Math.min(xMax,a+span);
+    if (t<=500) return L+(t/500)*(a-L);
+    return a+((t-500)/500)*(R-a);
+  }
+
+  /* ── Metrics update ──────────────────────────────── */
+  function updateMetrics() {
+    const t = S.animating ? S.slideFloat : parseFloat(el.xpos.value)||S.slideFloat;
+    const x = xFromSlider(t);
+    el.xvalBadge.textContent = isFinite(x) ? `x = ${+x.toPrecision(5)}` : "x = —";
+
+    const q=ratioAt(S.f0,S.g0,x), d=ratioAt(S.fLast,S.gLast,x);
+    el.qv.textContent = isFinite(q) ? fmt(q) : "Indefinido";
+    el.dv.textContent = isFinite(d) ? fmt(d) : "Indefinido";
+    if (S.limitVal!==null && isFinite(S.limitVal)) el.lv.textContent = fmt(S.limitVal);
+
+    const xDraw = S.animating
+      ? (S.drawSmooth = S.drawSmooth===null ? x : S.drawSmooth+(x-S.drawSmooth)*0.3)
+      : (S.drawSmooth = x);
+    drawPlot(xDraw);
+  }
+
+  /* ── Draw ────────────────────────────────────────── */
+  function drawPlot(xMark) {
+    const canvas = el.plot;
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width||!rect.height) return;
+    const dpr = devicePixelRatio || 1;
+    canvas.width  = rect.width  * dpr;
+    canvas.height = rect.height * dpr;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    const W=rect.width, H=rect.height;
+
+    let xMin=parseFloat(el.xmin.value), xMax=parseFloat(el.xmax.value);
+    if (!isFinite(xMin)||!isFinite(xMax)||xMax<=xMin){xMin=-3;xMax=3;}
+    const pad={l:44,r:16,t:14,b:34};
+
+    // Sample ys
+    const ys=[];
+    for (let i=0;i<=400;i++) {
+      const x=xMin+(i/400)*(xMax-xMin);
+      const q=ratioAt(S.f0,S.g0,x), d=ratioAt(S.fLast,S.gLast,x);
+      if (isFinite(q)) ys.push(q);
+      if (isFinite(d)) ys.push(d);
+    }
+    if (S.limitVal!==null&&isFinite(S.limitVal)) ys.push(S.limitVal);
+    let yMin=ys.length?Math.min(...ys):-2, yMax=ys.length?Math.max(...ys):2;
+    if (!isFinite(yMin)||!isFinite(yMax)){yMin=-2;yMax=2;}
+    if (yMax-yMin<1e-8){yMin-=1;yMax+=1;}
+    const yp=(yMax-yMin)*0.12; yMin-=yp; yMax+=yp;
+
+    const sx=x=>pad.l+((x-xMin)/(xMax-xMin))*(W-pad.l-pad.r);
+    const sy=y=>pad.t+(1-(y-yMin)/(yMax-yMin))*(H-pad.t-pad.b);
+
+    // BG
+    ctx.fillStyle="#fafbfd"; ctx.fillRect(0,0,W,H);
+
+    // Grid
+    const nt=v=>{const p=Math.pow(10,Math.floor(Math.log10(v)));const f=v/p;return f<1.5?p:f<3.5?2*p:f<7.5?5*p:10*p;};
+    const gxS=nt((xMax-xMin)/6), gyS=nt((yMax-yMin)/6);
+    ctx.strokeStyle="#edf0f6"; ctx.lineWidth=1;
+    for (let gx=Math.ceil(xMin/gxS)*gxS; gx<=xMax; gx+=gxS) {
+      ctx.beginPath(); ctx.moveTo(sx(gx),pad.t); ctx.lineTo(sx(gx),H-pad.b); ctx.stroke();
+    }
+    for (let gy=Math.ceil(yMin/gyS)*gyS; gy<=yMax; gy+=gyS) {
+      ctx.beginPath(); ctx.moveTo(pad.l,sy(gy)); ctx.lineTo(W-pad.r,sy(gy)); ctx.stroke();
+    }
+
+    // Axes
+    ctx.strokeStyle="#c0cfe0"; ctx.lineWidth=1.4;
+    if (yMin<0&&yMax>0){ctx.beginPath();ctx.moveTo(pad.l,sy(0));ctx.lineTo(W-pad.r,sy(0));ctx.stroke();}
+    if (xMin<0&&xMax>0){ctx.beginPath();ctx.moveTo(sx(0),pad.t);ctx.lineTo(sx(0),H-pad.b);ctx.stroke();}
+
+    // Tick labels
+    ctx.fillStyle="#8a9bb2"; ctx.font=`10px "JetBrains Mono",monospace`;
+    for (let gx=Math.ceil(xMin/gxS)*gxS; gx<=xMax; gx+=gxS) {
+      if (Math.abs(gx)<gxS*0.01) continue;
+      ctx.fillText(+gx.toPrecision(3), sx(gx)-10, H-pad.b+13);
+    }
+    for (let gy=Math.ceil(yMin/gyS)*gyS; gy<=yMax; gy+=gyS) {
+      if (Math.abs(gy)<gyS*0.01) continue;
+      ctx.fillText(+gy.toPrecision(3), 2, sy(gy)+3);
+    }
+
+    // Vertical line at a
+    const aLine = S.aIsInf ? xMax-0.015*(xMax-xMin) : S.aNum;
+    ctx.strokeStyle="#c4d0e4"; ctx.lineWidth=1.2; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(sx(aLine),pad.t); ctx.lineTo(sx(aLine),H-pad.b); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Horizontal limit line
+    if (S.limitVal!==null&&isFinite(S.limitVal)) {
+      ctx.strokeStyle="rgba(180,83,9,.3)"; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(pad.l,sy(S.limitVal)); ctx.lineTo(W-pad.r,sy(S.limitVal)); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Curves
+    function curve(fn, color, lw) {
+      ctx.strokeStyle=color; ctx.lineWidth=lw;
+      ctx.lineJoin="round"; ctx.lineCap="round";
+      ctx.beginPath();
+      let started=false;
+      for (let i=0;i<=600;i++) {
+        const x=xMin+(i/600)*(xMax-xMin), y=fn(x);
+        if (!isFinite(y)){started=false;continue;}
+        started ? ctx.lineTo(sx(x),sy(y)) : (ctx.moveTo(sx(x),sy(y)),started=true);
       }
+      ctx.stroke();
+    }
+    curve(x=>ratioAt(S.f0,S.g0,x),    "#1b4f8a", 2.3);
+    curve(x=>ratioAt(S.fLast,S.gLast,x), "#196642", 1.8);
 
-      function readInputs() {
-        state.fRaw = normalizeExpr(el.finput.value);
-        state.gRaw = normalizeExpr(el.ginput.value);
-        const aInfo = parseA(el.apoint.value);
-        state.aNum = aInfo.value;
-        state.aIsInfinity = aInfo.isInf;
-        state.f0 = state.fRaw;
-        state.g0 = state.gRaw;
-      }
-
-      function runCalc() {
-        el.errorOut.textContent = "";
-        el.resultOut.textContent = "";
-        readInputs();
-        try {
-          const res = computeLHospitale(state.f0, state.g0, { value: state.aNum, isInf: state.aIsInfinity });
-          
-          if (res.useHtml) {
-            el.stepsOut.innerHTML = res.htmlContent;
-            el.stepsOut.style.display = 'block';
-            
-            // Renderizar KaTeX en el contenido
-            el.stepsOut.querySelectorAll('.math-expression').forEach(mathDiv => {
-              const mathText = mathDiv.textContent || mathDiv.innerText;
-              if (mathText && mathText.includes('$$')) {
-                const cleanMath = mathText.replace(/\$\$/g, '');
-                mathDiv.innerHTML = '';
-                katex.render(cleanMath, mathDiv, { 
-                  throwOnError: false, 
-                  displayMode: true 
-                });
-              }
-            });
-          } else {
-            el.stepsOut.textContent = res.lines.join("\n");
-            el.stepsOut.style.display = 'block';
-          }
-          
-          state.fLast = res.fLast;
-          state.gLast = res.gLast;
-          state.f0 = res.fPlot;
-          state.g0 = res.gPlot;
-          state.limitVal = res.limitVal;
-          state.hops = res.hops;
-          
-          if (res.limitVal !== null) {
-            // Mostrar notación completa del límite
-            const limitPoint = state.aIsInfinity ? "\\infty" : state.aNum;
-            const limitExpression = "\\lim_{x \\to " + limitPoint + "} \\frac{" + res.fOriginal + "}{" + res.gOriginal + "} = " + fmtMath(res.limitVal);
-            
-            el.resultMath.innerHTML = '';
-            katex.render(limitExpression, el.resultMath, { 
-              throwOnError: false, 
-              displayMode: true 
-            });
-            
-            el.resultOut.textContent =
-              (res.hops > 0 ? res.hops + " aplicación(es) de la regla" : "Límite directo");
-            el.resultOverlay.style.display = 'block';
-            
-            el.lv.textContent = fmt(res.limitVal);
-            drawPlot();
-            updateMetrics();
-            startAnim();
-          }
-        } catch (err) {
-          const errorMsg = String(err.message || err);
-          if (errorMsg.startsWith('HTML_RESULT:')) {
-            try {
-              const htmlResult = JSON.parse(errorMsg.substring('HTML_RESULT:'.length));
-              el.stepsOut.innerHTML = htmlResult.htmlContent;
-              el.stepsOut.style.display = 'block';
-              
-              // Renderizar KaTeX en el contenido
-              el.stepsOut.querySelectorAll('.math-expression').forEach(mathDiv => {
-                const mathText = mathDiv.textContent || mathDiv.innerText;
-                if (mathText && mathText.includes('$$')) {
-                  const cleanMath = mathText.replace(/\$\$/g, '');
-                  mathDiv.innerHTML = '';
-                  katex.render(cleanMath, mathDiv, { 
-                    throwOnError: false, 
-                    displayMode: true 
-                  });
-                }
-              });
-              
-              el.errorOut.textContent = "";
-              
-              // Mostrar notación completa del límite si existe
-              if (htmlResult.limitVal !== null) {
-                const limitPoint = state.aIsInfinity ? "\\infty" : state.aNum;
-                const limitExpression = "\\lim_{x \\to " + limitPoint + "} \\frac{" + htmlResult.fOriginal + "}{" + htmlResult.gOriginal + "} = " + fmtMath(htmlResult.limitVal);
-                
-                el.resultMath.innerHTML = '';
-                katex.render(limitExpression, el.resultMath, { 
-                  throwOnError: false, 
-                  displayMode: true 
-                });
-                
-                el.resultOut.textContent =
-                  (htmlResult.hops > 0 ? htmlResult.hops + " aplicación(es) de la regla" : "Límite directo");
-                el.resultOverlay.style.display = 'block';
-                
-                el.lv.textContent = fmt(htmlResult.limitVal);
-                drawPlot();
-                updateMetrics();
-                startAnim();
-              }
-            } catch (parseErr) {
-              el.errorOut.textContent = "Error al procesar el resultado: " + parseErr.message;
-            }
-          } else {
-            el.errorOut.textContent = errorMsg;
-            el.stepsOut.textContent = "";
-            el.stepsOut.style.display = 'none';
-          }
-          el.lv.textContent = "—";
-        }
-      }
-
-      function getSlideT() {
-        const v = parseFloat(el.xpos.value);
-        if (Number.isFinite(v)) return v;
-        return state.slideFloat;
-      }
-
-      function xFromSlider(t) {
-        const xMin = parseFloat(el.xmin.value);
-        const xMax = parseFloat(el.xmax.value);
-        if (!Number.isFinite(xMin) || !Number.isFinite(xMax) || xMax <= xMin) return 0;
-        const a = state.aIsInfinity ? Infinity : state.aNum;
-        if (a === Infinity) {
-          return xMin + (t / 1000) * (xMax - xMin);
-        }
-        const span = (xMax - xMin) * 0.4;
-        const left = Math.max(xMin, a - span);
-        const right = Math.min(xMax, a + span);
-        if (t <= 500) {
-          const u = t / 500;
-          return left + u * (a - left);
-        }
-        const u = (t - 500) / 500;
-        return a + u * (right - a);
-      }
-
-      function updateMetrics() {
-        const t = state.animating ? state.slideFloat : getSlideT();
-        const x = xFromSlider(t);
-        el.xval.textContent = fmt(x);
-        const q = ratioAt(state.f0, state.g0, x);
-        const d = ratioAt(state.fLast, state.gLast, x);
-        el.qv.textContent = fmt(q);
-        el.dv.textContent = fmt(d);
-        if (state.limitVal !== null && Number.isFinite(state.limitVal)) el.lv.textContent = fmt(state.limitVal);
-        let xDraw = x;
-        if (state.animating) {
-          if (state.drawXSmooth === null || !Number.isFinite(state.drawXSmooth)) state.drawXSmooth = x;
-          state.drawXSmooth = state.drawXSmooth + (x - state.drawXSmooth) * 0.35;
-          xDraw = state.drawXSmooth;
-        } else {
-          state.drawXSmooth = x;
-        }
-        drawPlot(xDraw);
-      }
-
-      function drawPlot(xMark) {
-        const canvas = el.plot;
-        const ctx = canvas.getContext("2d");
-        const W = canvas.width;
-        const H = canvas.height;
-        const pad = { l: 52, r: 22, t: 18, b: 40 };
-
-        let xMin = parseFloat(el.xmin.value);
-        let xMax = parseFloat(el.xmax.value);
-        if (!Number.isFinite(xMin) || !Number.isFinite(xMax) || xMax <= xMin) {
-          xMin = -2;
-          xMax = 2;
-        }
-
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, W, H);
-
-        const sx = (x) => pad.l + ((x - xMin) / (xMax - xMin)) * (W - pad.l - pad.r);
-
-        function sampleYs() {
-          const ys = [];
-          const n = 180;
-          for (let i = 0; i <= n; i++) {
-            const x = xMin + (i / n) * (xMax - xMin);
-            const q = ratioAt(state.f0, state.g0, x);
-            const d = ratioAt(state.fLast, state.gLast, x);
-            if (Number.isFinite(q)) ys.push(q);
-            if (Number.isFinite(d)) ys.push(d);
-          }
-          if (state.limitVal !== null && Number.isFinite(state.limitVal)) ys.push(state.limitVal);
-          return ys;
-        }
-        const ys = sampleYs();
-        let yMin = ys.length ? Math.min(...ys) : -1;
-        let yMax = ys.length ? Math.max(...ys) : 1;
-        if (!Number.isFinite(yMin) || !Number.isFinite(yMax)) {
-          yMin = -2;
-          yMax = 2;
-        }
-        if (yMax - yMin < 1e-9) {
-          yMin -= 0.5;
-          yMax += 0.5;
-        }
-        const yPad = (yMax - yMin) * 0.1;
-        yMin -= yPad;
-        yMax += yPad;
-
-        const sy = (y) => pad.t + (1 - (y - yMin) / (yMax - yMin)) * (H - pad.t - pad.b);
-
-        ctx.strokeStyle = "#e9edf2";
-        ctx.lineWidth = 1;
-        for (let gx = Math.ceil(xMin); gx <= Math.floor(xMax); gx++) {
-          ctx.beginPath();
-          ctx.moveTo(sx(gx), pad.t);
-          ctx.lineTo(sx(gx), H - pad.b);
-          ctx.stroke();
-        }
-        const gyStep = (yMax - yMin) / 6;
-        for (let gy = yMin; gy <= yMax; gy += gyStep) {
-          ctx.beginPath();
-          ctx.moveTo(pad.l, sy(gy));
-          ctx.lineTo(W - pad.r, sy(gy));
-          ctx.stroke();
-        }
-
-        ctx.strokeStyle = "#2d4a6f";
-        ctx.lineWidth = 1.2;
-        ctx.lineCap = "round";
-        ctx.beginPath();
-        ctx.moveTo(sx(xMin), sy(0));
-        ctx.lineTo(sx(xMax), sy(0));
+    // Marker
+    if (xMark!==undefined&&isFinite(xMark)) {
+      ctx.strokeStyle="#c87b3a"; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(sx(xMark),pad.t); ctx.lineTo(sx(xMark),H-pad.b); ctx.stroke();
+      ctx.setLineDash([]);
+      const qm=ratioAt(S.f0,S.g0,xMark);
+      if (isFinite(qm)) {
+        ctx.fillStyle="#b45309";
+        ctx.beginPath(); ctx.arc(sx(xMark),sy(qm),5.5,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle="#fff"; ctx.lineWidth=1.8;
         ctx.stroke();
-
-        function plotCurve(ratioFn, color) {
-          ctx.strokeStyle = color;
-          ctx.lineWidth = 2.25;
-          ctx.lineJoin = "round";
-          ctx.lineCap = "round";
-          ctx.beginPath();
-          let started = false;
-          const n = 480;
-          for (let i = 0; i <= n; i++) {
-            const x = xMin + (i / n) * (xMax - xMin);
-            const y = ratioFn(x);
-            if (!Number.isFinite(y)) {
-              started = false;
-              continue;
-            }
-            const px = sx(x);
-            const py = sy(y);
-            if (!started) {
-              ctx.moveTo(px, py);
-              started = true;
-            } else ctx.lineTo(px, py);
-          }
-          ctx.stroke();
-        }
-
-        plotCurve((x) => ratioAt(state.f0, state.g0, x), "#1a4b7a");
-        plotCurve((x) => ratioAt(state.fLast, state.gLast, x), "#2e7d4a");
-
-        const aLine = state.aIsInfinity ? xMax - 0.02 * (xMax - xMin) : state.aNum;
-        ctx.strokeStyle = "#b8c4d4";
-        ctx.setLineDash([5, 5]);
-        ctx.beginPath();
-        ctx.moveTo(sx(aLine), pad.t);
-        ctx.lineTo(sx(aLine), H - pad.b);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        if (xMark !== undefined && Number.isFinite(xMark)) {
-          ctx.strokeStyle = "#c45c26";
-          ctx.lineWidth = 1.75;
-          ctx.lineCap = "round";
-          ctx.setLineDash([5, 5]);
-          ctx.beginPath();
-          ctx.moveTo(sx(xMark), pad.t);
-          ctx.lineTo(sx(xMark), H - pad.b);
-          ctx.stroke();
-          ctx.setLineDash([]);
-          const qm = ratioAt(state.f0, state.g0, xMark);
-          if (Number.isFinite(qm)) {
-            ctx.fillStyle = "#c45c26";
-            ctx.beginPath();
-            ctx.arc(sx(xMark), sy(qm), 6.5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = "#ffffff";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-          }
-        }
-
-        ctx.fillStyle = "#5c6b7e";
-        ctx.font = "11px JetBrains Mono, monospace";
-        ctx.fillText("x", W - 36, H - 10);
-        ctx.fillText("y", pad.l - 4, pad.t + 6);
       }
+    }
+  }
 
-      function easeCosine(t) {
-        return 0.5 - 0.5 * Math.cos(Math.PI * Math.min(1, Math.max(0, t)));
-      }
+  /* ── Animation ───────────────────────────────────── */
+  function ease(t){return .5-.5*Math.cos(Math.PI*Math.min(1,Math.max(0,t)));}
+  function animLoop(ts){
+    if (!S.animStart) S.animStart=ts;
+    const p=Math.min(1,(ts-S.animStart)/9500);
+    S.slideFloat=ease(p)*(S.aIsInf?1000:500);
+    el.xpos.value=S.slideFloat;
+    updateMetrics();
+    if (p<1) S.animId=requestAnimationFrame(animLoop);
+    else{S.animStart=null;S.animId=null;S.animating=false;S.drawSmooth=null;}
+  }
+  function startAnim(){
+    cancelAnimationFrame(S.animId);
+    S.animStart=null;S.animating=true;S.drawSmooth=null;
+    S.slideFloat=0;el.xpos.value="0";
+    S.animId=requestAnimationFrame(animLoop);
+  }
+  function stopAnim(){
+    cancelAnimationFrame(S.animId);
+    S.animId=null;S.animStart=null;S.animating=false;
+    S.slideFloat=parseFloat(el.xpos.value);S.drawSmooth=null;
+    updateMetrics();
+  }
 
-      function animateLoop(ts) {
-        if (!state.animStart) state.animStart = ts;
-        const dur = 9200;
-        const p = Math.min(1, (ts - state.animStart) / dur);
-        const e = easeCosine(p);
-        const maxSlide = state.aIsInfinity ? 1000 : 500;
-        state.slideFloat = e * maxSlide;
-        el.xpos.value = String(state.slideFloat);
-        updateMetrics();
-        if (p < 1) state.animId = requestAnimationFrame(animateLoop);
-        else {
-          state.animStart = null;
-          state.animId = null;
-          state.animating = false;
-          state.slideFloat = parseFloat(el.xpos.value);
-          state.drawXSmooth = null;
-        }
-      }
+  /* ── Resize ──────────────────────────────────────── */
+  new ResizeObserver(()=>drawPlot(S.drawSmooth)).observe(el.plot.parentElement);
 
-      function startAnim() {
-        cancelAnimationFrame(state.animId);
-        state.animStart = null;
-        state.animating = true;
-        state.drawXSmooth = null;
-        state.slideFloat = 0;
-        el.xpos.value = "0";
-        state.animId = requestAnimationFrame(animateLoop);
-      }
+  /* ── Events ──────────────────────────────────────── */
+  el.diagToggle.addEventListener("click",()=>{
+    const body=$("diag-body");
+    const open = body.style.display!=="none";
+    body.style.display = open ? "none" : "";
+    el.diagToggle.querySelector(".arr").textContent = open ? "▼" : "▲";
+  });
 
-      function stopAnim() {
-        cancelAnimationFrame(state.animId);
-        state.animId = null;
-        state.animStart = null;
-        state.animating = false;
-        state.slideFloat = parseFloat(el.xpos.value);
-        state.drawXSmooth = null;
-        updateMetrics();
-      }
+  el.preset.addEventListener("change",()=>{
+    const i=parseInt(el.preset.value,10);
+    applyPreset(i);
+    if (i>0) runCalc();
+  });
 
-      function init() {
-        presets.forEach((p, i) => {
-          const opt = document.createElement("option");
-          opt.value = String(i);
-          opt.textContent = p.name;
-          el.preset.appendChild(opt);
-        });
+  el.btnCalc.addEventListener("click", runCalc);
+  el.btnPlay.addEventListener("click", ()=>{ runCalc(); });
+  el.btnStop.addEventListener("click", stopAnim);
 
-        el.preset.addEventListener("change", () => {
-          applyPresetIndex(parseInt(el.preset.value, 10));
-          renderTex();
-          runCalc();
-        });
+  el.xpos.addEventListener("input",()=>{
+    if (S.animId) stopAnim();
+    S.slideFloat=parseFloat(el.xpos.value);
+    S.drawSmooth=null;
+    updateMetrics();
+  });
 
-        applyPresetIndex(1);
-        renderTex();
+  [el.finput,el.ginput].forEach(inp=>inp.addEventListener("change",()=>{el.preset.value="0";}));
 
-        el.btnCalc.addEventListener("click", runCalc);
-        el.btnPlay.addEventListener("click", () => {
-          runCalc();
-          startAnim();
-        });
-        el.btnStop.addEventListener("click", stopAnim);
-
-        el.xpos.addEventListener("input", () => {
-          if (state.animId) stopAnim();
-          state.slideFloat = parseFloat(el.xpos.value);
-          state.drawXSmooth = null;
-          updateMetrics();
-        });
-
-        el.finput.addEventListener("change", () => {
-          el.preset.value = "0";
-        });
-        el.ginput.addEventListener("change", () => {
-          el.preset.value = "0";
-        });
-
-        // Toggle para panel de evaluación
-        el.evalHeader.addEventListener("click", () => {
-          const isExpanded = el.evalContent.classList.contains("expanded");
-          if (isExpanded) {
-            el.evalContent.classList.remove("expanded");
-            el.evalToggle.textContent = "▼";
-          } else {
-            el.evalContent.classList.add("expanded");
-            el.evalToggle.textContent = "▲";
-          }
-        });
-
-        state.slideFloat = parseFloat(el.xpos.value) || 500;
-        runCalc();
-      }
-
-      window.addEventListener("load", init);
-    })();
-  </script>
+  /* ── Init ────────────────────────────────────────── */
+  function tryInit(){
+    if (!window.katex){setTimeout(tryInit,50);return;}
+    buildPresets();
+    renderStatic();
+    applyPreset(1);
+    runCalc();
+  }
+  window.addEventListener("load", tryInit);
+})();
+</script>
 </body>
 </html>
