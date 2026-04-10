@@ -3,1174 +3,325 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Regla de L'Hôpital — Laboratorio Interactivo</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <title>L'Hôpital Lab — Animación Fluida</title>
+  
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" onload="window._katexReady=true"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js"></script>
+
   <style>
-    /* ─── Design Tokens ───────────────────────────── */
     :root {
-      --bg:         #eef1f7;
-      --surface:    #ffffff;
-      --surface2:   #f7f9fc;
-      --border:     #e0e8f2;
-      --border2:    #c4d0e4;
-      --text:       #17243a;
-      --muted:      #586a84;
-      --accent:     #1b4f8a;
-      --accent2:    #2563b0;
-      --accent-bg:  #e8f0fb;
-      --green:      #196642;
-      --green-bg:   #ecf7f2;
-      --amber-bg:   #fef9ec;
-      --red:        #991b1b;
-      --red-bg:     #fff1f1;
-      --curve-f:    #1b4f8a;
-      --curve-d:    #196642;
-      --marker:     #b45309;
-      --r-sm:  7px;
-      --r-md:  13px;
-      --r-lg:  18px;
-      --sha-sm: 0 2px 8px rgba(20,34,58,.06);
-      --sha-md: 0 6px 24px rgba(20,34,58,.10);
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --accent: #2563eb;
+      --accent-light: #dbeafe;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
     }
 
-    /* ─── Reset ───────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; overflow: hidden; }
-    body {
-      font-family: "DM Sans", system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 13.5px;
-      line-height: 1.55;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-    /* ─── App Shell ───────────────────────────────── */
-    #app {
-      height: 100vh;
-      overflow: hidden;
-      display: grid;
-      grid-template-rows: 42px 1fr;
-      gap: 7px;
-      padding: 7px;
-    }
+    #app { display: grid; grid-template-rows: 60px 1fr; height: 100vh; padding: 12px; gap: 12px; }
+    
+    header { background: var(--surface); border-radius: 16px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+    
+    #main-layout { display: grid; grid-template-columns: 360px 1fr; gap: 12px; overflow: hidden; }
 
-    /* ─── Topbar ──────────────────────────────────── */
-    #topbar {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-md);
-      box-shadow: var(--sha-sm);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 14px;
-    }
-    #topbar h1 {
-      font-family: "Lora", Georgia, serif;
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: -.015em;
-    }
-    .badge-row { display: flex; gap: 6px; }
-    .badge {
-      font-size: 0.6rem;
-      font-weight: 600;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: var(--accent-bg);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 2px 8px;
-    }
+    .panel { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .panel-header { padding: 14px 20px; background: #f8fafc; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); color: var(--muted); }
+    .panel-body { padding: 20px; flex: 1; overflow-y: auto; }
 
-    /* ─── Main Grid 27/73 ─────────────────────────── */
-    #main {
-      display: grid;
-      grid-template-columns: 27% 1fr;
-      gap: 7px;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
+    .field { margin-bottom: 16px; }
+    label { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 6px; color: var(--muted); text-transform: uppercase; }
+    input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; background: #f8fafc; transition: all 0.2s; }
+    input:focus { outline: none; border-color: var(--accent); background: white; box-shadow: 0 0 0 3px var(--accent-light); }
+    
+    .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn { padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; transition: all 0.2s; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+    .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { background: #f8fafc; border-color: var(--muted); }
 
-    /* ─── Columns ─────────────────────────────────── */
-    #left, #right {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
+    .canvas-container { position: relative; flex: 1; background: white; overflow: hidden; cursor: crosshair; }
+    canvas { width: 100%; height: 100%; display: block; }
+    
+    #metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 20px; background: #f8fafc; border-top: 1px solid var(--border); }
+    .metric-card { background: white; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid var(--border); transition: transform 0.2s; }
+    .metric-card small { font-size: 0.6rem; color: var(--muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    .metric-card b { font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: var(--accent); }
 
-    /* ─── Card ────────────────────────────────────── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-lg);
-      box-shadow: var(--sha-sm);
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .card.grow {
-      flex: 1;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-    }
-    .card-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 13px;
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    .card-head h2 {
-      font-family: "Lora", Georgia, serif;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--accent);
-    }
-    .card-body {
-      padding: 11px 13px;
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-    }
+    .step { background: #f8fafc; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--accent); }
+    
+    #overlay-math { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.9); backdrop-filter: blur(8px); padding: 12px 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); pointer-events: none; }
 
-    /* ─── Theorem ─────────────────────────────────── */
-    #theorem {
-      padding: 9px 13px 9px 17px;
-      position: relative;
-    }
-    #theorem::before {
-      content: "";
-      position: absolute;
-      left: 0; top: 10%; bottom: 10%;
-      width: 3px;
-      background: var(--accent);
-      border-radius: 3px;
-    }
-    #thm-katex { margin-bottom: 3px; }
-    #theorem p {
-      font-size: 0.69rem;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    /* ─── Form ────────────────────────────────────── */
-    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-    .field { display: flex; flex-direction: column; gap: 3px; }
-    label {
-      font-size: 0.67rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-    input[type="text"], input[type="number"], select {
-      width: 100%;
-      font-family: "JetBrains Mono", monospace;
-      font-size: 0.78rem;
-      padding: 4px 8px;
-      height: 28px;
-      border: 1px solid var(--border);
-      border-radius: var(--r-sm);
-      background: var(--surface2);
-      color: var(--text);
-      transition: border-color .14s, box-shadow .14s;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--accent2);
-      box-shadow: 0 0 0 3px rgba(37,99,176,.11);
-      background: var(--surface);
-    }
-    input[type="range"] {
-      width: 100%;
-      height: 4px;
-      accent-color: var(--accent);
-      cursor: pointer;
-    }
-
-    /* ─── Buttons ─────────────────────────────────── */
-    .btn-row { display: flex; gap: 5px; }
-    .btn {
-      font-family: "DM Sans", sans-serif;
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      height: 28px;
-      border-radius: var(--r-sm);
-      border: 1px solid var(--border2);
-      background: var(--surface);
-      color: var(--accent);
-      cursor: pointer;
-      transition: background .13s, transform .09s;
-      white-space: nowrap;
-      display: flex; align-items: center; gap: 4px;
-    }
-    .btn:hover { background: var(--accent-bg); }
-    .btn:active { transform: scale(.97); }
-    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); }
-
-    /* ─── Hint ────────────────────────────────────── */
-    .hint {
-      font-size: 0.68rem;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-    .hint code {
-      font-family: "JetBrains Mono", monospace;
-      background: var(--accent-bg);
-      border-radius: 3px;
-      padding: 0 3px;
-    }
-
-    /* ─── Error strip ─────────────────────────────── */
-    #error-strip {
-      display: none;
-      background: var(--red-bg);
-      border: 1px solid #fca5a5;
-      border-radius: var(--r-sm);
-      padding: 5px 9px;
-      font-size: 0.72rem;
-      color: var(--red);
-    }
-
-    /* ─── Diagnostic Card ─────────────────────────── */
-    #diag-card {
-      flex: 1;
-      min-height: 0;
-    }
-    #diag-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 13px;
-      background: var(--accent-bg);
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      user-select: none;
-      flex-shrink: 0;
-    }
-    #diag-toggle h3 {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--accent);
-    }
-    #diag-toggle .arr { font-size: .65rem; color: var(--muted); transition: transform .2s; }
-    #diag-body {
-      flex: 1;
-      overflow-y: auto;
-      min-height: 0;
-    }
-    .diag-empty {
-      padding: 18px 13px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.74rem;
-    }
-
-    /* ─── Diag Blocks ─────────────────────────────── */
-    .db {
-      margin: 7px;
-      border-radius: 0 var(--r-sm) var(--r-sm) 0;
-      border-left: 3px solid var(--border2);
-      background: var(--surface2);
-      padding: 8px 11px;
-      font-size: 0.76rem;
-      line-height: 1.6;
-    }
-    .db.info  { border-left-color: var(--accent2); background: var(--accent-bg); }
-    .db.ok    { border-left-color: var(--green);   background: var(--green-bg); }
-    .db.warn  { border-left-color: #d97706;         background: var(--amber-bg); }
-    .db.err   { border-left-color: var(--red);      background: var(--red-bg); }
-    .db-title {
-      font-weight: 600;
-      font-size: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      margin-bottom: 4px;
-    }
-    .snum {
-      width: 17px; height: 17px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      font-size: 0.6rem;
-      font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .snum.g { background: var(--green); }
-    .db-math { margin: 5px 0; text-align: center; }
-    .db-line { margin: 2px 0; font-size: 0.73rem; }
-    .db-concl {
-      margin-top: 6px;
-      padding-top: 6px;
-      border-top: 1px solid rgba(0,0,0,.08);
-      font-weight: 600;
-      font-size: 0.76rem;
-    }
-
-    /* ─── Right / Viz ─────────────────────────────── */
-    #viz-card { min-height: 0; }
-    .viz-inner {
-      flex: 1;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      padding: 9px 13px 11px;
-    }
-
-    /* Canvas */
-    .canvas-wrap {
-      flex: 1;
-      min-height: 0;
-      position: relative;
-      border: 1px solid var(--border);
-      border-radius: var(--r-md);
-      background: #fafbfd;
-      overflow: hidden;
-    }
-    canvas { display: block; width: 100%; height: 100%; }
-
-    /* Overlay */
-    #result-overlay {
-      display: none;
-      position: absolute;
-      top: 9px; right: 9px;
-      background: rgba(255,255,255,.96);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      border-radius: var(--r-md);
-      padding: 7px 12px;
-      box-shadow: var(--sha-md);
-      min-width: 170px;
-      text-align: center;
-    }
-    .ovl-label {
-      font-size: 0.62rem;
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      color: var(--muted);
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-    #ovl-hops {
-      font-size: 0.66rem;
-      color: var(--green);
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
-    /* Legend */
-    .legend-row {
-      display: flex;
-      gap: 7px;
-      align-items: center;
-    }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.7rem;
-      color: var(--muted);
-      padding: 2px 7px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-    }
-    .cline { width: 15px; height: 2px; border-radius: 2px; }
-    .cdot  { width: 7px;  height: 7px; border-radius: 50%; }
-
-    /* Slider section */
-    #slider-sec { flex-shrink: 0; }
-    .sl-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    .sl-head span { font-size: 0.7rem; color: var(--muted); font-weight: 500; }
-    #xval-badge {
-      font-family: "JetBrains Mono", monospace;
-      font-size: 0.76rem;
-      color: var(--accent);
-      background: var(--accent-bg);
-      padding: 1px 7px;
-      border-radius: 4px;
-      font-weight: 500;
-    }
-
-    /* Metric cards */
-    #metrics {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 7px;
-      flex-shrink: 0;
-    }
-    .mc {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--r-md);
-      padding: 7px 9px;
-      text-align: center;
-    }
-    .mc:last-child {
-      border-color: var(--accent);
-      background: var(--accent-bg);
-    }
-    .mc-lbl {
-      min-height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 3px;
-    }
-    .mc-lbl-text {
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--muted);
-    }
-    .mc-val {
-      font-family: "JetBrains Mono", monospace;
-      font-size: 0.86rem;
-      font-weight: 500;
-      color: var(--text);
-    }
-    .mc:last-child .mc-val { color: var(--accent); font-weight: 700; }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
-
-    /* KaTeX */
-    .katex { font-size: 1em; }
-    .katex-display { margin: .15em 0 !important; }
-
-    .sr-only {
-      position: absolute; width: 1px; height: 1px;
-      padding: 0; margin: -1px; overflow: hidden;
-      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
-    }
+    input[type="range"] { -webkit-appearance: none; height: 6px; background: var(--border); border-radius: 5px; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--accent); border-radius: 50%; cursor: pointer; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
   </style>
 </head>
 <body>
-<div id="app">
 
-  <!-- Topbar -->
-  <header id="topbar">
-    <h1>Regla de L'Hôpital &mdash; Laboratorio Interactivo</h1>
-    <div class="badge-row">
-      <span class="badge">Cálculo Diferencial</span>
-      <span class="badge">PUCMM</span>
+<div id="app">
+  <header>
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="background: var(--accent); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">H</div>
+        <h2 style="font-size: 1rem; letter-spacing: -0.02em;">Laboratorio de L'Hôpital <span style="font-weight: 400; color: var(--muted);">— Visualizador Dinámico</span></h2>
     </div>
   </header>
 
-  <!-- Main -->
-  <div id="main">
-
-    <!-- ══ LEFT ══════════════════════════════════════ -->
-    <div id="left">
-
-      <!-- Theorem -->
-      <div class="card" id="theorem">
-        <div id="thm-katex"></div>
-        <p>Si <span id="thm-indet"></span> y <span id="thm-cond"></span>, el límite de la razón iguala el de sus derivadas.</p>
-      </div>
-
-      <!-- Inputs -->
-      <div class="card">
-        <div class="card-head"><h2>Modelo</h2></div>
-        <div class="card-body">
-
-          <div class="field">
-            <label for="preset">Ejemplo predefinido</label>
-            <select id="preset"></select>
-          </div>
-
-          <div class="row-2">
-            <div class="field">
-              <label for="finput">f(x) — numerador</label>
-              <input type="text" id="finput" spellcheck="false" autocomplete="off" placeholder="sin(x)" />
-            </div>
-            <div class="field">
-              <label for="ginput">g(x) — denominador</label>
-              <input type="text" id="ginput" spellcheck="false" autocomplete="off" placeholder="x" />
-            </div>
-          </div>
-
-          <div class="row-3">
-            <div class="field">
-              <label for="apoint">Punto a</label>
-              <input type="text" id="apoint" value="0" placeholder="0, +∞" />
-            </div>
-            <div class="field">
-              <label for="xmin">x mín</label>
-              <input type="number" id="xmin" value="-3" step="any" />
-            </div>
-            <div class="field">
-              <label for="xmax">x máx</label>
-              <input type="number" id="xmax" value="3" step="any" />
-            </div>
-          </div>
-
-          <p class="hint">Potencia: <code>^</code> · ln: <code>log</code> o <code>ln</code> · Fns: <code>sin</code> <code>cos</code> <code>exp</code></p>
-
-          <div class="btn-row">
-            <button class="btn btn-primary" id="btnCalc">⟹ Calcular límite</button>
-            <button class="btn" id="btnPlay">▶ Animar</button>
-            <button class="btn" id="btnStop">⏸</button>
-          </div>
-
-          <div id="error-strip"></div>
+  <div id="main-layout">
+    <div class="panel">
+      <div class="panel-header">Parámetros del Límite</div>
+      <div class="panel-body">
+        <div class="field">
+          <label>Configuración Previa</label>
+          <select id="presets">
+            <option value="sin(x)/x,0">sin(x) / x  → 0</option>
+            <option value="(exp(x)-1)/x,0">(e^x - 1) / x → 0</option>
+            <option value="log(x)/(x-1),1">ln(x) / (x-1) → 1</option>
+            <option value="x/exp(x),inf">x / e^x → ∞</option>
+            <option value="(1-cos(x))/x^2,0">(1 - cos x) / x² → 0</option>
+          </select>
         </div>
-      </div>
-
-      <!-- Diagnostic -->
-      <div class="card grow" id="diag-card">
-        <div id="diag-toggle">
-          <h3>📐 Evaluación del límite</h3>
-          <span class="arr">▼</span>
+        <div class="field"><label>Numerador f(x)</label><input type="text" id="f_inp" value="sin(x)"></div>
+        <div class="field"><label>Denominador g(x)</label><input type="text" id="g_inp" value="x"></div>
+        <div class="field"><label>Punto de aproximación (a)</label><input type="text" id="a_inp" value="0"></div>
+        
+        <div class="btn-group">
+            <button class="btn btn-primary" id="calc_btn">Calcular</button>
+            <button class="btn btn-outline" id="anim_btn">▶ Animar</button>
         </div>
-        <div id="diag-body">
-          <div class="diag-empty">Ingresa funciones y presiona <strong>Calcular límite</strong>.</div>
-        </div>
-      </div>
 
+        <div id="steps" style="margin-top: 24px;"></div>
+      </div>
     </div>
-    <!-- /LEFT -->
 
-    <!-- ══ RIGHT ══════════════════════════════════════ -->
-    <div id="right">
-
-      <div class="card grow" id="viz-card">
-        <div class="card-head">
-          <h2>Cocientes en el plano &nbsp;<span id="viz-sub" style="font-weight:400;font-family:'DM Sans',sans-serif;font-size:0.73rem;color:var(--muted)">f(x)/g(x) vs f'(x)/g'(x)</span></h2>
-          <div class="legend-row">
-            <span class="chip"><span class="cline" style="background:var(--curve-f)"></span>f/g</span>
-            <span class="chip"><span class="cline" style="background:var(--curve-d)"></span>f'/g'</span>
-            <span class="chip"><span class="cdot" style="background:var(--marker)"></span>x</span>
-          </div>
+    <div class="panel">
+      <div class="panel-header">Gráfica Interactiva (f/g vs f'/g')</div>
+      <div class="canvas-container">
+        <canvas id="plot"></canvas>
+        <div id="overlay-math"></div>
+      </div>
+      
+      <div style="padding: 20px; background: white; border-top: 1px solid var(--border);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <label style="margin:0">Posición de exploración (x)</label>
+            <b id="x_val_label" style="color: var(--accent); font-family: monospace;">0.00</b>
         </div>
-        <div class="viz-inner">
-
-          <div class="canvas-wrap">
-            <canvas id="plot" aria-label="Gráfica interactiva"></canvas>
-            <div id="result-overlay">
-              <div class="ovl-label">Límite exacto</div>
-              <div id="ovl-math"></div>
-              <div id="ovl-hops"></div>
-            </div>
-          </div>
-
-          <div id="slider-sec">
-            <div class="sl-head">
-              <span>Acercamiento a <em>a</em> — arrastra para explorar</span>
-              <span id="xval-badge">x = —</span>
-            </div>
-            <input type="range" id="xpos" min="0" max="1000" value="500" step="0.1" />
-          </div>
-
-          <div id="metrics">
-            <div class="mc">
-              <div class="mc-lbl" id="lbl-fg"></div>
-              <div class="mc-val" id="qv">—</div>
-            </div>
-            <div class="mc">
-              <div class="mc-lbl" id="lbl-dfg"></div>
-              <div class="mc-val" id="dv">—</div>
-            </div>
-            <div class="mc">
-              <div class="mc-lbl"><span class="mc-lbl-text">Límite</span></div>
-              <div class="mc-val" id="lv">—</div>
-            </div>
-          </div>
-
-        </div>
+        <input type="range" id="x_range" min="-5" max="5" step="0.001" value="0.5" style="width: 100%;">
       </div>
 
+      <div id="metrics">
+        <div class="metric-card"><small>Original f/g</small><b id="m_q">-</b></div>
+        <div class="metric-card"><small>Derivadas f'/g'</small><b id="m_d">-</b></div>
+        <div class="metric-card" style="border-color: var(--accent); background: var(--accent-light);"><small>Límite Final</small><b id="m_l">-</b></div>
+      </div>
     </div>
-    <!-- /RIGHT -->
-
   </div>
 </div>
 
 <script>
-(function () {
-  "use strict";
+  // Variables de estado
+  const state = {
+    f_js: null, g_js: null, df_js: null, dg_js: null,
+    aStr: "0", aVal: 0, limit: 0,
+    xTarget: 0.5, xCurrent: 0.5,
+    isAnimating: false,
+    zoom: 50
+  };
 
-  /* ── Presets ─────────────────────────────────────── */
-  const PRESETS = [
-    { name: "— Expresión propia —",      f: "",           g: "",       a: "0",         xmin:-3,   xmax:3   },
-    { name: "sin(x) / x  →  0",         f: "sin(x)",     g: "x",      a: "0",         xmin:-5,   xmax:5   },
-    { name: "(eˣ−1) / x  →  0",        f: "exp(x)-1",   g: "x",      a: "0",         xmin:-3,   xmax:3   },
-    { name: "(1−cos x) / x²  →  0",     f: "1-cos(x)",   g: "x^2",    a: "0",         xmin:-3,   xmax:3   },
-    { name: "ln(x) / (x−1)  →  1",      f: "log(x)",     g: "x-1",    a: "1",         xmin:0.1,  xmax:3   },
-    { name: "(x²−1) / (x−1)  →  1",     f: "x^2-1",      g: "x-1",    a: "1",         xmin:-1,   xmax:4   },
-    { name: "x / eˣ  →  +∞",           f: "x",          g: "exp(x)", a: "+infinity", xmin:0,    xmax:14  },
-    { name: "tan(x)−x / x³  →  0",      f: "tan(x)-x",   g: "x^3",    a: "0",         xmin:-1.3, xmax:1.3 },
-  ];
-
-  /* ── Refs ────────────────────────────────────────── */
   const $ = id => document.getElementById(id);
-  const el = {
-    preset:$("preset"), finput:$("finput"), ginput:$("ginput"),
-    apoint:$("apoint"), xmin:$("xmin"), xmax:$("xmax"),
-    btnCalc:$("btnCalc"), btnPlay:$("btnPlay"), btnStop:$("btnStop"),
-    diagToggle:$("diag-toggle"), diagBody:$("diag-body"),
-    errorStrip:$("error-strip"),
-    xpos:$("xpos"), xvalBadge:$("xval-badge"),
-    qv:$("qv"), dv:$("dv"), lv:$("lv"),
-    plot:$("plot"),
-    resultOverlay:$("result-overlay"), ovlMath:$("ovl-math"), ovlHops:$("ovl-hops"),
-    vizSub:$("viz-sub"),
-  };
+  const canvas = $('plot');
+  const ctx = canvas.getContext('2d');
 
-  /* ── State ───────────────────────────────────────── */
-  let S = {
-    f0:"sin(x)", g0:"x",
-    fLast:"sin(x)", gLast:"cos(x)",
-    aNum:0, aIsInf:false,
-    limitVal:null, hops:0,
-    animId:null, animStart:null, animating:false,
-    slideFloat:500, drawSmooth:null,
-  };
-
-  /* ── KaTeX ───────────────────────────────────────── */
-  function K(tex, node, display) {
-    if (!window.katex || !node) return;
-    try { katex.render(tex, node, { throwOnError:false, displayMode:!!display }); }
-    catch(_) { node.textContent = tex; }
+  // Inicialización
+  function init() {
+    setupEventListeners();
+    calculate();
+    requestAnimationFrame(renderLoop); // Iniciar bucle de renderizado fluido
   }
 
-  function renderStatic() {
-    K("\\displaystyle\\lim_{x\\to a}\\frac{f(x)}{g(x)}=\\lim_{x\\to a}\\frac{f'(x)}{g'(x)}", $("thm-katex"), false);
-    K("\\tfrac{0}{0}\\text{ ó }\\tfrac{\\infty}{\\infty}", $("thm-indet"), false);
-    K("g'(x)\\neq 0", $("thm-cond"), false);
-    K("\\dfrac{f}{g}", $("lbl-fg"), false);
-    K("\\dfrac{f'}{g'}", $("lbl-dfg"), false);
+  function setupEventListeners() {
+    $('calc_btn').onclick = calculate;
+    $('anim_btn').onclick = startAnimation;
+    
+    $('x_range').oninput = (e) => {
+      state.xTarget = parseFloat(e.target.value);
+      state.isAnimating = false;
+    };
+
+    $('presets').onchange = (e) => {
+      const [func, a] = e.target.value.split(',');
+      const [f, g] = func.split('/');
+      $('f_inp').value = f; $('g_inp').value = g; $('a_inp').value = a;
+      calculate();
+    };
+
+    window.onresize = () => {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+    };
   }
 
-  /* ── Build presets ───────────────────────────────── */
-  function buildPresets() {
-    PRESETS.forEach((p,i) => {
-      const o = document.createElement("option");
-      o.value = i; o.textContent = p.name;
-      el.preset.appendChild(o);
-    });
-    el.preset.value = "1";
-  }
-
-  function applyPreset(i) {
-    const p = PRESETS[i];
-    if (p.f) el.finput.value = p.f;
-    if (p.g) el.ginput.value = p.g;
-    el.apoint.value = p.a;
-    el.xmin.value = p.xmin;
-    el.xmax.value = p.xmax;
-    el.xpos.value = p.a === "+infinity" ? "870" : "500";
-    S.slideFloat = parseFloat(el.xpos.value);
-    S.drawSmooth = null;
-  }
-
-  /* ── Expr helpers ────────────────────────────────── */
-  function norm(s) {
-    if (!s) return "";
-    return s.trim().replace(/\*\*/g,"^").replace(/\bln\s*\(/gi,"log(");
-  }
-
-  function parseA(str) {
-    const s = (str||"").trim().toLowerCase();
-    if (["infinity","+infinity","inf","+inf","∞","+∞"].includes(s))
-      return {value:Infinity, isInf:true};
-    const n = parseFloat(s.replace(",","."));
-    if (!isFinite(n)) throw new Error("Punto a inválido. Usa un número o \"+infinity\".");
-    return {value:n, isInf:false};
-  }
-
-  function nNum(ev) {
+  function calculate() {
     try {
-      const e = typeof ev==="string" ? nerdamer(ev) : ev;
-      const t = e.text ? e.text() : String(e);
-      let n = parseFloat(t);
-      if (isFinite(n)) return n;
-      if (e.evaluate) {
-        const ev2 = e.evaluate();
-        const t2 = ev2.text ? ev2.text() : String(ev2);
-        n = parseFloat(t2);
-        if (isFinite(n)) return n;
+      const f_str = $('f_inp').value;
+      const g_str = $('g_inp').value;
+      state.aStr = $('a_inp').value;
+
+      // 1. Compilar funciones simbólicas a JS puro para máxima velocidad
+      state.f_js = nerdamer(f_str).buildFunction(['x']);
+      state.g_js = nerdamer(g_str).buildFunction(['x']);
+      
+      const df_sym = nerdamer.diff(f_str, 'x');
+      const dg_sym = nerdamer.diff(g_str, 'x');
+      state.df_js = df_sym.buildFunction(['x']);
+      state.dg_js = dg_sym.buildFunction(['x']);
+
+      // 2. Punto a
+      state.aVal = state.aStr === 'inf' ? 10 : parseFloat(state.aStr);
+
+      // 3. Calcular límite numérico preciso
+      const eps = 0.0000001;
+      const t = state.aStr === 'inf' ? 1000000 : state.aVal + eps;
+      state.limit = state.df_js(t) / state.dg_js(t);
+
+      // 4. UI
+      $('steps').innerHTML = `
+        <div class="step"><b>Derivadas:</b><br>f'(x) = ${df_sym.text()}<br>g'(x) = ${dg_sym.text()}</div>
+      `;
+      if (window.katex) {
+        katex.render(`\\lim_{x \\to ${state.aStr}} \\frac{f(x)}{g(x)} = ${state.limit.toFixed(4)}`, $('overlay-math'));
       }
-    } catch(_) {}
-    return NaN;
+      $('m_l').innerText = state.limit.toFixed(4);
+
+      // Ajustar Slider
+      const r = $('x_range');
+      if (state.aStr === 'inf') {
+        r.min = 1; r.max = 20; r.value = 2;
+      } else {
+        r.min = state.aVal - 4; r.max = state.aVal + 4; r.value = state.aVal + 1.5;
+      }
+      state.xTarget = parseFloat(r.value);
+      state.xCurrent = state.xTarget;
+      
+    } catch (e) {
+      console.error(e);
+      alert("Error en la fórmula. Asegúrate de usar 'x' como variable.");
+    }
   }
 
-  function evalAt(expr, xv) {
+  function startAnimation() {
+    state.isAnimating = true;
+    state.xTarget = state.aVal + (state.aStr === 'inf' ? 18 : 0.001);
+    // Resetear posición para que se vea el viaje
+    state.xCurrent = state.aVal - (state.aStr === 'inf' ? 0 : 3.5);
+  }
+
+  // Bucle de renderizado a 60fps
+  function renderLoop() {
+    // 1. Suavizado de movimiento (Lerp)
+    const lerpFactor = 0.08;
+    state.xCurrent += (state.xTarget - state.xCurrent) * lerpFactor;
+    
+    if (Math.abs(state.xCurrent - state.xTarget) < 0.001) {
+        state.isAnimating = false;
+    }
+
+    // 2. Actualizar UI
+    $('x_val_label').innerText = state.xCurrent.toFixed(3);
+    if (!state.isAnimating) $('x_range').value = state.xCurrent;
+
     try {
-      const ex = norm(expr);
-      if (!ex) return NaN;
-      return nNum(nerdamer(ex,{x:xv}).evaluate());
-    } catch(_) { return NaN; }
+        const q = state.f_js(state.xCurrent) / state.g_js(state.xCurrent);
+        const d = state.df_js(state.xCurrent) / state.dg_js(state.xCurrent);
+        $('m_q').innerText = isFinite(q) ? q.toFixed(4) : "Indet.";
+        $('m_d').innerText = isFinite(d) ? d.toFixed(4) : "Indet.";
+    } catch(e) {}
+
+    // 3. Dibujar
+    draw();
+
+    requestAnimationFrame(renderLoop);
   }
 
-  function ratioAt(f, g, x) {
-    const fn = evalAt(f,x), gn = evalAt(g,x);
-    if (!isFinite(fn)||!isFinite(gn)||Math.abs(gn)<1e-300) return NaN;
-    return fn/gn;
-  }
+  function draw() {
+    const w = canvas.width = canvas.offsetWidth;
+    const h = canvas.height = canvas.offsetHeight;
+    ctx.clearRect(0, 0, w, h);
 
-  function diffStr(expr) {
-    const ex = norm(expr);
-    if (!ex) throw new Error("Expresión vacía.");
-    try {
-      if (typeof nerdamer.diff==="function")
-        return nerdamer.diff(nerdamer(ex),"x").text();
-    } catch(_) {}
-    try { return nerdamer("diff("+ex+",x)").text(); }
-    catch(e) { throw new Error("No se pudo derivar «"+ex+"»"); }
-  }
+    const centerX = w / 2;
+    const centerY = h / 2;
+    const zoom = 60;
 
-  function fmt(n) {
-    if (n===null||n===undefined||!isFinite(n)) return "—";
-    const ax = Math.abs(n);
-    if (ax < 1e-11 && n!==0) return "≈ 0";
-    if (ax > 5e7) return n>0 ? "+∞" : "−∞";
-    return +n.toPrecision(7) + "";
-  }
+    // Re-centrar vista en el punto de interés
+    const offsetX = (state.aStr === 'inf' ? state.xCurrent - 5 : state.aVal);
+    const offsetY = state.limit;
 
-  /* ── Indetermination check ───────────────────────── */
-  function checkIndet(F, G, a, isInf) {
-    if (isInf) {
-      const x = 1e9;
-      return { ok: Math.abs(evalAt(F,x))>1e5 && Math.abs(evalAt(G,x))>1e5, zz:false, ii:true };
+    const toX = val => centerX + (val - offsetX) * zoom;
+    const toY = val => centerY - (val - offsetY) * zoom;
+
+    // Rejilla simple
+    ctx.strokeStyle = "#f1f5f9";
+    ctx.beginPath();
+    for(let i=-20; i<=20; i++) {
+        ctx.moveTo(toX(i), 0); ctx.lineTo(toX(i), h);
+        ctx.moveTo(0, toY(i)); ctx.lineTo(w, toY(i));
     }
-    const h = 1e-7;
-    const small = z => Math.abs(z)<5e-5;
-    const big   = z => Math.abs(z)>1e5;
-    const f1=evalAt(F,a+h), g1=evalAt(G,a+h);
-    const f2=evalAt(F,a-h), g2=evalAt(G,a-h);
-    const zz = (small(f1)&&small(g1)) || (small(f2)&&small(g2));
-    const ii = (big(f1)&&big(g1))     || (big(f2)&&big(g2));
-    return {ok:zz||ii, zz, ii};
-  }
+    ctx.stroke();
 
-  /* ── Core compute ────────────────────────────────── */
-  function compute(fIn, gIn, aInfo) {
-    let F = norm(fIn), G = norm(gIn);
-    if (!F||!G) throw new Error("f(x) y g(x) no pueden estar vacíos.");
-    try { nerdamer(F); nerdamer(G); }
-    catch(_) { throw new Error("Expresión inválida — revisa la sintaxis."); }
+    // Ejes
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, toY(0)); ctx.lineTo(w, toY(0));
+    ctx.moveTo(toX(0), 0); ctx.lineTo(toX(0), h);
+    ctx.stroke();
 
-    const a = aInfo.value, isInf = aInfo.isInf;
-    const lp = isInf ? "\\infty" : String(a);
-    const blocks = [];
+    // Función f/g (Azul)
+    drawGraph(x => state.f_js(x) / state.g_js(x), "#2563eb", 3, toX, toY, w, offsetX);
+    
+    // Función f'/g' (Verde)
+    drawGraph(x => state.df_js(x) / state.dg_js(x), "#10b981", 2, toX, toY, w, offsetX);
 
-    // Evaluate at a
-    let fVal, gVal;
-    if (isInf) {
-      fVal = evalAt(F,1e9); gVal = evalAt(G,1e9);
-    } else {
-      const h=1e-8;
-      const f1=evalAt(F,a+h),f2=evalAt(F,a-h);
-      const g1=evalAt(G,a+h),g2=evalAt(G,a-h);
-      fVal = (isFinite(f1)&&isFinite(f2))?(f1+f2)/2:(isFinite(f1)?f1:f2);
-      gVal = (isFinite(g1)&&isFinite(g2))?(g1+g2)/2:(isFinite(g1)?g1:g2);
-    }
-
-    const fSmall = Math.abs(fVal)<5e-5, gSmall = Math.abs(gVal)<5e-5;
-    const fBig   = Math.abs(fVal)>1e5,  gBig   = Math.abs(gVal)>1e5;
-    const isZZ = fSmall && gSmall;
-    const isII = fBig && gBig;
-    const isInd = isZZ || isII;
-
-    // Block 1 — initial evaluation
-    blocks.push({
-      type:"info", icon:"🔍",
-      title:`Evaluación en x → ${isInf?"∞":a}`,
-      lines:[
-        `Numerador: <strong>f → ${isZZ?"0":(fBig?"∞":fmt(fVal))}</strong>`,
-        `Denominador: <strong>g → ${gSmall?"0":(gBig?"∞":fmt(gVal))}</strong>`,
-      ]
-    });
-
-    // No indetermination
-    if (!isInd) {
-      if (Math.abs(gVal)<1e-10) {
-        blocks.push({
-          type:"err", icon:"✗",
-          title:"El límite diverge — L'Hôpital no aplica",
-          lines:["El denominador tiende a 0 pero el numerador no. El límite diverge a ±∞."]
-        });
-        return { blocks, fPlot:F, gPlot:G, fLast:F, gLast:G, hops:0, limitVal:null };
-      }
-      const direct = isFinite(fVal)&&isFinite(gVal) ? fVal/gVal : NaN;
-      blocks.push({
-        type:"ok", icon:"✓",
-        title:"Límite directo — sin indeterminación",
-        math:`\\lim_{x\\to ${lp}}\\frac{f}{g} = \\frac{${fmt(fVal)}}{${fmt(gVal)}} = ${fmt(direct)}`,
-        lines:["No se cumple <strong>0/0</strong> ni <strong>∞/∞</strong>. El límite se obtiene por sustitución directa."],
-        concl:`Límite = ${fmt(direct)}`
-      });
-      return { blocks, fPlot:F, gPlot:G, fLast:F, gLast:G, hops:0, limitVal:direct };
-    }
-
-    // Indetermination found
-    const indType = isZZ ? "0/0" : "\\infty/\\infty";
-    blocks.push({
-      type:"warn", icon:"⚠",
-      title:`Indeterminación ${isZZ?"0/0":"∞/∞"} detectada`,
-      math:`\\lim_{x\\to ${lp}}\\frac{${F}}{${G}} = \\frac{${isZZ?"0":"\\infty"}}{${isZZ?"0":"\\infty"}}\\quad\\Rightarrow\\quad\\text{Aplicamos L'Hôpital}`,
-      lines:[]
-    });
-
-    const MAX = 8;
-    let k = 0, lastVal = NaN;
-
-    for (; k<MAX; k++) {
-      const dF = diffStr(F), dG = diffStr(G);
-      if (dF==="0"&&dG==="0") throw new Error("Derivadas nulas — imposible continuar.");
-
-      blocks.push({
-        type:"info", icon:String(k+1), isStep:true,
-        title:`Aplicación ${k+1} de L'Hôpital`,
-        math:`f^{(${k+1})}(x) = ${dF}\\qquad g^{(${k+1})}(x) = ${dG}`,
-        lines:[]
-      });
-
-      F = dF; G = dG;
-
-      const indNow = checkIndet(F,G,a,isInf);
-      const sx = isInf ? 1e8 : a+(a===0?1e-7:1e-7*Math.abs(a));
-      const r = ratioAt(F,G,sx);
-
-      if (!indNow.ok || !isFinite(r)) {
-        // Evaluate limit
-        if (isInf) {
-          lastVal = ratioAt(F,G,1e13);
-          if (!isFinite(lastVal)) lastVal = ratioAt(F,G,1e10);
-        } else {
-          const h=1e-10;
-          const ra=ratioAt(F,G,a+h), rb=ratioAt(F,G,a-h);
-          lastVal = (isFinite(ra)&&isFinite(rb))?(ra+rb)/2:(isFinite(ra)?ra:rb);
-        }
-        break;
-      }
-      lastVal = r;
-    }
-
-    // Refine
-    let finalVal = lastVal;
-    if (isInf) {
-      const v = ratioAt(F,G,1e13);
-      if (isFinite(v)) finalVal = v;
-    } else {
-      const h=1e-11;
-      const ra=ratioAt(F,G,a+h), rb=ratioAt(F,G,a-h);
-      if (isFinite(ra)&&isFinite(rb)) finalVal=(ra+rb)/2;
-      else finalVal = isFinite(ra)?ra:rb;
-    }
-
-    blocks.push({
-      type:"ok", icon:"🎯",
-      title:`Resultado final — ${k+1} aplicación(es)`,
-      math:`\\lim_{x\\to ${lp}}\\frac{f(x)}{g(x)} = ${fmt(finalVal)}`,
-      lines:[],
-      concl:`Límite = ${fmt(finalVal)}`
-    });
-
-    return { blocks, fPlot:norm(fIn), gPlot:norm(gIn), fLast:F, gLast:G, hops:k+1, limitVal:finalVal };
-  }
-
-  /* ── Render diagnostic ───────────────────────────── */
-  function renderDiag(blocks) {
-    const body = el.diagBody;
-    body.innerHTML = "";
-    blocks.forEach(b => {
-      const div = document.createElement("div");
-      div.className = "db " + b.type;
-
-      let html = `<div class="db-title">`;
-      if (b.isStep) html += `<span class="snum">${b.icon}</span>`;
-      else           html += `<span>${b.icon}</span>`;
-      html += `<span>${b.title}</span></div>`;
-
-      if (b.math) html += `<div class="db-math" data-math="${encodeURIComponent(b.math)}"></div>`;
-      (b.lines||[]).forEach(l => { html += `<div class="db-line">${l}</div>`; });
-      if (b.concl) html += `<div class="db-concl">→ ${b.concl}</div>`;
-
-      div.innerHTML = html;
-      div.querySelectorAll("[data-math]").forEach(m => {
-        K(decodeURIComponent(m.getAttribute("data-math")), m, true);
-      });
-      body.appendChild(div);
-    });
-  }
-
-  /* ── Error display ───────────────────────────────── */
-  function showErr(msg) {
-    el.errorStrip.textContent = "⚠ " + msg;
-    el.errorStrip.style.display = "block";
-  }
-  function clearErr() {
-    el.errorStrip.style.display = "none";
-    el.errorStrip.textContent = "";
-  }
-
-  /* ── Run ─────────────────────────────────────────── */
-  function runCalc() {
-    clearErr();
-    el.resultOverlay.style.display = "none";
-
-    const fRaw = norm(el.finput.value), gRaw = norm(el.ginput.value);
-    let aInfo;
-    try { aInfo = parseA(el.apoint.value); }
-    catch(e) { showErr(e.message); return; }
-
-    S.aNum=aInfo.value; S.aIsInf=aInfo.isInf;
-
-    let res;
-    try { res = compute(fRaw, gRaw, aInfo); }
-    catch(e) { showErr(e.message); return; }
-
-    renderDiag(res.blocks);
-    S.f0=res.fPlot; S.g0=res.gPlot;
-    S.fLast=res.fLast; S.gLast=res.gLast;
-    S.limitVal=res.limitVal; S.hops=res.hops;
-
-    if (res.limitVal!==null && isFinite(res.limitVal)) {
-      const lp = aInfo.isInf ? "\\infty" : String(aInfo.value);
-      el.ovlMath.innerHTML = "";
-      K(`\\lim_{x\\to ${lp}}\\dfrac{f}{g} = ${fmt(res.limitVal)}`, el.ovlMath, false);
-      el.ovlHops.textContent = res.hops>0
-        ? `${res.hops} aplicación(es) de L'Hôpital`
-        : "Evaluación directa";
-      el.resultOverlay.style.display = "block";
-    }
-
-    el.lv.textContent = res.limitVal!==null ? fmt(res.limitVal) : "∄";
-    el.vizSub.textContent = `${fRaw||"f"} / ${gRaw||"g"}  —  a = ${aInfo.isInf?"+∞":aInfo.value}`;
-
-    drawPlot(); updateMetrics(); startAnim();
-  }
-
-  /* ── Slider ──────────────────────────────────────── */
-  function xFromSlider(t) {
-    const xMin=parseFloat(el.xmin.value), xMax=parseFloat(el.xmax.value);
-    if (!isFinite(xMin)||!isFinite(xMax)||xMax<=xMin) return 0;
-    if (S.aIsInf) return xMin+(t/1000)*(xMax-xMin);
-    const a=S.aNum, span=(xMax-xMin)*0.38;
-    const L=Math.max(xMin,a-span), R=Math.min(xMax,a+span);
-    if (t<=500) return L+(t/500)*(a-L);
-    return a+((t-500)/500)*(R-a);
-  }
-
-  /* ── Metrics update ──────────────────────────────── */
-  function updateMetrics() {
-    const t = S.animating ? S.slideFloat : parseFloat(el.xpos.value)||S.slideFloat;
-    const x = xFromSlider(t);
-    el.xvalBadge.textContent = isFinite(x) ? `x = ${+x.toPrecision(5)}` : "x = —";
-
-    const q=ratioAt(S.f0,S.g0,x), d=ratioAt(S.fLast,S.gLast,x);
-    el.qv.textContent = isFinite(q) ? fmt(q) : "Indefinido";
-    el.dv.textContent = isFinite(d) ? fmt(d) : "Indefinido";
-    if (S.limitVal!==null && isFinite(S.limitVal)) el.lv.textContent = fmt(S.limitVal);
-
-    const xDraw = S.animating
-      ? (S.drawSmooth = S.drawSmooth===null ? x : S.drawSmooth+(x-S.drawSmooth)*0.3)
-      : (S.drawSmooth = x);
-    drawPlot(xDraw);
-  }
-
-  /* ── Draw ────────────────────────────────────────── */
-  function drawPlot(xMark) {
-    const canvas = el.plot;
-    const rect = canvas.getBoundingClientRect();
-    if (!rect.width||!rect.height) return;
-    const dpr = devicePixelRatio || 1;
-    canvas.width  = rect.width  * dpr;
-    canvas.height = rect.height * dpr;
-    const ctx = canvas.getContext("2d");
-    ctx.scale(dpr, dpr);
-    const W=rect.width, H=rect.height;
-
-    let xMin=parseFloat(el.xmin.value), xMax=parseFloat(el.xmax.value);
-    if (!isFinite(xMin)||!isFinite(xMax)||xMax<=xMin){xMin=-3;xMax=3;}
-    const pad={l:44,r:16,t:14,b:34};
-
-    // Sample ys
-    const ys=[];
-    for (let i=0;i<=400;i++) {
-      const x=xMin+(i/400)*(xMax-xMin);
-      const q=ratioAt(S.f0,S.g0,x), d=ratioAt(S.fLast,S.gLast,x);
-      if (isFinite(q)) ys.push(q);
-      if (isFinite(d)) ys.push(d);
-    }
-    if (S.limitVal!==null&&isFinite(S.limitVal)) ys.push(S.limitVal);
-    let yMin=ys.length?Math.min(...ys):-2, yMax=ys.length?Math.max(...ys):2;
-    if (!isFinite(yMin)||!isFinite(yMax)){yMin=-2;yMax=2;}
-    if (yMax-yMin<1e-8){yMin-=1;yMax+=1;}
-    const yp=(yMax-yMin)*0.12; yMin-=yp; yMax+=yp;
-
-    const sx=x=>pad.l+((x-xMin)/(xMax-xMin))*(W-pad.l-pad.r);
-    const sy=y=>pad.t+(1-(y-yMin)/(yMax-yMin))*(H-pad.t-pad.b);
-
-    // BG
-    ctx.fillStyle="#fafbfd"; ctx.fillRect(0,0,W,H);
-
-    // Grid
-    const nt=v=>{const p=Math.pow(10,Math.floor(Math.log10(v)));const f=v/p;return f<1.5?p:f<3.5?2*p:f<7.5?5*p:10*p;};
-    const gxS=nt((xMax-xMin)/6), gyS=nt((yMax-yMin)/6);
-    ctx.strokeStyle="#edf0f6"; ctx.lineWidth=1;
-    for (let gx=Math.ceil(xMin/gxS)*gxS; gx<=xMax; gx+=gxS) {
-      ctx.beginPath(); ctx.moveTo(sx(gx),pad.t); ctx.lineTo(sx(gx),H-pad.b); ctx.stroke();
-    }
-    for (let gy=Math.ceil(yMin/gyS)*gyS; gy<=yMax; gy+=gyS) {
-      ctx.beginPath(); ctx.moveTo(pad.l,sy(gy)); ctx.lineTo(W-pad.r,sy(gy)); ctx.stroke();
-    }
-
-    // Axes
-    ctx.strokeStyle="#c0cfe0"; ctx.lineWidth=1.4;
-    if (yMin<0&&yMax>0){ctx.beginPath();ctx.moveTo(pad.l,sy(0));ctx.lineTo(W-pad.r,sy(0));ctx.stroke();}
-    if (xMin<0&&xMax>0){ctx.beginPath();ctx.moveTo(sx(0),pad.t);ctx.lineTo(sx(0),H-pad.b);ctx.stroke();}
-
-    // Tick labels
-    ctx.fillStyle="#8a9bb2"; ctx.font=`10px "JetBrains Mono",monospace`;
-    for (let gx=Math.ceil(xMin/gxS)*gxS; gx<=xMax; gx+=gxS) {
-      if (Math.abs(gx)<gxS*0.01) continue;
-      ctx.fillText(+gx.toPrecision(3), sx(gx)-10, H-pad.b+13);
-    }
-    for (let gy=Math.ceil(yMin/gyS)*gyS; gy<=yMax; gy+=gyS) {
-      if (Math.abs(gy)<gyS*0.01) continue;
-      ctx.fillText(+gy.toPrecision(3), 2, sy(gy)+3);
-    }
-
-    // Vertical line at a
-    const aLine = S.aIsInf ? xMax-0.015*(xMax-xMin) : S.aNum;
-    ctx.strokeStyle="#c4d0e4"; ctx.lineWidth=1.2; ctx.setLineDash([5,4]);
-    ctx.beginPath(); ctx.moveTo(sx(aLine),pad.t); ctx.lineTo(sx(aLine),H-pad.b); ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Horizontal limit line
-    if (S.limitVal!==null&&isFinite(S.limitVal)) {
-      ctx.strokeStyle="rgba(180,83,9,.3)"; ctx.lineWidth=1; ctx.setLineDash([4,4]);
-      ctx.beginPath(); ctx.moveTo(pad.l,sy(S.limitVal)); ctx.lineTo(W-pad.r,sy(S.limitVal)); ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    // Curves
-    function curve(fn, color, lw) {
-      ctx.strokeStyle=color; ctx.lineWidth=lw;
-      ctx.lineJoin="round"; ctx.lineCap="round";
-      ctx.beginPath();
-      let started=false;
-      for (let i=0;i<=600;i++) {
-        const x=xMin+(i/600)*(xMax-xMin), y=fn(x);
-        if (!isFinite(y)){started=false;continue;}
-        started ? ctx.lineTo(sx(x),sy(y)) : (ctx.moveTo(sx(x),sy(y)),started=true);
-      }
-      ctx.stroke();
-    }
-    curve(x=>ratioAt(S.f0,S.g0,x),    "#1b4f8a", 2.3);
-    curve(x=>ratioAt(S.fLast,S.gLast,x), "#196642", 1.8);
-
-    // Marker
-    if (xMark!==undefined&&isFinite(xMark)) {
-      ctx.strokeStyle="#c87b3a"; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
-      ctx.beginPath(); ctx.moveTo(sx(xMark),pad.t); ctx.lineTo(sx(xMark),H-pad.b); ctx.stroke();
-      ctx.setLineDash([]);
-      const qm=ratioAt(S.f0,S.g0,xMark);
-      if (isFinite(qm)) {
-        ctx.fillStyle="#b45309";
-        ctx.beginPath(); ctx.arc(sx(xMark),sy(qm),5.5,0,Math.PI*2); ctx.fill();
-        ctx.strokeStyle="#fff"; ctx.lineWidth=1.8;
+    // Punto Explorador
+    const curY = state.f_js(state.xCurrent) / state.g_js(state.xCurrent);
+    if (isFinite(curY)) {
+        ctx.fillStyle = "#2563eb";
+        ctx.beginPath();
+        ctx.arc(toX(state.xCurrent), toY(curY), 8, 0, Math.PI*2);
+        ctx.fill();
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 3;
         ctx.stroke();
-      }
     }
   }
 
-  /* ── Animation ───────────────────────────────────── */
-  function ease(t){return .5-.5*Math.cos(Math.PI*Math.min(1,Math.max(0,t)));}
-  function animLoop(ts){
-    if (!S.animStart) S.animStart=ts;
-    const p=Math.min(1,(ts-S.animStart)/9500);
-    S.slideFloat=ease(p)*(S.aIsInf?1000:500);
-    el.xpos.value=S.slideFloat;
-    updateMetrics();
-    if (p<1) S.animId=requestAnimationFrame(animLoop);
-    else{S.animStart=null;S.animId=null;S.animating=false;S.drawSmooth=null;}
-  }
-  function startAnim(){
-    cancelAnimationFrame(S.animId);
-    S.animStart=null;S.animating=true;S.drawSmooth=null;
-    S.slideFloat=0;el.xpos.value="0";
-    S.animId=requestAnimationFrame(animLoop);
-  }
-  function stopAnim(){
-    cancelAnimationFrame(S.animId);
-    S.animId=null;S.animStart=null;S.animating=false;
-    S.slideFloat=parseFloat(el.xpos.value);S.drawSmooth=null;
-    updateMetrics();
+  function drawGraph(fn, color, width, toX, toY, w, offsetX) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    let started = false;
+
+    for (let px = 0; px < w; px += 3) {
+      const x = offsetX + (px - w/2) / 60;
+      try {
+        const y = fn(x);
+        if (isFinite(y) && Math.abs(y) < 50) {
+          const py = toY(y);
+          if (!started) { ctx.moveTo(px, py); started = true; }
+          else { ctx.lineTo(px, py); }
+        } else { started = false; }
+      } catch(e) { started = false; }
+    }
+    ctx.stroke();
   }
 
-  /* ── Resize ──────────────────────────────────────── */
-  new ResizeObserver(()=>drawPlot(S.drawSmooth)).observe(el.plot.parentElement);
-
-  /* ── Events ──────────────────────────────────────── */
-  el.diagToggle.addEventListener("click",()=>{
-    const body=$("diag-body");
-    const open = body.style.display!=="none";
-    body.style.display = open ? "none" : "";
-    el.diagToggle.querySelector(".arr").textContent = open ? "▼" : "▲";
-  });
-
-  el.preset.addEventListener("change",()=>{
-    const i=parseInt(el.preset.value,10);
-    applyPreset(i);
-    if (i>0) runCalc();
-  });
-
-  el.btnCalc.addEventListener("click", runCalc);
-  el.btnPlay.addEventListener("click", ()=>{ runCalc(); });
-  el.btnStop.addEventListener("click", stopAnim);
-
-  el.xpos.addEventListener("input",()=>{
-    if (S.animId) stopAnim();
-    S.slideFloat=parseFloat(el.xpos.value);
-    S.drawSmooth=null;
-    updateMetrics();
-  });
-
-  [el.finput,el.ginput].forEach(inp=>inp.addEventListener("change",()=>{el.preset.value="0";}));
-
-  /* ── Init ────────────────────────────────────────── */
-  function tryInit(){
-    if (!window.katex){setTimeout(tryInit,50);return;}
-    buildPresets();
-    renderStatic();
-    applyPreset(1);
-    runCalc();
-  }
-  window.addEventListener("load", tryInit);
-})();
+  setTimeout(init, 500);
 </script>
 </body>
 </html>
