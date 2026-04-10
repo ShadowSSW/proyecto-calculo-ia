@@ -42,9 +42,9 @@
       font-size: 15px;
     }
     .app {
-      max-width: 1180px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 1.5rem 1.15rem 2.5rem;
+      padding: 0.8rem 0.8rem 1rem;
     }
     .hero {
       display: grid;
@@ -65,7 +65,7 @@
     }
     .hero h1 {
       font-family: "Source Serif 4", Georgia, serif;
-      font-size: clamp(1.5rem, 3.2vw, 1.95rem);
+      font-size: clamp(1.2rem, 2.5vw, 1.5rem);
       font-weight: 700;
       letter-spacing: -0.025em;
       margin: 0;
@@ -74,35 +74,39 @@
     }
     .hero p {
       color: var(--muted);
-      margin: 0.35rem 0 0;
-      font-size: 0.98rem;
-      max-width: 36rem;
+      margin: 0.25rem 0 0;
+      font-size: 0.85rem;
+      max-width: 30rem;
     }
     .hero-badge {
-      justify-self: start;
-      font-size: 0.72rem;
+      justify-self: end;
+      font-size: 0.65rem;
       font-weight: 600;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--accent);
       background: var(--accent-soft);
-      padding: 0.45rem 0.75rem;
+      padding: 0.3rem 0.6rem;
       border-radius: 999px;
       border: 1px solid var(--border);
       white-space: nowrap;
     }
-    @media (min-width: 720px) {
-      .hero-badge { justify-self: end; }
-    }
     .layout {
       display: grid;
-      gap: 1.25rem;
+      gap: 0.8rem;
       align-items: start;
+      grid-template-columns: 1fr;
     }
-    @media (min-width: 960px) {
+    @media (min-width: 1200px) {
       .layout {
-        grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
-        gap: 1.35rem;
+        grid-template-columns: 280px 1fr 280px;
+        gap: 1rem;
+      }
+    }
+    @media (min-width: 960px) and (max-width: 1199px) {
+      .layout {
+        grid-template-columns: 1fr 2fr 1fr;
+        gap: 0.8rem;
       }
     }
     .stack {
@@ -189,6 +193,31 @@
       height: 6px;
       accent-color: var(--accent);
       border-radius: 999px;
+    }
+    .input-compact {
+      padding: 0.3rem 0;
+    }
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      align-items: start;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .input-group label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.2rem;
+    }
+    .range-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.3rem;
     }
     .grid-2 {
       display: grid;
@@ -287,6 +316,7 @@
       overflow: hidden;
       border: 1px solid var(--border);
       background: #fafbfd;
+      position: relative;
     }
     canvas {
       width: 100%;
@@ -343,13 +373,55 @@
       max-height: 160px;
       overflow-y: auto;
     }
+    .evaluation-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-top: 0.75rem;
+      overflow: hidden;
+    }
+    .evaluation-header {
+      background: var(--accent-soft);
+      padding: 0.6rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .evaluation-header h3 {
+      margin: 0;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .evaluation-toggle {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0.2rem;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+    .evaluation-toggle:hover {
+      background: var(--border);
+    }
+    .evaluation-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .evaluation-content.expanded {
+      max-height: 400px;
+      overflow-y: auto;
+    }
     .evaluation-alert {
       background: #f8f9fa;
-      border: 1px solid #dee2e6;
+      border: none;
       border-left: 4px solid var(--accent);
-      border-radius: var(--radius-sm);
+      border-radius: 0;
       padding: 1rem 1.25rem;
-      margin-top: 0.75rem;
       font-family: "Source Sans 3", sans-serif;
       font-size: 0.9rem;
       line-height: 1.6;
@@ -389,6 +461,35 @@
       position: absolute;
       left: 0;
       color: var(--muted);
+    }
+    .result-overlay {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.8rem 1rem;
+      box-shadow: var(--shadow);
+      z-index: 10;
+      min-width: 200px;
+      max-width: 300px;
+    }
+    .result-overlay .result-math {
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      text-align: center;
+    }
+    .result-overlay .result-math .katex-display {
+      margin: 0.3rem 0;
+    }
+    .result-overlay .status-ok {
+      font-size: 0.75rem;
+      text-align: center;
+      margin: 0;
     }
     code { font-family: "JetBrains Mono", monospace; font-size: 0.85em; }
     .katex { font-size: 1em; }
@@ -431,27 +532,29 @@
             <label for="preset">Ejemplo o expresión propia</label>
             <select id="preset" aria-label="Elegir ejemplo"></select>
 
-            <div class="grid-2 cols-2" style="margin-top:0.85rem;">
-              <div>
-                <label for="finput">Numerador <span class="tex" data-tex="f(x)"></span></label>
-                <input type="text" id="finput" spellcheck="false" autocomplete="off" placeholder="sin(x)" />
+            <div class="input-compact" style="margin-top:0.6rem;">
+              <div class="input-row">
+                <div class="input-group">
+                  <label for="finput">f(x)</label>
+                  <input type="text" id="finput" spellcheck="false" autocomplete="off" placeholder="sin(x)" />
+                </div>
+                <div class="input-group">
+                  <label for="ginput">g(x)</label>
+                  <input type="text" id="ginput" spellcheck="false" autocomplete="off" placeholder="x" />
+                </div>
               </div>
-              <div>
-                <label for="ginput">Denominador <span class="tex" data-tex="g(x)"></span></label>
-                <input type="text" id="ginput" spellcheck="false" autocomplete="off" placeholder="x" />
-              </div>
-            </div>
-
-            <div class="grid-2 cols-2" style="margin-top:0.85rem;">
-              <div>
-                <label for="apoint">Punto <span class="tex" data-tex="a"></span></label>
-                <input type="text" id="apoint" value="0" placeholder="0, 1, +infinity" />
-              </div>
-              <div>
-                <label>Eje horizontal visible</label>
-                <div class="grid-2 cols-2" style="gap:0.5rem;">
-                  <input type="number" id="xmin" step="any" value="-1.5" aria-label="mínimo x" />
-                  <input type="number" id="xmax" step="any" value="1.5" aria-label="máximo x" />
+              
+              <div class="input-row" style="margin-top:0.5rem;">
+                <div class="input-group">
+                  <label for="apoint">Punto a</label>
+                  <input type="text" id="apoint" value="0" placeholder="0, 1, +∞" />
+                </div>
+                <div class="input-group">
+                  <label>Eje x</label>
+                  <div class="range-inputs">
+                    <input type="number" id="xmin" step="any" value="-1.5" placeholder="min" aria-label="mínimo x" />
+                    <input type="number" id="xmax" step="any" value="1.5" placeholder="max" aria-label="máximo x" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -464,8 +567,15 @@
               <button type="button" class="btn" id="btnStop">Pausa</button>
             </div>
 
-            <div class="evaluation-alert" id="stepsOut" aria-live="polite" style="display: none;"></div>
-            <p class="status-ok" id="resultOut"></p>
+            <div class="evaluation-panel">
+              <div class="evaluation-header" id="evalHeader">
+                <h3>📊 Evaluación del límite</h3>
+                <button class="evaluation-toggle" id="evalToggle">▼</button>
+              </div>
+              <div class="evaluation-content" id="evalContent">
+                <div class="evaluation-alert" id="stepsOut" aria-live="polite" style="display: none;"></div>
+              </div>
+            </div>
             <p class="status-err" id="errorOut"></p>
           </div>
         </div>
@@ -480,6 +590,10 @@
           </div>
           <div class="canvas-shell">
             <canvas id="plot" width="920" height="320" aria-label="Gráfica de cocientes"></canvas>
+            <div class="result-overlay" id="resultOverlay" style="display: none;">
+              <div class="result-math" id="resultMath"></div>
+              <p class="status-ok" id="resultOut"></p>
+            </div>
           </div>
           <div class="legend-chips">
             <span class="chip"><i style="background:var(--curve-q)"></i><span class="tex" data-tex="\frac{f}{g}"></span></span>
@@ -576,6 +690,11 @@
         dv: document.getElementById("dv"),
         lv: document.getElementById("lv"),
         plot: document.getElementById("plot"),
+        resultOverlay: document.getElementById("resultOverlay"),
+        resultMath: document.getElementById("resultMath"),
+        evalHeader: document.getElementById("evalHeader"),
+        evalToggle: document.getElementById("evalToggle"),
+        evalContent: document.getElementById("evalContent"),
       };
 
       let state = {
@@ -700,9 +819,9 @@
         if (n === null || n === undefined) return "—";
         if (!Number.isFinite(n)) return "—";
         const ax = Math.abs(n);
-        if (ax < 1e-12 && n !== 0) return "un número muy pequeño";
-        if (ax > 1e6) return "un número muy grande";
-        if (ax < 1e-4 && ax > 0) return "un número muy pequeño";
+        if (ax < 1e-12 && n !== 0) return "tiende a 0";
+        if (ax > 1e6) return "tiende a infinito";
+        if (ax < 1e-4 && ax > 0) return "aproximadamente 0";
         return Number(n.toPrecision(8)).toString();
       }
       
@@ -753,8 +872,8 @@
           gVal = (Number.isFinite(g1) && Number.isFinite(g2)) ? (g1 + g2) / 2 : g1 || g2;
         }
 
-        htmlContent.push('<div class="step-item">El numerador tiende a: <strong>' + fmt(fVal) + '</strong></div>');
-        htmlContent.push('<div class="step-item">El denominador tiende a: <strong>' + fmt(gVal) + '</strong></div>');
+        htmlContent.push('<div class="step-item">El numerador <strong>' + fmt(fVal) + '</strong></div>');
+        htmlContent.push('<div class="step-item">El denominador <strong>' + fmt(gVal) + '</strong></div>');
 
         // Verificar si es una indeterminación
         const isZeroZero = Math.abs(fVal) < 1e-6 && Math.abs(gVal) < 1e-6;
@@ -810,6 +929,14 @@
         }
 
         htmlContent.push('<div class="step-item">🔍 Detectamos una indeterminación del tipo <strong>' + (isZeroZero ? "0/0" : "∞/∞") + '</strong>. ¡Perfecto para aplicar L\'Hôpital!</div>');
+        
+        // Mostrar las primeras derivadas
+        const firstDF = diffStr(F);
+        const firstDG = diffStr(G);
+        htmlContent.push('<div class="step-item">📐 Vamos a derivar:</div>');
+        htmlContent.push('<div class="math-expression">');
+        htmlContent.push('$$f\'(x) = ' + firstDF + '$$<br><br>$$g\'(x) = ' + firstDG + '$$');
+        htmlContent.push('</div>');
 
         const maxIter = 12;
         let k = 0;
@@ -932,8 +1059,20 @@
           state.hops = res.hops;
           
           if (res.limitVal !== null) {
+            // Mostrar notación completa del límite
+            const limitPoint = state.aIsInfinity ? "\\infty" : state.aNum;
+            const limitExpression = "\\lim_{x \\to " + limitPoint + "} \\frac{" + res.fOriginal + "}{" + res.gOriginal + "} = " + fmtMath(res.limitVal);
+            
+            el.resultMath.innerHTML = '';
+            katex.render(limitExpression, el.resultMath, { 
+              throwOnError: false, 
+              displayMode: true 
+            });
+            
             el.resultOut.textContent =
-              "Límite: " + fmt(res.limitVal) + (res.hops > 0 ? "  ·  " + res.hops + " aplicación(es) de la regla" : "");
+              (res.hops > 0 ? res.hops + " aplicación(es) de la regla" : "Límite directo");
+            el.resultOverlay.style.display = 'block';
+            
             el.lv.textContent = fmt(res.limitVal);
             drawPlot();
             updateMetrics();
@@ -961,6 +1100,27 @@
               });
               
               el.errorOut.textContent = "";
+              
+              // Mostrar notación completa del límite si existe
+              if (htmlResult.limitVal !== null) {
+                const limitPoint = state.aIsInfinity ? "\\infty" : state.aNum;
+                const limitExpression = "\\lim_{x \\to " + limitPoint + "} \\frac{" + htmlResult.fOriginal + "}{" + htmlResult.gOriginal + "} = " + fmtMath(htmlResult.limitVal);
+                
+                el.resultMath.innerHTML = '';
+                katex.render(limitExpression, el.resultMath, { 
+                  throwOnError: false, 
+                  displayMode: true 
+                });
+                
+                el.resultOut.textContent =
+                  (htmlResult.hops > 0 ? htmlResult.hops + " aplicación(es) de la regla" : "Límite directo");
+                el.resultOverlay.style.display = 'block';
+                
+                el.lv.textContent = fmt(htmlResult.limitVal);
+                drawPlot();
+                updateMetrics();
+                startAnim();
+              }
             } catch (parseErr) {
               el.errorOut.textContent = "Error al procesar el resultado: " + parseErr.message;
             }
@@ -1235,6 +1395,18 @@
         });
         el.ginput.addEventListener("change", () => {
           el.preset.value = "0";
+        });
+
+        // Toggle para panel de evaluación
+        el.evalHeader.addEventListener("click", () => {
+          const isExpanded = el.evalContent.classList.contains("expanded");
+          if (isExpanded) {
+            el.evalContent.classList.remove("expanded");
+            el.evalToggle.textContent = "▼";
+          } else {
+            el.evalContent.classList.add("expanded");
+            el.evalToggle.textContent = "▲";
+          }
         });
 
         state.slideFloat = parseFloat(el.xpos.value) || 500;
