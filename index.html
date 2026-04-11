@@ -169,91 +169,125 @@ body{min-height:100vh;overflow-y:auto;}
 }
 
 /* ══════════════════════════════════════════════════════
-   TEORÍA
+   TEORÍA — ALWAYS VISIBLE (no accordion)
 ══════════════════════════════════════════════════════ */
 .teoria-body{
-  padding:28px 36px 48px;
-  display:flex;flex-direction:column;gap:18px;
-  max-width:860px;margin:0 auto;width:100%;
+  padding:24px 32px 48px;
+  display:flex;flex-direction:column;gap:16px;
+  max-width:960px;margin:0 auto;width:100%;
+  overflow-y:auto;
 }
+#view-teoria{overflow-y:auto;}
+
+/* Hero theorem card */
+.tcard-hero{
+  background:linear-gradient(135deg,#1e3a6e 0%,#1b4f8a 100%);
+  border:1px solid rgba(96,165,250,.25);
+  border-radius:var(--r);
+  box-shadow:0 8px 32px rgba(37,99,235,.2);
+  overflow:hidden;
+}
+.tcard-hero-head{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 24px 0;
+}
+.tcard-hero-title{
+  font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em;
+}
+.tcard-hero-sub{
+  font-size:.7rem;color:rgba(255,255,255,.5);margin-top:2px;
+}
+.tcard-hero-body{
+  padding:16px 24px 22px;
+  text-align:center;
+}
+.thm-note{
+  font-size:.75rem;color:rgba(255,255,255,.5);margin-top:10px;
+  font-style:italic;
+}
+.tcard-hero .theorem-formula .katex{color:#fff;}
+
+/* Regular tcard — always visible */
 .tcard{
   background:var(--surface);border:1px solid var(--border);
   border-radius:var(--r);box-shadow:var(--sha2);overflow:hidden;
 }
-.tcard-head{
-  padding:11px 18px;background:#f8fafc;
+.tcard-head-static{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 18px;
+  background:#f8fafc;
   border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:9px;
-  cursor:pointer;
-  transition:background .2s;
 }
-.tcard-head:hover{background:#f1f5f9;}
-.tcard-icon{
-  width:26px;height:26px;border-radius:7px;
-  display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;
+.tcard-head-static h2{
+  font-size:.76rem;font-weight:700;color:var(--navy3);
+  text-transform:uppercase;letter-spacing:.07em;
 }
-.tcard-head h2{font-size:.76rem;font-weight:700;color:var(--navy3);text-transform:uppercase;letter-spacing:.07em;}
-.tcard-head .accordion-icon{
-  margin-left:auto;font-size:.7rem;color:var(--muted);
-  transition:transform .2s;
-}
-.tcard.expanded .accordion-icon{transform:rotate(180deg);}
-.tcard-body{
+.tcard-body-static{
   padding:18px 22px;
-  max-height:0;
-  overflow:hidden;
-  transition:max-height .3s ease-out;
 }
-.tcard.expanded .tcard-body{max-height:2000px;}
-.tcard-body p{font-size:.85rem;color:#334155;line-height:1.75;margin-bottom:9px;}
-.tcard-body p:last-child{margin-bottom:0;}
+.tcard-body-static p{font-size:.85rem;color:#334155;line-height:1.75;margin-bottom:9px;}
+.tcard-body-static p:last-child{margin-bottom:0;}
 
-.theorem-block{
-  background:linear-gradient(135deg,#eff6ff,#dbeafe);
-  border:1px solid #93c5fd;border-radius:var(--r);
-  padding:18px 22px;position:relative;margin-bottom:12px;
+/* Icon variants */
+.tcard-icon{
+  width:30px;height:30px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;
 }
-.theorem-block::before{
-  content:"";position:absolute;left:0;top:10%;bottom:10%;
-  width:4px;background:var(--blue);border-radius:4px;
-}
-.th-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;}
-.theorem-formula{text-align:center;margin:10px 0;}
+.tci-blue{background:#eff6ff;color:var(--blue);}
+.tci-amber{background:#fffbeb;color:#b45309;}
+.tci-green{background:#f0fdf4;color:var(--green);}
+.tci-purple{background:#fdf4ff;color:#7c3aed;}
+.tci-red{background:#fef2f2;color:var(--red);}
 
+/* 2-col grid */
+.teoria-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;
+}
+@media(max-width:700px){.teoria-grid{grid-template-columns:1fr;}}
+
+/* Steps in a row */
+.steps-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+}
+@media(max-width:700px){.steps-row{grid-template-columns:1fr;}}
+
+.step-block{
+  background:#f8fafc;border:1px solid var(--border);
+  border-radius:10px;padding:13px 15px;
+}
+.step-hdr{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.step-num{
+  width:22px;height:22px;border-radius:50%;background:var(--blue);
+  color:#fff;font-size:.65rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.step-label{font-size:.74rem;font-weight:700;color:var(--navy3);}
+.step-body{font-size:.81rem;color:#475569;line-height:1.65;}
+.step-math{text-align:center;margin:7px 0;}
+
+/* Conclusion block */
+.concl-block{
+  background:linear-gradient(135deg,#f0fdf4,#dcfce7);
+  border:1px solid #86efac;border-radius:10px;
+  padding:14px 18px;display:flex;gap:10px;align-items:flex-start;
+  font-size:.84rem;color:#166534;line-height:1.65;
+}
+.ck-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;color:var(--green);}
+
+/* Hypo list */
 .hypo-list{list-style:none;display:flex;flex-direction:column;gap:9px;}
 .hypo-list li{display:flex;gap:10px;align-items:flex-start;font-size:.83rem;color:#334155;line-height:1.6;}
 .hypo-list li::before{
   content:"";flex-shrink:0;width:6px;height:6px;border-radius:50%;
   background:var(--blue);margin-top:7px;
 }
-
-.step-block{
-  background:#f8fafc;border:1px solid var(--border);
-  border-radius:10px;padding:13px 17px;margin-bottom:9px;
-}
-.step-hdr{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.step-num{
-  width:20px;height:20px;border-radius:50%;background:var(--blue);
-  color:#fff;font-size:.62rem;font-weight:700;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.step-label{font-size:.74rem;font-weight:700;color:var(--navy3);}
-.step-body{font-size:.83rem;color:#475569;line-height:1.7;}
-.step-math{text-align:center;margin:7px 0;}
-
-.concl-block{
-  background:linear-gradient(135deg,#f0fdf4,#dcfce7);
-  border:1px solid #86efac;border-radius:10px;
-  padding:13px 17px;display:flex;gap:9px;align-items:flex-start;
-  font-size:.84rem;color:#166534;line-height:1.65;
-}
-.concl-block .ck{font-size:1rem;flex-shrink:0;margin-top:2px;}
-
 .warn-block{
   background:#fefce8;border:1px solid #fde68a;border-radius:10px;
-  padding:12px 16px;font-size:.79rem;color:#92400e;line-height:1.65;margin-top:10px;
+  padding:11px 15px;font-size:.79rem;color:#92400e;line-height:1.65;margin-top:12px;
 }
 
+/* Indet grid */
 .indet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .indet-cell{padding:12px 16px;border-radius:10px;}
 .indet-cell.blue{background:#eff6ff;border:1px solid #bfdbfe;}
@@ -264,6 +298,23 @@ body{min-height:100vh;overflow-y:auto;}
 .indet-cell-body{font-size:.79rem;line-height:1.75;}
 .indet-cell.blue .indet-cell-body{color:#1e40af;}
 .indet-cell.green .indet-cell-body{color:#166534;}
+
+/* No-use section */
+.no-use-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:600px){.no-use-grid{grid-template-columns:1fr;}}
+.no-use-card{border-radius:10px;padding:14px 16px;}
+.no-use-bad{background:#fef2f2;border:1px solid #fca5a5;}
+.no-use-good{background:#f0fdf4;border:1px solid #86efac;}
+.no-use-label{
+  font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  margin-bottom:8px;display:flex;align-items:center;gap:4px;
+}
+.no-use-bad .no-use-label{color:var(--red);}
+.no-use-good .no-use-label{color:var(--green);}
+.no-use-math{text-align:center;margin:8px 0;}
+.no-use-note{font-size:.75rem;line-height:1.55;margin-top:6px;}
+.no-use-bad .no-use-note{color:#7f1d1d;}
+.no-use-good .no-use-note{color:#14532d;}
 
 /* ══════════════════════════════════════════════════════
    LAB SIDEBAR
@@ -480,16 +531,6 @@ body{min-height:100vh;overflow-y:auto;}
   color:#1e293b;font-weight:700;
 }
 
-/* Punto límite */
-.limit-point{
-  width:8px;height:8px;border-radius:50%;
-  background:var(--amber);border:2px solid #fff;
-  box-shadow:0 2px 8px rgba(217,119,6,.5);
-  position:absolute;z-index:10;
-  transform:translate(-50%,-50%);
-  pointer-events:none;
-}
-
 /* Bottom bar */
 .lab-bottom{
   background:var(--surface);border-top:1px solid var(--border);
@@ -517,6 +558,171 @@ body{min-height:100vh;overflow-y:auto;}
 }
 .mc-val{font-family:'JetBrains Mono',monospace;font-size:.9rem;font-weight:700;color:var(--text);}
 .mc:last-child .mc-val{color:var(--blue);}
+
+/* ══════════════════════════════════════════════════════
+   VELOCÍMETRO DE PENDIENTE
+══════════════════════════════════════════════════════ */
+.speedometer-wrap{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:12px;
+  padding:14px 13px 10px;
+}
+.speed-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;
+}
+.speed-title{
+  font-size:.6rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:rgba(255,255,255,.4);
+}
+.speed-badge{
+  font-size:.55rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  padding:2px 7px;border-radius:999px;
+  background:rgba(37,99,235,.25);color:var(--blue3);
+  border:1px solid rgba(96,165,250,.2);
+}
+.speed-arc-wrap{
+  display:flex;justify-content:center;
+  margin-bottom:4px;
+}
+#speed-svg{display:block;}
+.speed-readings{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;
+  margin-top:6px;
+}
+.speed-val-box{
+  background:rgba(0,0,0,.25);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:8px;
+  padding:7px 9px;
+  text-align:center;
+}
+.speed-val-lbl{
+  font-size:.55rem;text-transform:uppercase;letter-spacing:.09em;
+  color:rgba(255,255,255,.35);margin-bottom:3px;font-weight:600;
+}
+.speed-val-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.92rem;font-weight:700;
+  color:#fff;
+  letter-spacing:-.02em;
+  transition:color .2s;
+}
+.speed-val-num.high{color:#f87171;}
+.speed-val-num.med {color:#fbbf24;}
+.speed-val-num.low {color:#34d399;}
+.speed-val-num.zero{color:rgba(255,255,255,.4);}
+
+/* ══════════════════════════════════════════════════════
+   FOCUS MODE
+══════════════════════════════════════════════════════ */
+.focus-toggle-wrap{
+  display:flex;align-items:center;gap:8px;
+  margin-left:auto;
+  user-select:none;
+}
+.focus-label{
+  font-size:.68rem;font-weight:600;color:var(--muted);
+  transition:color .2s;
+}
+.focus-switch{
+  position:relative;width:38px;height:21px;cursor:pointer;
+}
+.focus-switch input{opacity:0;width:0;height:0;position:absolute;}
+.focus-track{
+  position:absolute;inset:0;
+  background:var(--bg2);border-radius:999px;
+  transition:background .22s;
+  border:1px solid var(--border);
+}
+.focus-switch input:checked ~ .focus-track{background:var(--blue);}
+.focus-knob{
+  position:absolute;top:2px;left:2px;
+  width:15px;height:15px;border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.2);
+  transition:transform .22s cubic-bezier(.4,0,.2,1);
+}
+.focus-switch input:checked ~ .focus-track .focus-knob{transform:translateX(17px);}
+.focus-label.active{color:var(--blue);font-weight:700;}
+
+/* Focus mode layout changes */
+#view-lab.focus-mode .chart-container{display:none !important;}
+#view-lab.focus-mode .r-topbar .legend-row{display:none !important;}
+#view-lab.focus-mode .r-title::after{
+  content:" — Modo Examen";font-size:.65rem;color:var(--amber);
+  font-weight:700;letter-spacing:.06em;margin-left:8px;
+}
+#view-lab.focus-mode .lab-bottom{display:none !important;}
+#view-lab.focus-mode .lab-right{
+  justify-content:flex-start;
+}
+#view-lab.focus-mode .diag-box{
+  max-height:none !important;flex:1;
+}
+/* In focus mode, expand speedometer */
+#view-lab.focus-mode .speedometer-wrap{
+  background:rgba(255,255,255,.06);
+  border-color:rgba(96,165,250,.25);
+}
+
+/* Autoevaluacion panel (inside focus mode right panel) */
+.autoval-panel{
+  display:none;
+  padding:18px 20px;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+#view-lab.focus-mode .autoval-panel{display:block;}
+.autoval-title{
+  font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--navy3);margin-bottom:12px;
+  display:flex;align-items:center;gap:7px;
+}
+.autoval-row{display:flex;gap:10px;align-items:center;}
+.autoval-input{
+  flex:1;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.92rem;padding:9px 12px;
+  border:2px solid var(--border);border-radius:9px;
+  background:var(--bg);color:var(--text);
+  transition:.15s;
+}
+.autoval-input:focus{
+  outline:none;border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(37,99,235,.12);background:var(--surface);
+}
+.autoval-btn{
+  padding:9px 16px;border-radius:9px;border:none;cursor:pointer;
+  font-size:.8rem;font-weight:700;transition:.18s;
+  display:flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.autoval-check{background:var(--blue);color:#fff;}
+.autoval-check:hover{background:var(--blue2);}
+.autoval-reveal{background:var(--bg2);color:var(--navy3);}
+.autoval-reveal:hover{background:var(--border);}
+.autoval-feedback{
+  margin-top:10px;padding:10px 14px;border-radius:8px;
+  font-size:.82rem;line-height:1.55;display:none;
+}
+.autoval-feedback.correct{background:#f0fdf4;border:1px solid #86efac;color:#166534;}
+.autoval-feedback.wrong  {background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;}
+.autoval-feedback.reveal {background:#eff6ff;border:1px solid #93c5fd;color:#1e40af;}
+.autoval-result-reveal{
+  margin-top:8px;font-family:'JetBrains Mono',monospace;
+  font-size:1.1rem;font-weight:700;text-align:center;
+  padding:8px;background:rgba(37,99,235,.08);border-radius:7px;color:var(--blue);
+}
+
+/* Focus mode — right panel layout */
+#view-lab.focus-mode .lab-right{
+  display:flex;flex-direction:column;overflow:hidden;
+}
+#view-lab.focus-mode .diag-box-body{
+  max-height:none;
+}
 
 /* Scrollbars */
 ::-webkit-scrollbar{width:5px;}
@@ -573,118 +779,143 @@ body{min-height:100vh;overflow-y:auto;}
   </div>
 
   <div class="teoria-body">
-    <!-- Definición -->
-    <div class="tcard" data-accordion="definicion">
-      <div class="tcard-head" onclick="toggleAccordion('definicion')">
-        <div class="tcard-icon" style="background:#eff6ff;">📐</div>
-        <h2>Definición Formal del Teorema</h2>
-        <span class="accordion-icon">▼</span>
-      </div>
-      <div class="tcard-body">
-        <div class="theorem-block">
-          <div class="th-label">Regla de L'Hôpital — Guillaume de l'Hôpital (1696)</div>
-          <p style="font-size:.82rem;color:#1e3a8a;margin-bottom:10px;">
-            Sean <em>f</em> y <em>g</em> funciones diferenciables en un entorno de <em>a</em> (excepto posiblemente en <em>a</em>). Si se cumplen las hipótesis:
-          </p>
-          <div class="theorem-formula" id="thm-formula"></div>
-          <p style="font-size:.74rem;color:#1e40af;margin-top:8px;text-align:center;">
-            siempre que el límite del lado derecho exista (finito o infinito).
-          </p>
+
+    <!-- Teorema principal — siempre visible, destaque visual -->
+    <div class="tcard tcard-hero">
+      <div class="tcard-hero-head">
+        <div class="tcard-icon tci-blue"><i class="bx bx-math"></i></div>
+        <div>
+          <div class="tcard-hero-title">Regla de L'Hôpital</div>
+          <div class="tcard-hero-sub">Guillaume de l'Hôpital, 1696 · Cálculo Diferencial</div>
         </div>
-        <p>La regla se aplica iterativamente: si tras derivar el cociente sigue siendo indeterminado, se vuelven a derivar <em>f</em> y <em>g</em> hasta obtener convergencia.</p>
+      </div>
+      <div class="tcard-hero-body">
+        <div class="theorem-formula" id="thm-formula"></div>
+        <p class="thm-note">Válido siempre que el lado derecho exista (finito o infinito) y se cumplan las hipótesis del teorema.</p>
       </div>
     </div>
 
-    <!-- Hipótesis -->
-    <div class="tcard" data-accordion="hipotesis">
-      <div class="tcard-head" onclick="toggleAccordion('hipotesis')">
-        <div class="tcard-icon" style="background:#fefce8;">⚠️</div>
-        <h2>Hipótesis del Teorema</h2>
-        <span class="accordion-icon">▼</span>
-      </div>
-      <div class="tcard-body">
-        <ul class="hypo-list">
-          <li><em>f</em> y <em>g</em> son diferenciables en un entorno abierto de <em>a</em>, excepto posiblemente en <em>a</em> mismo.</li>
-          <li>El cociente presenta una indeterminación <span id="hypo-00"></span> o <span id="hypo-ii"></span> cuando <em>x</em> tiende a <em>a</em>.</li>
-          <li>La derivada del denominador <span id="hypo-gp"></span> en ese entorno (excepto quizás en <em>a</em>).</li>
-          <li>El límite <span id="hypo-lim"></span> existe — puede ser finito, +∞ o −∞.</li>
-        </ul>
-        <div class="warn-block">
-          <strong>⚠ Advertencia crítica:</strong> Usar L'Hôpital sin verificar la indeterminación es un error conceptual grave. Si f(a)/g(a) no es 0/0 ni ∞/∞, la regla no aplica y el resultado sería incorrecto.
+    <!-- Grid de dos columnas -->
+    <div class="teoria-grid">
+
+      <!-- Hipótesis -->
+      <div class="tcard">
+        <div class="tcard-head-static">
+          <div class="tcard-icon tci-amber"><i class="bx bx-error-circle"></i></div>
+          <h2>Hipótesis del Teorema</h2>
+        </div>
+        <div class="tcard-body-static">
+          <ul class="hypo-list">
+            <li><em>f</em> y <em>g</em> son diferenciables en un entorno de <em>a</em>, excepto posiblemente en <em>a</em>.</li>
+            <li>El cociente presenta indeterminación <span id="hypo-00"></span> o <span id="hypo-ii"></span> cuando <em>x → a</em>.</li>
+            <li>La derivada del denominador <span id="hypo-gp"></span> en ese entorno.</li>
+            <li>El límite <span id="hypo-lim"></span> existe (finito o infinito).</li>
+          </ul>
+          <div class="warn-block">
+            <i class="bx bx-shield-x" style="font-size:1rem;vertical-align:middle;margin-right:4px;"></i>
+            <strong>Advertencia:</strong> Aplicar L'Hôpital sin verificar la indeterminación produce resultados incorrectos.
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Ejemplo -->
-    <div class="tcard" data-accordion="ejemplo">
-      <div class="tcard-head" onclick="toggleAccordion('ejemplo')">
-        <div class="tcard-icon" style="background:#f0fdf4;">✏️</div>
-        <h2>Ejemplo Resuelto: <span id="ex-title-inline" style="font-weight:500;"></span></h2>
-        <span class="accordion-icon">▼</span>
+      <!-- Tipos de indeterminación -->
+      <div class="tcard">
+        <div class="tcard-head-static">
+          <div class="tcard-icon tci-purple"><i class="bx bx-list-check"></i></div>
+          <h2>Tipos de Indeterminación</h2>
+        </div>
+        <div class="tcard-body-static">
+          <div class="indet-grid">
+            <div class="indet-cell blue">
+              <div class="indet-cell-label">Directas (L'Hôpital aplica)</div>
+              <div class="indet-cell-body" id="indet-direct"></div>
+            </div>
+            <div class="indet-cell green">
+              <div class="indet-cell-label">Reducibles (transformar primero)</div>
+              <div class="indet-cell-body">
+                <strong>0·∞</strong> → reorganizar como cociente<br>
+                <strong>∞ − ∞</strong> → factorizar o racionalizar<br>
+                <strong>0⁰, 1<sup>∞</sup>, ∞⁰</strong> → logaritmo + L'Hôpital
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="tcard-body">
-        <p>Resolvemos el límite fundamental trigonométrico con L'Hôpital.</p>
 
-        <div class="step-block">
-          <div class="step-hdr"><div class="step-num">1</div><div class="step-label">Verificar la indeterminación</div></div>
-          <div class="step-body">
-            Evaluamos en <em>x</em> = 0:
-            <div class="step-math" id="ex-step1"></div>
-            El resultado 0/0 confirma la indeterminación. ✓
+    </div><!-- /teoria-grid -->
+
+    <!-- Ejemplo resuelto — full width, pasos visibles -->
+    <div class="tcard">
+      <div class="tcard-head-static">
+        <div class="tcard-icon tci-green"><i class="bx bx-book-open"></i></div>
+        <h2>Ejemplo Resuelto paso a paso: &nbsp;<span id="ex-title-inline" style="font-weight:500;text-transform:none;letter-spacing:0;"></span></h2>
+      </div>
+      <div class="tcard-body-static">
+        <p style="margin-bottom:14px;color:var(--muted);font-size:.84rem;">
+          Calculamos el límite fundamental del cálculo trigonométrico aplicando la Regla de L'Hôpital.
+        </p>
+
+        <div class="steps-row">
+          <div class="step-block">
+            <div class="step-hdr"><div class="step-num">1</div><div class="step-label">Verificar indeterminación</div></div>
+            <div class="step-body">
+              Sustituimos <em>x = 0</em> directamente:
+              <div class="step-math" id="ex-step1"></div>
+              Obtenemos <strong>0/0</strong> — indeterminación confirmada, L'Hôpital aplica.
+            </div>
+          </div>
+
+          <div class="step-block">
+            <div class="step-hdr"><div class="step-num">2</div><div class="step-label">Derivar f y g por separado</div></div>
+            <div class="step-body">
+              <div class="step-math" id="ex-step2"></div>
+            </div>
+          </div>
+
+          <div class="step-block">
+            <div class="step-hdr"><div class="step-num">3</div><div class="step-label">Aplicar la regla y evaluar</div></div>
+            <div class="step-body">
+              <div class="step-math" id="ex-step3"></div>
+              Ahora <em>x = 0</em> es válido: cos(0) = <strong>1</strong>.
+            </div>
           </div>
         </div>
 
-        <div class="step-block">
-          <div class="step-hdr"><div class="step-num">2</div><div class="step-label">Derivar numerador y denominador por separado</div></div>
-          <div class="step-body">
-            <div class="step-math" id="ex-step2"></div>
-          </div>
-        </div>
-
-        <div class="step-block">
-          <div class="step-hdr"><div class="step-num">3</div><div class="step-label">Aplicar L'Hôpital y evaluar</div></div>
-          <div class="step-body">
-            <div class="step-math" id="ex-step3"></div>
-            Ahora la sustitución directa funciona: cos(0) = 1.
-          </div>
-        </div>
-
-        <div class="concl-block">
-          <span class="ck">✓</span>
+        <div class="concl-block" style="margin-top:14px;">
+          <i class="bx bx-check-circle ck-icon"></i>
           <div>
             <div id="ex-concl"></div>
-            <div style="margin-top:5px;font-size:.78rem;">Este es el límite fundamental del cálculo trigonométrico, confirmado en <strong>una sola iteración</strong> de L'Hôpital.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tipos -->
-    <div class="tcard" data-accordion="tipos">
-      <div class="tcard-head" onclick="toggleAccordion('tipos')">
-        <div class="tcard-icon" style="background:#fdf4ff;">🔬</div>
-        <h2>Tipos de Indeterminación</h2>
-        <span class="accordion-icon">▼</span>
-      </div>
-      <div class="tcard-body">
-        <div class="indet-grid">
-          <div class="indet-cell blue">
-            <div class="indet-cell-label">Formas directas (L'Hôpital aplica)</div>
-            <div class="indet-cell-body" id="indet-direct"></div>
-          </div>
-          <div class="indet-cell green">
-            <div class="indet-cell-label">Reducibles (transformar primero)</div>
-            <div class="indet-cell-body">
-              0·∞ → reorganizar como cociente<br>
-              ∞ − ∞ → factorizar o racionalizar<br>
-              0⁰, 1^∞, ∞⁰ → logaritmo + L'Hôpital
+            <div style="margin-top:5px;font-size:.78rem;color:#166534;">
+              Este es el límite fundamental trigonométrico del cálculo — resuelto en <strong>una sola iteración</strong> de L'Hôpital.
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div style="height:16px;"></div>
+    <!-- Cuándo NO usar -->
+    <div class="tcard">
+      <div class="tcard-head-static">
+        <div class="tcard-icon tci-red"><i class="bx bx-x-circle"></i></div>
+        <h2>¿Cuándo NO aplicar L'Hôpital?</h2>
+      </div>
+      <div class="tcard-body-static">
+        <div class="no-use-grid">
+          <div class="no-use-card no-use-bad">
+            <div class="no-use-label"><i class="bx bx-x"></i> Incorrecto</div>
+            <div class="no-use-math" id="no-use-bad"></div>
+            <div class="no-use-note">El límite no es 0/0 ni ∞/∞. Aplicar L'Hôpital aquí da un resultado falso.</div>
+          </div>
+          <div class="no-use-card no-use-good">
+            <div class="no-use-label"><i class="bx bx-check"></i> Correcto</div>
+            <div class="no-use-math" id="no-use-good"></div>
+            <div class="no-use-note">Sustitución directa: el resultado es inmediato, no hay indeterminación.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:24px;"></div>
   </div>
 </div>
 
@@ -744,6 +975,43 @@ body{min-height:100vh;overflow-y:auto;}
 
       <div id="result-strip" style="display:none;"></div>
       <div id="err-strip" style="display:none;"></div>
+
+      <!-- Velocímetro de Pendiente -->
+      <span class="s-sec">Indicador de Tasa de Cambio</span>
+      <div class="speedometer-wrap">
+        <div class="speed-head">
+          <span class="speed-title"><i class="bx bx-tachometer" style="margin-right:4px;vertical-align:middle;"></i>Velocímetro</span>
+          <span class="speed-badge" id="speed-badge">Sin datos</span>
+        </div>
+        <div class="speed-arc-wrap">
+          <svg id="speed-svg" width="180" height="100" viewBox="0 0 180 100">
+            <!-- Track arc -->
+            <path id="speed-track" d="" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="10" stroke-linecap="round"/>
+            <!-- Colored fill arc -->
+            <path id="speed-fill" d="" fill="none" stroke="#3b82f6" stroke-width="10" stroke-linecap="round"/>
+            <!-- Needle -->
+            <line id="speed-needle" x1="90" y1="90" x2="90" y2="30"
+              stroke="#fff" stroke-width="2.5" stroke-linecap="round"
+              transform="rotate(0, 90, 90)" style="transition:stroke .3s, transform .35s cubic-bezier(.4,0,.2,1)"/>
+            <!-- Center cap -->
+            <circle cx="90" cy="90" r="5" fill="#fff" opacity=".9"/>
+            <!-- Zone labels -->
+            <text x="18" y="96" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(255,255,255,.4)">−∞</text>
+            <text x="79" y="14" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(255,255,255,.4)">0</text>
+            <text x="150" y="96" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(255,255,255,.4)">+∞</text>
+          </svg>
+        </div>
+        <div class="speed-readings">
+          <div class="speed-val-box">
+            <div class="speed-val-lbl">f&prime;(x)</div>
+            <div class="speed-val-num zero" id="spd-f">—</div>
+          </div>
+          <div class="speed-val-box">
+            <div class="speed-val-lbl">g&prime;(x)</div>
+            <div class="speed-val-num zero" id="spd-g">—</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="s-footer">
@@ -760,11 +1028,19 @@ body{min-height:100vh;overflow-y:auto;}
         <span class="leg"><span class="leg-line" style="background:#059669"></span>f'(x)/g'(x)</span>
         <span class="leg"><span class="leg-dash" style="border-color:#d97706"></span>Límite L</span>
       </div>
+      <!-- Focus Mode Toggle -->
+      <div class="focus-toggle-wrap">
+        <i class="bx bx-brain" style="color:var(--muted);font-size:1rem;"></i>
+        <span class="focus-label" id="focus-label">Modo Examen</span>
+        <label class="focus-switch">
+          <input type="checkbox" id="focus-toggle" />
+          <div class="focus-track"><div class="focus-knob"></div></div>
+        </label>
+      </div>
     </div>
 
     <div class="chart-container">
       <canvas id="chart"></canvas>
-      <div id="limit-point" class="limit-point" style="display:none;"></div>
     </div>
 
     <div class="lab-bottom">
@@ -788,6 +1064,26 @@ body{min-height:100vh;overflow-y:auto;}
         </div>
       </div>
     </div>
+
+    <!-- Autoevaluación (visible only in Focus Mode) -->
+    <div class="autoval-panel" id="autoval-panel">
+      <div class="autoval-title">
+        <i class="bx bx-pencil" style="font-size:1rem;color:var(--blue);"></i>
+        Autoevaluación — ¿Cuál es el límite?
+      </div>
+      <div class="autoval-row">
+        <input type="text" class="autoval-input" id="autoval-input"
+          placeholder="Tu respuesta (ej: 1, 0, 1/2…)"
+          spellcheck="false" autocomplete="off"/>
+        <button class="autoval-btn autoval-check" id="autoval-check-btn">
+          <i class="bx bx-check-circle"></i> Verificar
+        </button>
+        <button class="autoval-btn autoval-reveal" id="autoval-reveal-btn">
+          <i class="bx bx-show"></i> Revelar
+        </button>
+      </div>
+      <div class="autoval-feedback" id="autoval-feedback"></div>
+    </div>
   </div>
 </div>
 
@@ -795,8 +1091,8 @@ body{min-height:100vh;overflow-y:auto;}
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <div class="modal-head">
-      <h3 class="modal-title">📋 Procedimiento Detallado de L'Hôpital</h3>
-      <button class="modal-close" onclick="closeModal()">×</button>
+      <h3 class="modal-title"><i class="bx bx-list-ul" style="margin-right:8px;vertical-align:middle;"></i>Procedimiento Detallado de L'Hôpital</h3>
+      <button class="modal-close" onclick="closeModal()"><i class="bx bx-x"></i></button>
     </div>
     <div class="modal-body" id="modal-body">
       <!-- Content will be dynamically inserted -->
@@ -812,6 +1108,9 @@ const MEMBERS = [
   "Carlos Perez",
   "Luis Martinez",
 ];
+
+// Scope-level flag so updateSlider can read it
+let _foundLimit = false;
 
 /* ── Router ──────────────────────────────────────── */
 let chartInstance = null;
@@ -878,6 +1177,9 @@ function renderTeoria() {
     K("\\lim_{x\\to 0}\\frac{\\sin x}{x}\\;=\\;\\lim_{x\\to 0}\\frac{\\cos x}{1}\\;=\\;\\frac{\\cos 0}{1}\\;=\\;1", document.getElementById("ex-step3"), true);
     K("\\therefore\\quad\\lim_{x\\to 0}\\dfrac{\\sin x}{x}=1", document.getElementById("ex-concl"), true);
     K("\\dfrac{0}{0}\\quad\\text{y}\\quad\\dfrac{\\infty}{\\infty}", document.getElementById("indet-direct"), true);
+    // No-use examples
+    K("\\lim_{x\\to 2}\\frac{x^2-1}{x-1}\\neq\\lim_{x\\to 2}\\frac{2x}{1}", document.getElementById("no-use-bad"), true);
+    K("\\lim_{x\\to 2}\\frac{x^2-1}{x-1}=\\frac{3}{1}=3", document.getElementById("no-use-good"), true);
     _teoriaRendered = true;
   });
 }
@@ -1014,10 +1316,11 @@ function diffStr(expr){
 }
 function ratio(f,g){return x=>{const fv=f(x),gv=g(x);return(isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300)?fv/gv:NaN;};}
 function fmt(n,p=6){
-  if(!isFinite(n)) return "--"; // Usar -- en lugar de — para KaTeX
-  if(n === 0 || n === "0" || Math.abs(n) < 1e-15) return "0"; // Detectar cero exacto y numérico
+  if(n === null || n === undefined) return "—";
+  if(n === 0 || (typeof n === 'number' && Math.abs(n) < 1e-15)) return "0";
+  if(!isFinite(n)) return n > 0 ? "+∞" : "−∞";
   if(Math.abs(n) < 1e-10) return "≈ 0";
-  if(Math.abs(n) > 5e7) return n>0?"+∞":"-∞"; // Usar -∞ en lugar de −∞
+  if(Math.abs(n) > 5e7) return n>0?"+∞":"−∞";
   return +n.toPrecision(p)+"";
 }
 
@@ -1130,143 +1433,190 @@ function createChart() {
           label: 'f(x)/g(x)',
           data: points,
           borderColor: '#2563eb',
-          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          backgroundColor: 'rgba(37, 99, 235, 0.05)',
           borderWidth: 2.8,
-          tension: 0.1,
+          tension: 0,
           pointRadius: 0,
-          pointHoverRadius: 6
+          pointHoverRadius: 5,
+          spanGaps: false
         },
         {
-          label: 'f\'(x)/g\'(x)',
+          label: "f'(x)/g'(x)",
           data: derivPoints,
           borderColor: '#059669',
-          backgroundColor: 'rgba(5, 150, 105, 0.1)',
+          backgroundColor: 'rgba(5, 150, 105, 0.05)',
           borderWidth: 2,
-          tension: 0.1,
+          tension: 0,
           pointRadius: 0,
-          pointHoverRadius: 6
+          pointHoverRadius: 5,
+          spanGaps: false
         },
         ...(ST.limitVal !== null && isFinite(ST.limitVal) ? [{
           label: 'Límite L',
           data: limitLine,
           borderColor: '#d97706',
-          borderWidth: 2,
+          borderWidth: 1.5,
           borderDash: [5, 5],
           pointRadius: 0,
-          fill: false
+          pointHoverRadius: 0,
+          fill: false,
+          spanGaps: true
         }] : [])
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: false,
       interaction: {
-        mode: 'index',
+        mode: 'nearest',
         intersect: false,
+        axis: 'x'
       },
       plugins: {
-        legend: {
-          display: false
-        },
+        legend: { display: false },
         tooltip: {
           backgroundColor: '#0f172a',
-          titleColor: '#fff',
+          titleColor: '#94a3b8',
           bodyColor: '#fff',
           borderColor: '#334155',
           borderWidth: 1,
-          padding: 12,
+          padding: 10,
           displayColors: true,
           callbacks: {
+            title: function(items) {
+              return items.length ? `x = ${Number(items[0].parsed.x).toPrecision(5)}` : '';
+            },
             label: function(context) {
-              let label = context.dataset.label || '';
-              if (label) {
-                label += ': ';
+              // Skip the limit-line dataset in tooltip
+              if (context.datasetIndex === 2) return null;
+              const label = context.dataset.label || '';
+              const y = context.parsed.y;
+              if (y === null || y === undefined) return null;
+              return `${label}: ${fmt(y, 6)}`;
+            },
+            afterBody: function() {
+              if (ST.limitVal !== null && isFinite(ST.limitVal)) {
+                return [`Límite L: ${fmt(ST.limitVal, 6)}`];
               }
-              if (context.parsed.y !== null) {
-                label += fmt(context.parsed.y, 6);
-              }
-              return label;
+              return [];
             }
           }
-        }
+        },
+        // Vertical line at x = a
+        verticalLine: {}
       },
       scales: {
         x: {
           type: 'linear',
           position: 'center',
-          grid: {
-            color: '#f1f5f9',
-            drawBorder: false
-          },
+          grid: { color: '#f1f5f9' },
           ticks: {
             color: '#94a3b8',
-            font: {
-              family: "'JetBrains Mono', monospace"
-            }
+            font: { family: "'JetBrains Mono', monospace" },
+            maxTicksLimit: 10
           }
         },
         y: {
           type: 'linear',
           position: 'center',
-          grid: {
-            color: '#f1f5f9',
-            drawBorder: false
-          },
+          grid: { color: '#f1f5f9' },
           ticks: {
             color: '#94a3b8',
-            font: {
-              family: "'JetBrains Mono', monospace"
+            font: { family: "'JetBrains Mono', monospace" },
+            maxTicksLimit: 8
+          }
+        }
+      }
+    },
+    plugins: [{
+      id: 'overlays',
+      afterDraw: (chart) => {
+        const ctx2 = chart.ctx;
+        const xScale = chart.scales.x;
+        const yScale = chart.scales.y;
+        if (!xScale || !yScale) return;
+
+        // 1. Vertical dashed line at x = a
+        if (!ST.aIsInf) {
+          const xPos = xScale.getPixelForValue(ST.aNum);
+          ctx2.save();
+          ctx2.strokeStyle = 'rgba(100,116,139,0.4)';
+          ctx2.lineWidth = 1.5;
+          ctx2.setLineDash([5, 4]);
+          ctx2.beginPath();
+          ctx2.moveTo(xPos, chart.chartArea.top);
+          ctx2.lineTo(xPos, chart.chartArea.bottom);
+          ctx2.stroke();
+          ctx2.setLineDash([]);
+          ctx2.restore();
+        }
+
+        // 2. Slider x marker — vertical line + dot on f/g curve
+        const sliderX = parseFloat(document.getElementById('x_slider').value);
+        if (isFinite(sliderX) && ST.ready && ST.fFn && ST.gFn) {
+          const sliderPx = xScale.getPixelForValue(sliderX);
+          // Only draw if within chart area
+          if (sliderPx >= chart.chartArea.left && sliderPx <= chart.chartArea.right) {
+            // Vertical line at slider x
+            ctx2.save();
+            ctx2.strokeStyle = 'rgba(37,99,235,0.5)';
+            ctx2.lineWidth = 1.5;
+            ctx2.setLineDash([3, 3]);
+            ctx2.beginPath();
+            ctx2.moveTo(sliderPx, chart.chartArea.top);
+            ctx2.lineTo(sliderPx, chart.chartArea.bottom);
+            ctx2.stroke();
+            ctx2.setLineDash([]);
+            ctx2.restore();
+
+            // Dot on f(x)/g(x) curve at slider x
+            const fv = ST.fFn(sliderX), gv = ST.gFn(sliderX);
+            if (isFinite(fv) && isFinite(gv) && Math.abs(gv) > 1e-300) {
+              const y = fv / gv;
+              const yPx = yScale.getPixelForValue(y);
+              if (yPx >= chart.chartArea.top && yPx <= chart.chartArea.bottom) {
+                ctx2.save();
+                ctx2.fillStyle = '#2563eb';
+                ctx2.beginPath();
+                ctx2.arc(sliderPx, yPx, 6, 0, Math.PI * 2);
+                ctx2.fill();
+                ctx2.strokeStyle = '#fff';
+                ctx2.lineWidth = 2;
+                ctx2.stroke();
+                ctx2.restore();
+              }
             }
           }
         }
-      },
-      // Añadir línea vertical en x=a
-      plugins: [{
-        id: 'verticalLine',
-        beforeDraw: (chart) => {
-          if (ST.aNum !== null && !ST.aIsInf && chart.scales.x) {
-            const ctx = chart.ctx;
-            const xScale = chart.scales.x;
-            const xPos = xScale.getPixelForValue(ST.aNum);
-            
-            ctx.save();
-            ctx.strokeStyle = 'rgba(100, 116, 139, 0.3)';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([4, 4]);
-            ctx.beginPath();
-            ctx.moveTo(xPos, chart.chartArea.top);
-            ctx.lineTo(xPos, chart.chartArea.bottom);
-            ctx.stroke();
-            ctx.restore();
+
+        // 3. Limit point dot at (a, L) — only for finite a
+        if (ST.limitVal !== null && isFinite(ST.limitVal) && !ST.aIsInf) {
+          const xPos = xScale.getPixelForValue(ST.aNum);
+          const yPos = yScale.getPixelForValue(ST.limitVal);
+          // Only draw if within chart area
+          if (xPos >= chart.chartArea.left && xPos <= chart.chartArea.right &&
+              yPos >= chart.chartArea.top && yPos <= chart.chartArea.bottom) {
+            ctx2.save();
+            ctx2.fillStyle = '#d97706';
+            ctx2.beginPath();
+            ctx2.arc(xPos, yPos, 7, 0, Math.PI * 2);
+            ctx2.fill();
+            ctx2.strokeStyle = '#fff';
+            ctx2.lineWidth = 2.5;
+            ctx2.stroke();
+            // Label
+            ctx2.fillStyle = '#92400e';
+            ctx2.font = 'bold 10px JetBrains Mono, monospace';
+            ctx2.fillText(`L=${fmt(ST.limitVal, 4)}`, xPos + 10, yPos - 6);
+            ctx2.restore();
           }
         }
-      }]
-    }
+      }
+    }]
   });
   
-  // Mostrar punto límite
-  updateLimitPoint();
-}
-
-/* ── Update Limit Point ─────────────────────────────── */
-function updateLimitPoint() {
-  const point = document.getElementById('limit-point');
-  
-  if (ST.limitVal !== null && isFinite(ST.limitVal) && !ST.aIsInf && chartInstance) {
-    const xScale = chartInstance.scales.x;
-    const yScale = chartInstance.scales.y;
-    
-    if (xScale && yScale) {
-      const xPos = xScale.getPixelForValue(ST.aNum);
-      const yPos = yScale.getPixelForValue(ST.limitVal);
-      
-      point.style.display = 'block';
-      point.style.left = xPos + 'px';
-      point.style.top = yPos + 'px';
-    }
-  } else {
-    point.style.display = 'none';
-  }
+  // Chart drawn — slider marker will appear via plugin afterDraw
 }
 
 /* ── Main calculation ────────────────────────────── */
@@ -1359,7 +1709,7 @@ function validateAndCalculate(){
 
   steps.push({
     type:"info", icon:"bx-bolt",
-    title:`Indeterminación ${isZZ?"0/0":"∞/∞"} confirmada ✓`,
+    title:`Indeterminación ${isZZ?"0/0":"∞/∞"} confirmada`,
     math:`\\lim_{x\\to ${lp}}\\frac{${ST.fRaw}}{${ST.gRaw}}=\\frac{${isZZ?"0":"\\infty"}}{${isZZ?"0":"\\infty"}}`,
     lines:["Condición de L'Hôpital cumplida. Procedemos iterativamente."]
   });
@@ -1367,13 +1717,13 @@ function validateAndCalculate(){
   // Iterative derivation
   let F=ST.fRaw, G=ST.gRaw, limitVal=NaN;
   const MAX=8;
-  let foundLimit = false;
+  _foundLimit = false;
 
   for(let k=0;k<MAX;k++){
     let dF,dG;
     try{dF=diffStr(F);dG=diffStr(G);}
-    catch(e){steps.push({type:"err",icon:"✗",title:"Error al derivar",lines:[e.message]});break;}
-    if(dF==="0"&&dG==="0"){steps.push({type:"err",icon:"✗",title:"Derivadas nulas",lines:["Imposible continuar."]});break;}
+    catch(e){steps.push({type:"err",icon:"bx-x-circle",title:"Error al derivar",lines:[e.message]});break;}
+    if(dF==="0"&&dG==="0"){steps.push({type:"err",icon:"bx-x-circle",title:"Derivadas nulas",lines:["Imposible continuar."]});break;}
 
     ST.dfSyms.push(dF); ST.dgSyms.push(dG);
     const dfFn=buildFn(dF), dgFn=buildFn(dG);
@@ -1384,126 +1734,114 @@ function validateAndCalculate(){
       title:`Aplicación ${k+1} de L'Hôpital`,
       mlines:[`f^{(${k+1})}(x)=${dF}`, `g^{(${k+1})}(x)=${dG}`]
     });
-    
-    // Los pasos del diagnóstico ya se guardan automáticamente en lastDiagSteps
 
     F=dF; G=dG;
 
     const nowIndet=checkIndet(F,G,a,isInf);
-    const sx=isInf?1e8:a+(a===0?1e-7:1e-7*Math.abs(a));
-    const r=dfFn(sx)/dgFn(sx);
 
-    if(!nowIndet.ok||isFinite(r)){
-      if(isInf){
-        limitVal=dfFn(1e12)/dgFn(1e12);
-        if(!isFinite(limitVal)) limitVal=dfFn(1e9)/dgFn(1e9);
+    // Evaluate the new ratio to check convergence
+    // For infinity: use moderate values where JS floats still work (exp(50) ~ 5e21, exp(100) = Infinity in JS)
+    // We test at x=20 and x=50 which are reachable by buildFn
+    let r = NaN;
+    if (isInf) {
+      const candidates = [10, 20, 30, 50, 100];
+      for (const tx of candidates) {
+        const rv = dfFn(tx) / dgFn(tx);
+        if (isFinite(rv)) { r = rv; break; }
+      }
+      // If those fail, try nEval which uses nerdamer's symbolic evaluator
+      if (!isFinite(r)) {
+        for (const tx of [10, 20, 30]) {
+          const fv = nEval(dF, tx), gv = nEval(dG, tx);
+          if (isFinite(fv) && isFinite(gv) && Math.abs(gv) > 1e-300) {
+            r = fv / gv; break;
+          }
+        }
+      }
+    } else {
+      const sx = a + (a===0 ? 1e-7 : 1e-7*Math.abs(a));
+      r = dfFn(sx) / dgFn(sx);
+    }
+
+    if (!nowIndet.ok || isFinite(r)) {
+      if (isInf) {
+        // Evaluate limit numerically at increasing x values
+        // Use nEval (symbolic) rather than buildFn for stability at large x
+        let bestVal = NaN;
+        const xProbe = [5, 10, 20, 30, 50, 100];
+        for (const tx of xProbe) {
+          const fv = nEval(dF, tx), gv = nEval(dG, tx);
+          if (isFinite(fv) && isFinite(gv) && Math.abs(gv) > 1e-300) {
+            bestVal = fv / gv;
+          }
+        }
+        // Check trend: if values are converging to 0
+        const probe1 = (() => { const fv=nEval(dF,20),gv=nEval(dG,20); return isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300?fv/gv:NaN; })();
+        const probe2 = (() => { const fv=nEval(dF,50),gv=nEval(dG,50); return isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300?fv/gv:NaN; })();
+        const probe3 = (() => { const fv=nEval(dF,100),gv=nEval(dG,100); return isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300?fv/gv:NaN; })();
+
+        if (isFinite(probe1) && isFinite(probe2) && isFinite(probe3)) {
+          // Trend analysis: if |value| is shrinking towards 0
+          if (Math.abs(probe3) < 1e-6 || (Math.abs(probe3) < Math.abs(probe1) * 0.01)) {
+            bestVal = 0;
+          } else {
+            bestVal = probe3; // use largest probe as best estimate
+          }
+        } else if (isFinite(probe2)) {
+          bestVal = Math.abs(probe2) < 1e-6 ? 0 : probe2;
+        } else if (isFinite(probe1)) {
+          bestVal = Math.abs(probe1) < 1e-6 ? 0 : probe1;
+        }
+
+        limitVal = isFinite(bestVal) ? bestVal : NaN;
       } else {
         const h=1e-10;
         const ra=dfFn(a+h)/dgFn(a+h), rb=dfFn(a-h)/dgFn(a-h);
         limitVal=(isFinite(ra)&&isFinite(rb))?(ra+rb)/2:(isFinite(ra)?ra:rb);
       }
-      ST.hops=k+1; foundLimit = true; break;
+      ST.hops=k+1; _foundLimit = true; break;
     }
-    // Si no hay indeterminación, usar el valor actual
-    if (!foundLimit && isFinite(r)) {
+
+    // If still indeterminate but r is finite, use as best estimate and continue
+    if (isFinite(r)) {
       limitVal = r;
-      ST.hops = k+1;
-      foundLimit = true;
-      break;
+    }
+    ST.hops = k+1;
+  }
+
+  // Fallback: if we exhausted iterations without converging, use last finite ratio
+  if (!_foundLimit) {
+    const lastDFn = ST.dfFns[ST.dfFns.length-1];
+    const lastDGn = ST.dgFns[ST.dgFns.length-1];
+    if (lastDFn && lastDGn) {
+      if (isInf) {
+        for (const tx of [10, 20, 30, 50]) {
+          const fv = nEval(ST.dfSyms[ST.dfSyms.length-1], tx);
+          const gv = nEval(ST.dgSyms[ST.dgSyms.length-1], tx);
+          if (isFinite(fv) && isFinite(gv) && Math.abs(gv) > 1e-300) {
+            limitVal = fv / gv;
+            break;
+          }
+        }
+      } else {
+        const h = 1e-9;
+        const ra = lastDFn(a+h)/lastDGn(a+h), rb = lastDFn(a-h)/lastDGn(a-h);
+        limitVal = (isFinite(ra)&&isFinite(rb))?(ra+rb)/2:(isFinite(ra)?ra:rb);
+      }
+    }
+    if (!isFinite(limitVal)) {
+      limitVal = NaN;
     }
   }
 
-  // Asegurar que tenemos un valor válido
-  if (!foundLimit && !isFinite(limitVal)) {
-    // Último intento: evaluación directa
-    try {
-      const testX = isInf ? 1e8 : a + 1e-6;
-      const lastDFn = ST.dfFns[ST.dfFns.length-1];
-      const lastDGn = ST.dgFns[ST.dgFns.length-1];
-      
-      if (lastDFn && lastDGn) {
-        limitVal = lastDFn(testX) / lastDGn(testX);
-      } else {
-        // Si no hay funciones derivadas, intentar evaluación directa
-        limitVal = nEval(ST.fRaw, testX) / nEval(ST.gRaw, testX);
-      }
-    } catch (_) {
-      limitVal = NaN;
-    }
-  }
+  ST.limitVal = limitVal;
   
-  // Evaluación de tendencia para límites al infinito
-  if (!isFinite(limitVal) && isInf) {
-    try {
-      // Obtener las últimas derivadas válidas
-      const lastDFn = ST.dfFns[ST.dfFns.length - 1];
-      const lastDGn = ST.dgFns[ST.dgFns.length - 1];
-      
-      if (lastDFn && lastDGn) {
-        // Evaluar el cociente de derivadas en un valor muy grande
-        const testValues = [1e6, 1e8, 1e10];
-        const results = testValues.map(x => {
-          try {
-            return lastDFn(x) / lastDGn(x);
-          } catch (_) {
-            return NaN;
-          }
-        }).filter(v => isFinite(v));
-        
-        if (results.length > 0) {
-          const avgResult = results.reduce((sum, v) => sum + v, 0) / results.length;
-          const maxResult = Math.max(...results.map(Math.abs));
-          
-          // Análisis de tendencia
-          if (maxResult < 0.000001) {
-            // El cociente tiende a 0
-            limitVal = 0;
-            ST.limitVal = 0; // <--- AGREGAR ESTA LÍNEA
-            foundLimit = true;
-            break; // Romper el bucle
-          } else if (maxResult > 1e10) {
-            // El cociente tiende a infinito
-            limitVal = results[results.length - 1] > 0 ? Infinity : -Infinity;
-            ST.limitVal = results[results.length - 1] > 0 ? Infinity : -Infinity; // <--- AGREGAR ESTA LÍNEA
-            foundLimit = true;
-            break; // Romper el bucle
-          } else {
-            // El cociente tiende a un valor finito
-            limitVal = avgResult;
-            ST.limitVal = avgResult; // <--- AGREGAR ESTA LÍNEA
-            foundLimit = true;
-            break; // Romper el bucle
-          }
-        }
-      }
-    } catch (_) {
-      limitVal = NaN;
-    }
-  }
-  
-  ST.limitVal=limitVal;
-  
-  // Agregar paso explicativo para límites al infinito
-  if (isInf && ST.dfFns.length > 0) {
-    const lastDFn = ST.dfFns[ST.dfFns.length - 1];
-    const lastDGn = ST.dgFns[ST.dgFns.length - 1];
-    
-    steps.push({
-      type:"info", icon:"bx-info-circle",
-      title:"Análisis de tendencia al infinito",
-      lines:[
-        `Cociente final: ${ST.dfSyms[ST.dfSyms.length-1]} / ${ST.dgSyms[ST.dgSyms.length-1]}`
-        `Evaluado en valores grandes para determinar tendencia`
-      ],
-      math:`\\frac{${ST.dfSyms[ST.dfSyms.length-1]}}{${ST.dgSyms[ST.dgSyms.length-1]}`
-    });
-  }
-  
+  const fmtLimit = (limitVal === 0 || (isFinite(limitVal) && Math.abs(limitVal) < 1e-15)) ? "0" : fmt(limitVal, 8);
   steps.push({
     type:"ok", icon:"bx-target-lock",
     title:`Resultado — ${ST.hops} iteración(es)`,
-    math:`\\lim_{x\\to ${lp}}\\frac{f(x)}{g(x)}=${fmt(limitVal,8)}`,
-    concl:`Límite = ${fmt(limitVal,8)}`
+    math:`\\lim_{x\\to ${lp}}\\frac{f(x)}{g(x)}=${fmtLimit}`,
+    concl:`Límite = ${fmtLimit}`
   });
 
   finalize(steps,lp);
@@ -1512,7 +1850,7 @@ function validateAndCalculate(){
 function showErr(msg){
   const e=document.getElementById("err-strip");
   e.style.display="block";
-  e.innerHTML=`<div class="err-strip">⚠ ${msg}</div>`;
+  e.innerHTML=`<div class="err-strip"><i class="bx bx-error-circle" style="vertical-align:middle;margin-right:5px;"></i>${msg}</div>`;
   document.getElementById("diag-out").innerHTML=`<div class="diag-idle">Corrige el error y vuelve a intentarlo.</div>`;
 }
 
@@ -1520,23 +1858,28 @@ function finalize(steps,lp){
   renderDiag(steps);
 
   const resStrip=document.getElementById("result-strip");
-  if(ST.limitVal!==null&&isFinite(ST.limitVal)){
+  const lv = ST.limitVal;
+  if(lv !== null && (lv === 0 || isFinite(lv))){
     resStrip.style.display="block";
     resStrip.innerHTML=`
       <div class="res-strip">
         <div class="rs-lbl">Límite exacto</div>
-        <div class="rs-val">${fmt(ST.limitVal,8)}</div>
+        <div class="rs-val">${fmt(lv,8)}</div>
         <div class="rs-sub">${ST.hops>0?ST.hops+" aplicación(es) de L'Hôpital":"Evaluación directa"}</div>
       </div>`;
+  } else {
+    resStrip.style.display="none";
   }
 
   ST.ready=true;
   setupSlider();
   createChart();
   updateMetricLabels();
-  
-  // Actualizar punto límite después de un pequeño delay
-  setTimeout(() => updateLimitPoint(), 100);
+  // Initialize speedometer at slider position
+  const initX = parseFloat(document.getElementById("x_slider").value);
+  updateSpeedometer(initX);
+  // Reset autoevaluacion when a new limit is computed
+  resetAutoval();
 }
 
 /* ── Slider ──────────────────────────────────────── */
@@ -1565,12 +1908,16 @@ function updateSlider(){
 
   document.getElementById("val_orig").textContent=isFinite(fR)?fmt(fR,6):"Indefinido";
   document.getElementById("val_deriv").textContent=isFinite(dR)?fmt(dR,6):"Indefinido";
-  // Versión ultra-defensiva que reconoce el cero
   const finalVal = ST.limitVal;
-  document.getElementById("val_limit").textContent = (finalVal === 0 || finalVal === "0") ? "0" : (finalVal && isFinite(finalVal) ? fmt(finalVal, 6) : "--");
-  
-  // Debug: mostrar el valor en consola para verificar
-  console.log('ST.limitVal:', ST.limitVal, 'finalVal:', finalVal, 'fmt:', fmt(finalVal,6), 'isFinite:', isFinite(ST.limitVal), 'foundLimit:', foundLimit);
+  document.getElementById("val_limit").textContent =
+    (finalVal === 0) ? "0" :
+    (finalVal !== null && isFinite(finalVal) ? fmt(finalVal, 6) : "—");
+
+  // Update speedometer with current x
+  updateSpeedometer(x);
+
+  // Redraw chart so the slider marker updates position
+  if (chartInstance) chartInstance.update('none');
 }
 
 function updateMetricLabels(){
@@ -1587,19 +1934,218 @@ document.getElementById("preset-sel").addEventListener("change",function(){
   document.getElementById("f_input").value=f;
   document.getElementById("g_input").value=g;
   document.getElementById("a_input").value=a;
-  // Los inputs x_min y x_max ya no existen - se calculan automáticamente
+});
+
+/* ══════════════════════════════════════════════════════
+   VELOCÍMETRO DE PENDIENTE
+══════════════════════════════════════════════════════ */
+// SVG arc path helper for a semi-circle (top half)
+// cx,cy = center; r = radius; startDeg = -180 (left) to 0 (right)
+// endDeg = angle where arc ends
+function arcPath(cx, cy, r, startAngle, endAngle) {
+  const toRad = d => (d * Math.PI) / 180;
+  const x1 = cx + r * Math.cos(toRad(startAngle));
+  const y1 = cy + r * Math.sin(toRad(startAngle));
+  const x2 = cx + r * Math.cos(toRad(endAngle));
+  const y2 = cy + r * Math.sin(toRad(endAngle));
+  const large = Math.abs(endAngle - startAngle) > 180 ? 1 : 0;
+  return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
+}
+
+// The gauge goes from -180deg (left, value=-∞) to 0deg (right, value=+∞)
+// Center at (90, 90), radius 68
+const ARC_CX = 90, ARC_CY = 90, ARC_R = 64;
+const ARC_START = -180, ARC_END = 0; // degrees
+
+// Draw the static track once
+(function initSpeedTrack() {
+  const track = document.getElementById("speed-track");
+  if (track) track.setAttribute("d", arcPath(ARC_CX, ARC_CY, ARC_R, ARC_START, ARC_END));
+})();
+
+// Map a derivative value to an angle between -180 and 0
+function valueToAngle(v) {
+  if (!isFinite(v)) return v > 0 ? ARC_END : ARC_START;
+  // Use atan so big values saturate gracefully
+  // atan(v) goes from -π/2 to +π/2
+  const norm = Math.atan(v / 3) / (Math.PI / 2); // -1..+1
+  return ARC_START + (norm + 1) / 2 * (ARC_END - ARC_START);
+}
+
+// Color based on |slope|
+function slopeColor(v) {
+  if (!isFinite(v)) return "#94a3b8";
+  const mag = Math.abs(v);
+  if (mag > 5)  return "#f87171"; // red
+  if (mag > 1.5) return "#fbbf24"; // amber
+  if (mag > 0.1) return "#34d399"; // green
+  return "#60a5fa"; // blue (near 0)
+}
+function slopeClass(v) {
+  if (!isFinite(v)) return "zero";
+  const mag = Math.abs(v);
+  if (mag > 5) return "high";
+  if (mag > 1.5) return "med";
+  if (mag > 0.1) return "low";
+  return "zero";
+}
+
+function updateSpeedometer(x) {
+  const needle  = document.getElementById("speed-needle");
+  const fill    = document.getElementById("speed-fill");
+  const spdF    = document.getElementById("spd-f");
+  const spdG    = document.getElementById("spd-g");
+  const badge   = document.getElementById("speed-badge");
+  if (!needle || !fill || !spdF || !spdG) return;
+
+  if (!ST.ready || !ST.dfFns.length || !ST.dgFns.length) {
+    needle.setAttribute("transform", `rotate(${-90}, ${ARC_CX}, ${ARC_CY})`);
+    fill.setAttribute("d", "");
+    spdF.textContent = "—"; spdF.className = "speed-val-num zero";
+    spdG.textContent = "—"; spdG.className = "speed-val-num zero";
+    badge.textContent = "Sin datos";
+    return;
+  }
+
+  // Get raw derivative values using the last-iteration functions
+  const dfFn = ST.dfFns[ST.dfFns.length - 1];
+  const dgFn = ST.dgFns[ST.dgFns.length - 1];
+  const dfVal = dfFn ? dfFn(x) : NaN;
+  const dgVal = dgFn ? dgFn(x) : NaN;
+
+  // Display readings
+  spdF.textContent  = isFinite(dfVal) ? fmt(dfVal, 5) : (dfVal > 0 ? "+∞" : "−∞");
+  spdG.textContent  = isFinite(dgVal) ? fmt(dgVal, 5) : (dgVal > 0 ? "+∞" : "−∞");
+  spdF.className    = "speed-val-num " + slopeClass(dfVal);
+  spdG.className    = "speed-val-num " + slopeClass(dgVal);
+
+  // Needle is driven by f'(x) — primary rate of change
+  const angle     = valueToAngle(dfVal);
+  const color     = slopeColor(dfVal);
+
+  // Rotate needle: SVG needle points up (−90° from horizontal)
+  const needleDeg = angle + 90; // offset because needle points up (90°)
+  needle.setAttribute("transform", `rotate(${needleDeg}, ${ARC_CX}, ${ARC_CY})`);
+  needle.setAttribute("stroke", color);
+
+  // Fill arc from start to angle
+  if (isFinite(dfVal)) {
+    fill.setAttribute("d", arcPath(ARC_CX, ARC_CY, ARC_R, ARC_START, angle));
+    fill.setAttribute("stroke", color);
+  } else {
+    fill.setAttribute("d", "");
+  }
+
+  // Badge
+  const mag = isFinite(dfVal) ? Math.abs(dfVal) : Infinity;
+  badge.textContent = mag > 5 ? "Alta" : mag > 1.5 ? "Media" : mag > 0.1 ? "Baja" : "Cero";
+  badge.style.background = `${color}22`;
+  badge.style.color = color;
+  badge.style.borderColor = `${color}44`;
+}
+
+/* ══════════════════════════════════════════════════════
+   FOCUS MODE
+══════════════════════════════════════════════════════ */
+let focusModeActive = false;
+
+document.getElementById("focus-toggle").addEventListener("change", function() {
+  focusModeActive = this.checked;
+  const lab = document.getElementById("view-lab");
+  const label = document.getElementById("focus-label");
+  lab.classList.toggle("focus-mode", focusModeActive);
+  label.classList.toggle("active", focusModeActive);
+
+  if (focusModeActive) {
+    // Reset autoevaluacion when entering focus mode
+    resetAutoval();
+    // In focus mode the slider is hidden — but if user had a position, keep it
+  } else {
+    // Leaving focus mode: redraw chart
+    if (chartInstance) setTimeout(() => chartInstance.update('none'), 50);
+  }
+});
+
+/* ══════════════════════════════════════════════════════
+   AUTOEVALUACIÓN
+══════════════════════════════════════════════════════ */
+function resetAutoval() {
+  const input    = document.getElementById("autoval-input");
+  const feedback = document.getElementById("autoval-feedback");
+  if (input)    { input.value = ""; }
+  if (feedback) { feedback.style.display = "none"; feedback.className = "autoval-feedback"; feedback.innerHTML = ""; }
+}
+
+document.getElementById("autoval-check-btn").addEventListener("click", function() {
+  const input    = document.getElementById("autoval-input");
+  const feedback = document.getElementById("autoval-feedback");
+  const raw      = (input.value || "").trim();
+  if (!raw) { input.focus(); return; }
+
+  if (ST.limitVal === null || !isFinite(ST.limitVal) && ST.limitVal !== 0) {
+    feedback.className = "autoval-feedback reveal";
+    feedback.style.display = "block";
+    feedback.innerHTML = `<i class="bx bx-info-circle"></i> Calcula un límite primero antes de autoevaluarte.`;
+    return;
+  }
+
+  // Parse the user's answer — allow fractions like "1/2"
+  let userVal = NaN;
+  try {
+    if (raw.includes("/")) {
+      const parts = raw.split("/");
+      userVal = parseFloat(parts[0]) / parseFloat(parts[1]);
+    } else {
+      userVal = parseFloat(raw);
+    }
+  } catch(_) {}
+
+  const correct = ST.limitVal;
+  const tolerance = Math.max(1e-4, Math.abs(correct) * 0.01); // 1% or 0.0001
+  const isCorrect = isFinite(userVal) && Math.abs(userVal - correct) < tolerance;
+
+  feedback.style.display = "block";
+  if (isCorrect) {
+    feedback.className = "autoval-feedback correct";
+    feedback.innerHTML = `
+      <i class="bx bx-check-circle" style="font-size:1.1rem;vertical-align:middle;margin-right:5px;"></i>
+      <strong>¡Correcto!</strong> El límite es <span style="font-family:monospace;font-weight:700;">${fmt(correct,8)}</span>.
+      Excelente comprensión del proceso de L'Hôpital.`;
+  } else {
+    feedback.className = "autoval-feedback wrong";
+    feedback.innerHTML = `
+      <i class="bx bx-x-circle" style="font-size:1.1rem;vertical-align:middle;margin-right:5px;"></i>
+      <strong>Incorrecto.</strong> Tu respuesta fue <span style="font-family:monospace;">${raw}</span>.
+      Revisa el diagnóstico paso a paso en el panel izquierdo y vuelve a intentarlo.`;
+  }
+});
+
+document.getElementById("autoval-reveal-btn").addEventListener("click", function() {
+  const feedback = document.getElementById("autoval-feedback");
+  const correct  = ST.limitVal;
+  feedback.style.display = "block";
+  if (correct === null || (!isFinite(correct) && correct !== 0)) {
+    feedback.className = "autoval-feedback reveal";
+    feedback.innerHTML = `<i class="bx bx-info-circle"></i> Calcula un límite primero.`;
+    return;
+  }
+  feedback.className = "autoval-feedback reveal";
+  feedback.innerHTML = `
+    <i class="bx bx-show" style="vertical-align:middle;margin-right:5px;"></i>
+    <strong>Resultado revelado:</strong>
+    <div class="autoval-result-reveal">${fmt(correct, 8)}</div>
+    <div style="font-size:.78rem;margin-top:6px;opacity:.75;">
+      ${ST.hops > 0 ? `Obtenido tras ${ST.hops} aplicación(es) de L'Hôpital.` : "Obtenido por evaluación directa."}
+    </div>`;
 });
 
 /* ── Events ──────────────────────────────────────── */
-document.getElementById("x_slider").addEventListener("input",updateSlider);
-document.getElementById("calc-btn").addEventListener("click",validateAndCalculate);
-document.getElementById("detail-btn").addEventListener("click",openModal);
+document.getElementById("x_slider").addEventListener("input", updateSlider);
+document.getElementById("calc-btn").addEventListener("click", validateAndCalculate);
+document.getElementById("detail-btn").addEventListener("click", openModal);
 
-// Cerrar modal al hacer clic fuera
 document.getElementById('modal-overlay').addEventListener('click', function(e) {
-  if (e.target === this) {
-    closeModal();
-  }
+  if (e.target === this) closeModal();
 });
 
 /* ── Init ────────────────────────────────────────── */
