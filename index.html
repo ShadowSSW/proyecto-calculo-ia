@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>L'Hôpital Lab Pro | Proyecto Final Calculo Diferencial · PUCMM</title>
+<title>L'Hôpital Lab Pro | Proyecto Final Cálculo Diferencial · PUCMM</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" onload="window.__katexReady=true"></script>
 <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js"></script>
@@ -12,735 +15,8 @@
 <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<link rel="stylesheet" href="style.css" />
 
-<style>
-/* ══════════════════════════════════════════════════════
-   DESIGN TOKENS
-══════════════════════════════════════════════════════ */
-:root {
-  --navy:      #0f172a;
-  --navy2:     #1e293b;
-  --navy3:     #334155;
-  --blue:      #2563eb;
-  --blue2:     #3b82f6;
-  --blue3:     #60a5fa;
-  --green:     #059669;
-  --amber:     #d97706;
-  --red:       #dc2626;
-  --bg:        #f1f5f9;
-  --bg2:       #e2e8f0;
-  --surface:   #ffffff;
-  --border:    #e2e8f0;
-  --text:      #0f172a;
-  --muted:     #64748b;
-  --r:         12px;
-  --sha:       0 4px 24px rgba(15,23,42,.12);
-  --sha2:      0 1px 4px rgba(15,23,42,.07);
-}
-
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);}
-body{min-height:100vh;overflow-y:auto;}
-
-/* ══════════════════════════════════════════════════════
-   SPA VIEWS
-══════════════════════════════════════════════════════ */
-.view{display:none;min-height:100vh;}
-.view.active{display:flex;flex-direction:column;}
-#view-lab{flex-direction:row !important;}
-
-/* ══════════════════════════════════════════════════════
-   HOME
-══════════════════════════════════════════════════════ */
-#view-home{
-  background:linear-gradient(135deg,#0f172a 0%,#1b3560 50%,#0f172a 100%);
-  align-items:center;justify-content:center;
-  position:relative;overflow:hidden;
-}
-#view-home::before{
-  content:"";position:absolute;inset:0;
-  background-image:
-    linear-gradient(rgba(37,99,235,.07) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(37,99,235,.07) 1px,transparent 1px);
-  background-size:56px 56px;
-  animation:gridScroll 25s linear infinite;
-}
-@keyframes gridScroll{from{background-position:0 0}to{background-position:56px 56px}}
-.home-glow{
-  position:absolute;pointer-events:none;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(37,99,235,.22) 0%,transparent 70%);
-}
-.home-glow.a{width:700px;height:700px;top:-200px;left:-200px;}
-.home-glow.b{width:500px;height:500px;bottom:-100px;right:-100px;}
-
-.home-card{
-  position:relative;z-index:2;
-  max-width:700px;width:92%;
-  padding:50px 56px;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.09);
-  border-radius:24px;
-  backdrop-filter:blur(18px);
-  box-shadow:0 32px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);
-  text-align:center;
-}
-.home-eyebrow{
-  display:inline-block;
-  font-size:.64rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--blue3);
-  background:rgba(37,99,235,.15);
-  border:1px solid rgba(96,165,250,.25);
-  border-radius:999px;padding:4px 14px;margin-bottom:22px;
-}
-.home-title{
-  font-size:clamp(1.9rem,3.8vw,3rem);
-  font-weight:800;line-height:1.08;letter-spacing:-.045em;color:#fff;margin-bottom:8px;
-}
-.home-title .accent{color:var(--blue2);}
-.home-sub{font-size:.95rem;color:rgba(255,255,255,.5);margin-bottom:5px;}
-.home-course{font-size:.72rem;color:rgba(255,255,255,.3);margin-bottom:34px;}
-
-.members-card{
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:var(--r);
-  padding:14px 20px;margin-bottom:30px;
-}
-.members-lbl{
-  font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;
-  color:rgba(255,255,255,.35);font-weight:700;margin-bottom:10px;
-}
-.members-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;}
-.mchip{
-  display:flex;align-items:center;gap:6px;
-  background:rgba(37,99,235,.13);
-  border:1px solid rgba(96,165,250,.18);
-  border-radius:999px;padding:5px 12px;
-  font-size:.72rem;font-weight:500;color:rgba(255,255,255,.75);
-}
-.mchip .av{
-  width:19px;height:19px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,var(--blue),var(--blue3));
-  display:flex;align-items:center;justify-content:center;
-  font-size:.52rem;font-weight:800;color:#fff;
-}
-
-.home-btns{display:flex;gap:12px;justify-content:center;}
-.hbtn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:13px 26px;border-radius:var(--r);
-  font-size:.84rem;font-weight:700;cursor:pointer;border:none;
-  transition:all .2s cubic-bezier(.4,0,.2,1);
-  letter-spacing:-.01em;
-}
-.hbtn-primary{
-  background:var(--blue);color:#fff;
-  box-shadow:0 0 0 0 rgba(37,99,235,.5);
-}
-.hbtn-primary:hover{background:var(--blue2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,.55);}
-.hbtn-ghost{
-  background:rgba(255,255,255,.07);color:rgba(255,255,255,.82);
-  border:1px solid rgba(255,255,255,.12);
-}
-.hbtn-ghost:hover{background:rgba(255,255,255,.12);transform:translateY(-2px);}
-
-/* ══════════════════════════════════════════════════════
-   TOPBAR (shared by Teoría)
-══════════════════════════════════════════════════════ */
-.top-bar{
-  height:50px;flex-shrink:0;
-  background:var(--navy);
-  display:flex;align-items:center;padding:0 24px;gap:14px;
-  box-shadow:var(--sha);
-}
-.back-btn{
-  display:flex;align-items:center;gap:5px;
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
-  border-radius:8px;color:rgba(255,255,255,.75);
-  font-size:.72rem;font-weight:600;padding:5px 11px;cursor:pointer;transition:.16s;
-}
-.back-btn:hover{background:rgba(255,255,255,.13);color:#fff;}
-.top-title{font-size:.8rem;font-weight:700;color:rgba(255,255,255,.88);letter-spacing:-.01em;}
-.top-badge{
-  margin-left:auto;font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--blue3);background:rgba(37,99,235,.2);
-  border:1px solid rgba(96,165,250,.3);border-radius:999px;padding:3px 10px;
-}
-
-/* ══════════════════════════════════════════════════════
-   TEORÍA — ALWAYS VISIBLE (no accordion)
-══════════════════════════════════════════════════════ */
-.teoria-body{
-  padding:24px 32px 48px;
-  display:flex;flex-direction:column;gap:16px;
-  max-width:960px;margin:0 auto;width:100%;
-  overflow-y:auto;
-}
-#view-teoria{overflow-y:auto;}
-
-/* Hero theorem card */
-.tcard-hero{
-  background:linear-gradient(135deg,#1e3a6e 0%,#1b4f8a 100%);
-  border:1px solid rgba(96,165,250,.25);
-  border-radius:var(--r);
-  box-shadow:0 8px 32px rgba(37,99,235,.2);
-  overflow:hidden;
-}
-.tcard-hero-head{
-  display:flex;align-items:center;gap:14px;
-  padding:16px 24px 0;
-}
-.tcard-hero-title{
-  font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em;
-}
-.tcard-hero-sub{
-  font-size:.7rem;color:rgba(255,255,255,.5);margin-top:2px;
-}
-.tcard-hero-body{
-  padding:16px 24px 22px;
-  text-align:center;
-}
-.thm-note{
-  font-size:.75rem;color:rgba(255,255,255,.5);margin-top:10px;
-  font-style:italic;
-}
-.tcard-hero .theorem-formula .katex{color:#fff;}
-
-/* Regular tcard — always visible */
-.tcard{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);box-shadow:var(--sha2);overflow:hidden;
-}
-.tcard-head-static{
-  display:flex;align-items:center;gap:10px;
-  padding:12px 18px;
-  background:#f8fafc;
-  border-bottom:1px solid var(--border);
-}
-.tcard-head-static h2{
-  font-size:.76rem;font-weight:700;color:var(--navy3);
-  text-transform:uppercase;letter-spacing:.07em;
-}
-.tcard-body-static{
-  padding:18px 22px;
-}
-.tcard-body-static p{font-size:.85rem;color:#334155;line-height:1.75;margin-bottom:9px;}
-.tcard-body-static p:last-child{margin-bottom:0;}
-
-/* Icon variants */
-.tcard-icon{
-  width:30px;height:30px;border-radius:8px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1rem;
-}
-.tci-blue{background:#eff6ff;color:var(--blue);}
-.tci-amber{background:#fffbeb;color:#b45309;}
-.tci-green{background:#f0fdf4;color:var(--green);}
-.tci-purple{background:#fdf4ff;color:#7c3aed;}
-.tci-red{background:#fef2f2;color:var(--red);}
-
-/* 2-col grid */
-.teoria-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:16px;
-}
-@media(max-width:700px){.teoria-grid{grid-template-columns:1fr;}}
-
-/* Steps in a row */
-.steps-row{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
-}
-@media(max-width:700px){.steps-row{grid-template-columns:1fr;}}
-
-.step-block{
-  background:#f8fafc;border:1px solid var(--border);
-  border-radius:10px;padding:13px 15px;
-}
-.step-hdr{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.step-num{
-  width:22px;height:22px;border-radius:50%;background:var(--blue);
-  color:#fff;font-size:.65rem;font-weight:700;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.step-label{font-size:.74rem;font-weight:700;color:var(--navy3);}
-.step-body{font-size:.81rem;color:#475569;line-height:1.65;}
-.step-math{text-align:center;margin:7px 0;}
-
-/* Conclusion block */
-.concl-block{
-  background:linear-gradient(135deg,#f0fdf4,#dcfce7);
-  border:1px solid #86efac;border-radius:10px;
-  padding:14px 18px;display:flex;gap:10px;align-items:flex-start;
-  font-size:.84rem;color:#166534;line-height:1.65;
-}
-.ck-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;color:var(--green);}
-
-/* Hypo list */
-.hypo-list{list-style:none;display:flex;flex-direction:column;gap:9px;}
-.hypo-list li{display:flex;gap:10px;align-items:flex-start;font-size:.83rem;color:#334155;line-height:1.6;}
-.hypo-list li::before{
-  content:"";flex-shrink:0;width:6px;height:6px;border-radius:50%;
-  background:var(--blue);margin-top:7px;
-}
-.warn-block{
-  background:#fefce8;border:1px solid #fde68a;border-radius:10px;
-  padding:11px 15px;font-size:.79rem;color:#92400e;line-height:1.65;margin-top:12px;
-}
-
-/* Indet grid */
-.indet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.indet-cell{padding:12px 16px;border-radius:10px;}
-.indet-cell.blue{background:#eff6ff;border:1px solid #bfdbfe;}
-.indet-cell.green{background:#f0fdf4;border:1px solid #bbf7d0;}
-.indet-cell-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;}
-.indet-cell.blue .indet-cell-label{color:var(--blue);}
-.indet-cell.green .indet-cell-label{color:var(--green);}
-.indet-cell-body{font-size:.79rem;line-height:1.75;}
-.indet-cell.blue .indet-cell-body{color:#1e40af;}
-.indet-cell.green .indet-cell-body{color:#166534;}
-
-/* No-use section */
-.no-use-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media(max-width:600px){.no-use-grid{grid-template-columns:1fr;}}
-.no-use-card{border-radius:10px;padding:14px 16px;}
-.no-use-bad{background:#fef2f2;border:1px solid #fca5a5;}
-.no-use-good{background:#f0fdf4;border:1px solid #86efac;}
-.no-use-label{
-  font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
-  margin-bottom:8px;display:flex;align-items:center;gap:4px;
-}
-.no-use-bad .no-use-label{color:var(--red);}
-.no-use-good .no-use-label{color:var(--green);}
-.no-use-math{text-align:center;margin:8px 0;}
-.no-use-note{font-size:.75rem;line-height:1.55;margin-top:6px;}
-.no-use-bad .no-use-note{color:#7f1d1d;}
-.no-use-good .no-use-note{color:#14532d;}
-
-/* ══════════════════════════════════════════════════════
-   LAB SIDEBAR
-══════════════════════════════════════════════════════ */
-.lab-sidebar{
-  width:380px;flex-shrink:0;
-  background:var(--navy);
-  display:flex;flex-direction:column;overflow:hidden;
-  position:sticky;top:0;height:100vh;
-}
-.sidebar-top{
-  padding:12px 16px 10px;
-  border-bottom:1px solid rgba(255,255,255,.07);
-  flex-shrink:0;display:flex;align-items:center;gap:8px;
-}
-.s-logo{font-size:.84rem;font-weight:800;letter-spacing:-.02em;color:#fff;}
-.s-logo span{color:var(--blue2);}
-.s-logo small{font-size:.48rem;vertical-align:middle;opacity:.45;}
-.s-scroll{
-  flex:1;overflow-y:auto;
-  padding:12px 13px;
-  display:flex;flex-direction:column;gap:10px;
-}
-.s-scroll::-webkit-scrollbar{width:3px;}
-.s-scroll::-webkit-scrollbar-track{background:transparent;}
-.s-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
-
-.s-sec{font-size:.56rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.28);padding:0 3px;margin-top:4px;}
-.s-field{display:flex;flex-direction:column;gap:3px;}
-.s-lbl{font-size:.61rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);}
-.s-inp{
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);
-  border-radius:8px;color:#fff;
-  font-family:'JetBrains Mono',monospace;font-size:.84rem;
-  padding:7px 10px;width:100%;transition:.15s;
-}
-.s-inp:focus{outline:none;border-color:var(--blue2);box-shadow:0 0 0 3px rgba(37,99,235,.2);background:rgba(255,255,255,.09);}
-.s-inp-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.s-sel{
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);
-  border-radius:8px;color:#fff;font-size:.76rem;padding:7px 9px;
-  width:100%;cursor:pointer;transition:.15s;
-}
-.s-sel:focus{outline:none;border-color:var(--blue2);}
-.s-sel option{background:var(--navy2);color:#fff;}
-.s-hint{font-size:.64rem;color:rgba(255,255,255,.25);line-height:1.55;}
-.s-hint code{background:rgba(255,255,255,.07);border-radius:3px;padding:1px 4px;font-family:monospace;}
-
-.s-calc{
-  background:var(--blue);color:#fff;border:none;border-radius:9px;
-  padding:10px;font-size:.8rem;font-weight:700;
-  cursor:pointer;transition:.2s;
-  display:flex;align-items:center;justify-content:center;gap:7px;
-}
-.s-calc:hover{background:var(--blue2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(37,99,235,.45);}
-.s-calc:active{transform:translateY(0);}
-
-/* Diagnostic box */
-.diag-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;max-height:350px;}
-.diag-box-head{
-  padding:7px 12px;background:rgba(255,255,255,.04);
-  border-bottom:1px solid rgba(255,255,255,.05);
-  font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);
-  flex-shrink:0;
-}
-.diag-box-body{padding:9px 11px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;flex:1;}
-.diag-box-body::-webkit-scrollbar{width:3px;}
-.diag-box-body::-webkit-scrollbar-track{background:transparent;}
-.diag-box-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px;}
-.diag-idle{font-size:.73rem;color:rgba(255,255,255,.22);text-align:center;padding:10px 0;font-style:italic;}
-
-/* Diag step */
-.ds{border-radius:8px;padding:8px 10px;font-size:.73rem;line-height:1.6;border:1px solid transparent;color:rgba(255,255,255,.82);}
-.ds.info{background:rgba(37,99,235,.12);border-color:rgba(37,99,235,.25);}
-.ds.ok  {background:rgba(5,150,105,.12);border-color:rgba(5,150,105,.3);color:rgba(134,239,172,.88);}
-.ds.warn{background:rgba(217,119,6,.12);border-color:rgba(217,119,6,.3);color:rgba(253,230,138,.88);}
-.ds.err {background:rgba(220,38,38,.12);border-color:rgba(220,38,38,.3);color:rgba(252,165,165,.88);}
-.ds-head{font-weight:700;display:flex;align-items:center;gap:5px;margin-bottom:4px;font-size:.74rem;}
-.ds-icon{
-  font-size:1rem;flex-shrink:0;
-}
-.ds-num{
-  width:16px;height:16px;border-radius:50%;flex-shrink:0;
-  background:rgba(37,99,235,.65);color:#fff;
-  font-size:.52rem;font-weight:800;
-  display:flex;align-items:center;justify-content:center;
-}
-.ds-num.g{background:rgba(5,150,105,.65);}
-.ds-line{margin:2px 0;font-size:.71rem;opacity:.92;}
-.ds-math{margin:5px 0 2px;text-align:center;}
-.ds-concl{margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.08);font-weight:700;font-size:.75rem;}
-
-/* Result & Error strips */
-.res-strip{
-  background:linear-gradient(135deg,rgba(37,99,235,.2),rgba(37,99,235,.08));
-  border:1px solid rgba(37,99,235,.3);border-radius:9px;
-  padding:10px 13px;text-align:center;
-}
-.res-strip .rs-lbl{font-size:.56rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.38);font-weight:700;margin-bottom:4px;}
-.res-strip .rs-val{font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.03em;}
-.res-strip .rs-sub{font-size:.62rem;color:rgba(255,255,255,.38);margin-top:2px;}
-.err-strip{
-  background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.28);
-  border-radius:9px;padding:9px 12px;
-  font-size:.73rem;color:rgba(252,165,165,.88);line-height:1.5;
-}
-
-.s-footer{padding:9px 13px;border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;}
-.s-back{
-  display:flex;align-items:center;justify-content:center;gap:5px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-  border-radius:8px;color:rgba(255,255,255,.5);
-  font-size:.7rem;font-weight:600;padding:8px;cursor:pointer;transition:.16s;width:100%;
-}
-.s-back:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.75);}
-
-/* ══════════════════════════════════════════════════════
-   LAB RIGHT
-══════════════════════════════════════════════════════ */
-.lab-right{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
-
-.r-topbar{
-  height:46px;flex-shrink:0;
-  background:var(--surface);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 18px;gap:12px;
-  box-shadow:var(--sha2);
-}
-.r-title{font-size:.76rem;font-weight:700;color:var(--navy3);text-transform:uppercase;letter-spacing:.07em;}
-.legend-row{display:flex;gap:10px;margin-left:auto;}
-.leg{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--muted);font-weight:500;}
-.leg-line{width:22px;height:2.5px;border-radius:3px;}
-.leg-dash{width:22px;height:1px;border-radius:1px;border-top:2px dashed;}
-
-.chart-container{flex:1;position:relative;min-height:400px;padding:20px;}
-
-/* Modal */
-.modal-overlay{
-  position:fixed;top:0;left:0;right:0;bottom:0;
-  background:rgba(15,23,42,.85);backdrop-filter:blur(10px);
-  display:flex;align-items:center;justify-content:center;z-index:1000;
-  opacity:0;visibility:hidden;transition:all .3s;
-}
-.modal-overlay.active{
-  opacity:1;visibility:visible;
-}
-.modal{
-  background:rgba(255,255,255,.98);backdrop-filter:blur(20px);
-  border-radius:16px;max-width:800px;width:90%;max-height:80vh;
-  box-shadow:0 25px 50px rgba(15,23,42,.3);
-  transform:scale(.9);transition:transform .3s;
-  overflow:hidden;
-}
-.modal-overlay.active .modal{transform:scale(1);}
-.modal-head{
-  padding:20px 24px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-}
-.modal-title{font-size:1.1rem;font-weight:700;color:var(--navy);}
-.modal-close{
-  width:32px;height:32px;border-radius:8px;
-  background:var(--bg);border:none;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  font-size:1.2rem;color:var(--muted);transition:all .2s;
-}
-.modal-close:hover{background:var(--bg2);color:var(--text);}
-.modal-body{
-  padding:24px;overflow-y:auto;max-height:60vh;
-}
-.modal-step{
-  background:var(--bg);border:1px solid var(--border);
-  border-radius:10px;padding:16px;margin-bottom:16px;
-}
-.modal-step:last-child{margin-bottom:0;}
-.modal-step-title{
-  font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:12px;
-  display:flex;align-items:center;gap:8px;
-}
-.modal-step-num{
-  width:24px;height:24px;border-radius:50%;background:var(--blue);
-  color:#fff;font-size:.7rem;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-}
-.modal-step-content{
-  font-size:.85rem;line-height:1.7;color:var(--text);
-}
-
-/* Mejorar contraste en modal para diagnóstico */
-.modal .ds{
-  color:#1e293b; /* Texto más oscuro para mejor legibilidad */
-}
-.modal .ds.info{
-  background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.2);
-  color:#1e3a8a;
-}
-.modal .ds.ok{
-  background:rgba(5,150,105,.08);border-color:rgba(5,150,105,.2);
-  color:#14532d;
-}
-.modal .ds.warn{
-  background:rgba(217,119,6,.08);border-color:rgba(217,119,6,.2);
-  color:#78350f;
-}
-.modal .ds.err{
-  background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.2);
-  color:#7f1d1d;
-}
-.modal .ds-head{
-  color:#1e293b;font-weight:700;
-}
-.modal .ds-line{
-  color:#475569;
-}
-.modal .ds-concl{
-  color:#1e293b;font-weight:700;
-}
-
-/* Bottom bar */
-.lab-bottom{
-  background:var(--surface);border-top:1px solid var(--border);
-  padding:11px 18px;flex-shrink:0;
-  box-shadow:0 -1px 4px rgba(0,0,0,.04);
-}
-.sl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
-.sl-head span{font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
-#x_label{
-  font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:700;color:var(--blue);
-  background:rgba(37,99,235,.08);padding:2px 9px;border-radius:6px;
-}
-#x_slider{width:100%;height:4px;accent-color:var(--blue);cursor:pointer;margin-bottom:10px;}
-
-.metrics-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-.mc{
-  padding:9px 12px;border-radius:10px;
-  border:1px solid var(--border);background:var(--bg);
-  text-align:center;
-}
-.mc:last-child{border-color:rgba(37,99,235,.3);background:rgba(37,99,235,.04);}
-.mc-lbl{
-  min-height:20px;display:flex;align-items:center;justify-content:center;
-  margin-bottom:4px;font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);
-}
-.mc-val{font-family:'JetBrains Mono',monospace;font-size:.9rem;font-weight:700;color:var(--text);}
-.mc:last-child .mc-val{color:var(--blue);}
-
-/* ══════════════════════════════════════════════════════
-   VELOCÍMETRO DE PENDIENTE
-══════════════════════════════════════════════════════ */
-.speedometer-wrap{
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.09);
-  border-radius:12px;
-  padding:14px 13px 10px;
-}
-.speed-head{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:10px;
-}
-.speed-title{
-  font-size:.6rem;font-weight:700;letter-spacing:.1em;
-  text-transform:uppercase;color:rgba(255,255,255,.4);
-}
-.speed-badge{
-  font-size:.55rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
-  padding:2px 7px;border-radius:999px;
-  background:rgba(37,99,235,.25);color:var(--blue3);
-  border:1px solid rgba(96,165,250,.2);
-}
-.speed-arc-wrap{
-  display:flex;justify-content:center;
-  margin-bottom:4px;
-}
-#speed-svg{display:block;}
-.speed-readings{
-  display:grid;grid-template-columns:1fr 1fr;gap:6px;
-  margin-top:6px;
-}
-.speed-val-box{
-  background:rgba(0,0,0,.25);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:8px;
-  padding:7px 9px;
-  text-align:center;
-}
-.speed-val-lbl{
-  font-size:.55rem;text-transform:uppercase;letter-spacing:.09em;
-  color:rgba(255,255,255,.35);margin-bottom:3px;font-weight:600;
-}
-.speed-val-num{
-  font-family:'JetBrains Mono',monospace;
-  font-size:.92rem;font-weight:700;
-  color:#fff;
-  letter-spacing:-.02em;
-  transition:color .2s;
-}
-.speed-val-num.high{color:#f87171;}
-.speed-val-num.med {color:#fbbf24;}
-.speed-val-num.low {color:#34d399;}
-.speed-val-num.zero{color:rgba(255,255,255,.4);}
-
-/* ══════════════════════════════════════════════════════
-   FOCUS MODE
-══════════════════════════════════════════════════════ */
-.focus-toggle-wrap{
-  display:flex;align-items:center;gap:8px;
-  margin-left:auto;
-  user-select:none;
-}
-.focus-label{
-  font-size:.68rem;font-weight:600;color:var(--muted);
-  transition:color .2s;
-}
-.focus-switch{
-  position:relative;width:38px;height:21px;cursor:pointer;
-}
-.focus-switch input{opacity:0;width:0;height:0;position:absolute;}
-.focus-track{
-  position:absolute;inset:0;
-  background:var(--bg2);border-radius:999px;
-  transition:background .22s;
-  border:1px solid var(--border);
-}
-.focus-switch input:checked ~ .focus-track{background:var(--blue);}
-.focus-knob{
-  position:absolute;top:2px;left:2px;
-  width:15px;height:15px;border-radius:50%;
-  background:#fff;
-  box-shadow:0 1px 4px rgba(0,0,0,.2);
-  transition:transform .22s cubic-bezier(.4,0,.2,1);
-}
-.focus-switch input:checked ~ .focus-track .focus-knob{transform:translateX(17px);}
-.focus-label.active{color:var(--blue);font-weight:700;}
-
-/* Focus mode layout changes */
-#view-lab.focus-mode .chart-container{display:none !important;}
-#view-lab.focus-mode .r-topbar .legend-row{display:none !important;}
-#view-lab.focus-mode .r-title::after{
-  content:" — Modo Examen";font-size:.65rem;color:var(--amber);
-  font-weight:700;letter-spacing:.06em;margin-left:8px;
-}
-#view-lab.focus-mode .lab-bottom{display:none !important;}
-#view-lab.focus-mode .lab-right{
-  justify-content:flex-start;
-}
-#view-lab.focus-mode .diag-box{
-  max-height:none !important;flex:1;
-}
-/* In focus mode, expand speedometer */
-#view-lab.focus-mode .speedometer-wrap{
-  background:rgba(255,255,255,.06);
-  border-color:rgba(96,165,250,.25);
-}
-
-/* Autoevaluacion panel (inside focus mode right panel) */
-.autoval-panel{
-  display:none;
-  padding:18px 20px;
-  background:var(--surface);
-  border-top:1px solid var(--border);
-  flex-shrink:0;
-}
-#view-lab.focus-mode .autoval-panel{display:block;}
-.autoval-title{
-  font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
-  color:var(--navy3);margin-bottom:12px;
-  display:flex;align-items:center;gap:7px;
-}
-.autoval-row{display:flex;gap:10px;align-items:center;}
-.autoval-input{
-  flex:1;
-  font-family:'JetBrains Mono',monospace;
-  font-size:.92rem;padding:9px 12px;
-  border:2px solid var(--border);border-radius:9px;
-  background:var(--bg);color:var(--text);
-  transition:.15s;
-}
-.autoval-input:focus{
-  outline:none;border-color:var(--blue);
-  box-shadow:0 0 0 3px rgba(37,99,235,.12);background:var(--surface);
-}
-.autoval-btn{
-  padding:9px 16px;border-radius:9px;border:none;cursor:pointer;
-  font-size:.8rem;font-weight:700;transition:.18s;
-  display:flex;align-items:center;gap:6px;white-space:nowrap;
-}
-.autoval-check{background:var(--blue);color:#fff;}
-.autoval-check:hover{background:var(--blue2);}
-.autoval-reveal{background:var(--bg2);color:var(--navy3);}
-.autoval-reveal:hover{background:var(--border);}
-.autoval-feedback{
-  margin-top:10px;padding:10px 14px;border-radius:8px;
-  font-size:.82rem;line-height:1.55;display:none;
-}
-.autoval-feedback.correct{background:#f0fdf4;border:1px solid #86efac;color:#166534;}
-.autoval-feedback.wrong  {background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;}
-.autoval-feedback.reveal {background:#eff6ff;border:1px solid #93c5fd;color:#1e40af;}
-.autoval-result-reveal{
-  margin-top:8px;font-family:'JetBrains Mono',monospace;
-  font-size:1.1rem;font-weight:700;text-align:center;
-  padding:8px;background:rgba(37,99,235,.08);border-radius:7px;color:var(--blue);
-}
-
-/* Focus mode — right panel layout */
-#view-lab.focus-mode .lab-right{
-  display:flex;flex-direction:column;overflow:hidden;
-}
-#view-lab.focus-mode .diag-box-body{
-  max-height:none;
-}
-
-/* Scrollbars */
-::-webkit-scrollbar{width:5px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:10px;}
-
-/* KaTeX */
-.katex{font-size:1em;}
-.katex-display{margin:.15em 0 !important;}
-
-/* Responsive */
-@media (max-width: 768px) {
-  #view-lab{flex-direction:column !important;}
-  .lab-sidebar{width:100%;height:auto;position:relative;}
-  .s-scroll{max-height:400px;}
-  .chart-container{min-height:300px;}
-}
-</style>
 </head>
 <body>
 
@@ -780,7 +56,7 @@ body{min-height:100vh;overflow-y:auto;}
 
   <div class="teoria-body">
 
-    <!-- Teorema principal — siempre visible, destaque visual -->
+    <!-- ① Teorema principal -->
     <div class="tcard tcard-hero">
       <div class="tcard-hero-head">
         <div class="tcard-icon tci-blue"><i class="bx bx-math"></i></div>
@@ -790,15 +66,31 @@ body{min-height:100vh;overflow-y:auto;}
         </div>
       </div>
       <div class="tcard-hero-body">
-        <div class="theorem-formula" id="thm-formula"></div>
+        <div class="thm-formula-html">
+          Si <em>f(a) = g(a) = 0</em> (o ambas → ∞) y <em>g′(x) ≠ 0</em> cerca de <em>a</em>, entonces:
+          <div class="thm-frac-wrap">
+            <span class="thm-frac-lim">lim<sub>x→a</sub></span>
+            <span class="thm-frac-box">
+              <span class="thm-frac-top">f(x)</span>
+              <span class="thm-frac-bar"></span>
+              <span class="thm-frac-bot">g(x)</span>
+            </span>
+            <span class="thm-frac-eq">=</span>
+            <span class="thm-frac-lim">lim<sub>x→a</sub></span>
+            <span class="thm-frac-box">
+              <span class="thm-frac-top">f′(x)</span>
+              <span class="thm-frac-bar"></span>
+              <span class="thm-frac-bot">g′(x)</span>
+            </span>
+          </div>
+        </div>
         <p class="thm-note">Válido siempre que el lado derecho exista (finito o infinito) y se cumplan las hipótesis del teorema.</p>
       </div>
     </div>
 
-    <!-- Grid de dos columnas -->
+    <!-- ② Grid hipótesis + tipos -->
     <div class="teoria-grid">
 
-      <!-- Hipótesis -->
       <div class="tcard">
         <div class="tcard-head-static">
           <div class="tcard-icon tci-amber"><i class="bx bx-error-circle"></i></div>
@@ -806,19 +98,18 @@ body{min-height:100vh;overflow-y:auto;}
         </div>
         <div class="tcard-body-static">
           <ul class="hypo-list">
-            <li><em>f</em> y <em>g</em> son diferenciables en un entorno de <em>a</em>, excepto posiblemente en <em>a</em>.</li>
-            <li>El cociente presenta indeterminación <span id="hypo-00"></span> o <span id="hypo-ii"></span> cuando <em>x → a</em>.</li>
-            <li>La derivada del denominador <span id="hypo-gp"></span> en ese entorno.</li>
-            <li>El límite <span id="hypo-lim"></span> existe (finito o infinito).</li>
+            <li><em>f</em> y <em>g</em> son diferenciables en un entorno de <em>a</em>, excepto quizás en <em>a</em> mismo.</li>
+            <li>El cociente presenta indeterminación <strong><span class="math-frac-line math-frac-tight math-frac-small"><span class="math-frac-top">0</span><span class="math-frac-bar"></span><span class="math-frac-bot">0</span></span></strong> o <strong><span class="math-frac-line math-frac-tight math-frac-small"><span class="math-frac-top">∞</span><span class="math-frac-bar"></span><span class="math-frac-bot">∞</span></span></strong> cuando <em>x → a</em>.</li>
+            <li>La derivada del denominador satisface <strong>g′(x) ≠ 0</strong> en ese entorno.</li>
+            <li>El límite <strong>lim <span class="math-frac-line math-frac-tight math-frac-small"><span class="math-frac-top">f′(x)</span><span class="math-frac-bar"></span><span class="math-frac-bot">g′(x)</span></span></strong> existe (finito o infinito).</li>
           </ul>
           <div class="warn-block">
-            <i class="bx bx-shield-x" style="font-size:1rem;vertical-align:middle;margin-right:4px;"></i>
+            <i class="bx bx-shield-x" style="font-size:1rem;vertical-align:middle;margin-right:6px;"></i>
             <strong>Advertencia:</strong> Aplicar L'Hôpital sin verificar la indeterminación produce resultados incorrectos.
           </div>
         </div>
       </div>
 
-      <!-- Tipos de indeterminación -->
       <div class="tcard">
         <div class="tcard-head-static">
           <div class="tcard-icon tci-purple"><i class="bx bx-list-check"></i></div>
@@ -827,13 +118,17 @@ body{min-height:100vh;overflow-y:auto;}
         <div class="tcard-body-static">
           <div class="indet-grid">
             <div class="indet-cell blue">
-              <div class="indet-cell-label">Directas (L'Hôpital aplica)</div>
-              <div class="indet-cell-body" id="indet-direct"></div>
+              <div class="indet-cell-label">Directas — L'Hôpital aplica</div>
+              <div class="indet-cell-body" style="font-size:1.15rem;font-weight:700;letter-spacing:.04em;line-height:2;">
+                <span class="math-frac-line"><span class="math-frac-top">0</span><span class="math-frac-bar"></span><span class="math-frac-bot">0</span></span>
+                &nbsp;&nbsp;
+                <span class="math-frac-line"><span class="math-frac-top">∞</span><span class="math-frac-bar"></span><span class="math-frac-bot">∞</span></span>
+              </div>
             </div>
             <div class="indet-cell green">
-              <div class="indet-cell-label">Reducibles (transformar primero)</div>
+              <div class="indet-cell-label">Reducibles — transformar primero</div>
               <div class="indet-cell-body">
-                <strong>0·∞</strong> → reorganizar como cociente<br>
+                <strong>0·∞</strong> → reescribir como cociente<br>
                 <strong>∞ − ∞</strong> → factorizar o racionalizar<br>
                 <strong>0⁰, 1<sup>∞</sup>, ∞⁰</strong> → logaritmo + L'Hôpital
               </div>
@@ -842,80 +137,109 @@ body{min-height:100vh;overflow-y:auto;}
         </div>
       </div>
 
-    </div><!-- /teoria-grid -->
+    </div>
 
-    <!-- Ejemplo resuelto — full width, pasos visibles -->
-    <div class="tcard">
+    <!-- ③ Ejemplo resuelto -->
+    <div class="tcard tcard-example">
       <div class="tcard-head-static">
         <div class="tcard-icon tci-green"><i class="bx bx-book-open"></i></div>
-        <h2>Ejemplo Resuelto paso a paso: &nbsp;<span id="ex-title-inline" style="font-weight:500;text-transform:none;letter-spacing:0;"></span></h2>
+        <h2>Ejemplo resuelto: lím(x→0) <span class="math-frac-line math-frac-tight math-frac-small"><span class="math-frac-top">sin(x)</span><span class="math-frac-bar"></span><span class="math-frac-bot">x</span></span></h2>
       </div>
       <div class="tcard-body-static">
-        <p style="margin-bottom:14px;color:var(--muted);font-size:.84rem;">
-          Calculamos el límite fundamental del cálculo trigonométrico aplicando la Regla de L'Hôpital.
+        <p style="color:var(--muted);font-size:.84rem;margin-bottom:14px;">
+          El límite fundamental trigonométrico del cálculo, resuelto paso a paso con L'Hôpital.
         </p>
-
         <div class="steps-row">
           <div class="step-block">
             <div class="step-hdr"><div class="step-num">1</div><div class="step-label">Verificar indeterminación</div></div>
             <div class="step-body">
-              Sustituimos <em>x = 0</em> directamente:
-              <div class="step-math" id="ex-step1"></div>
-              Obtenemos <strong>0/0</strong> — indeterminación confirmada, L'Hôpital aplica.
+              Sustituimos <em>x = 0</em> directamente:<br>
+              <span class="step-inline-math">
+                <span class="math-frac-line"><span class="math-frac-top">sin(0)</span><span class="math-frac-bar"></span><span class="math-frac-bot">0</span></span>
+                =
+                <span class="math-frac-line"><span class="math-frac-top">0</span><span class="math-frac-bar"></span><span class="math-frac-bot">0</span></span>
+              </span><br>
+              Obtenemos <strong><span class="math-frac-line math-frac-tight math-frac-small"><span class="math-frac-top">0</span><span class="math-frac-bar"></span><span class="math-frac-bot">0</span></span></strong> — L'Hôpital aplica.
             </div>
           </div>
-
           <div class="step-block">
             <div class="step-hdr"><div class="step-num">2</div><div class="step-label">Derivar f y g por separado</div></div>
             <div class="step-body">
-              <div class="step-math" id="ex-step2"></div>
+              <span class="step-inline-math">f(x) = sin(x) → f′(x) = cos(x)</span><br>
+              <span class="step-inline-math">g(x) = x &nbsp;&nbsp;&nbsp;→ g′(x) = 1</span>
             </div>
           </div>
-
           <div class="step-block">
             <div class="step-hdr"><div class="step-num">3</div><div class="step-label">Aplicar la regla y evaluar</div></div>
             <div class="step-body">
-              <div class="step-math" id="ex-step3"></div>
-              Ahora <em>x = 0</em> es válido: cos(0) = <strong>1</strong>.
+              <span class="step-inline-math">
+                
+                lim
+                <span class="math-frac-line"><span class="math-frac-top">cos(x)</span><span class="math-frac-bar"></span><span class="math-frac-bot">1</span></span>
+                =
+                <span class="math-frac-line"><span class="math-frac-top">cos(0)</span><span class="math-frac-bar"></span><span class="math-frac-bot">1</span></span>
+                = 1
+              </span><br>
+              Evaluación directa ahora válida: cos(0) = <strong>1</strong>.
             </div>
           </div>
         </div>
-
         <div class="concl-block" style="margin-top:14px;">
           <i class="bx bx-check-circle ck-icon"></i>
           <div>
-            <div id="ex-concl"></div>
+            <strong style="font-size:.92rem;">∴ lím(x→0) sin(x)/x = 1</strong>
             <div style="margin-top:5px;font-size:.78rem;color:#166534;">
-              Este es el límite fundamental trigonométrico del cálculo — resuelto en <strong>una sola iteración</strong> de L'Hôpital.
+              Resuelto en <strong>una sola iteración</strong> de L'Hôpital.
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Cuándo NO usar -->
-    <div class="tcard">
+    <!-- ④ Cuándo NO usar -->
+    <div class="tcard tcard-nouse">
       <div class="tcard-head-static">
         <div class="tcard-icon tci-red"><i class="bx bx-x-circle"></i></div>
         <h2>¿Cuándo NO aplicar L'Hôpital?</h2>
       </div>
       <div class="tcard-body-static">
+        <p style="color:var(--muted);font-size:.84rem;margin-bottom:12px;">
+          Aplicar la regla sin verificar la indeterminación lleva a resultados incorrectos.
+        </p>
         <div class="no-use-grid">
           <div class="no-use-card no-use-bad">
-            <div class="no-use-label"><i class="bx bx-x"></i> Incorrecto</div>
-            <div class="no-use-math" id="no-use-bad"></div>
-            <div class="no-use-note">El límite no es 0/0 ni ∞/∞. Aplicar L'Hôpital aquí da un resultado falso.</div>
+            <div class="no-use-label"><i class="bx bx-x"></i> Incorrecto — no hay indeterminación</div>
+            <div class="no-use-math-html">
+              <div class="no-use-formula-line">
+                <span>lím(x→2)</span>
+                <span class="math-frac-line math-frac-tight math-frac-small"><span class="math-frac-top">x²−1</span><span class="math-frac-bar"></span><span class="math-frac-bot">x−1</span></span>
+                <span>≠ lím(x→2)</span>
+                <span class="math-frac-line math-frac-tight math-frac-small"><span class="math-frac-top">2x</span><span class="math-frac-bar"></span><span class="math-frac-bot">1</span></span>
+                <span>= 4 ✗</span>
+              </div>
+            </div>
+            <div class="no-use-note">El límite no es 0/0 ni ∞/∞. Aplicar L'Hôpital da un resultado falso.</div>
           </div>
           <div class="no-use-card no-use-good">
-            <div class="no-use-label"><i class="bx bx-check"></i> Correcto</div>
-            <div class="no-use-math" id="no-use-good"></div>
-            <div class="no-use-note">Sustitución directa: el resultado es inmediato, no hay indeterminación.</div>
+            <div class="no-use-label"><i class="bx bx-check"></i> Correcto — sustitución directa</div>
+            <div class="no-use-math-html">
+              <div class="no-use-formula-line">
+                <span>lím(x→2)</span>
+                <span class="math-frac-line math-frac-tight math-frac-small"><span class="math-frac-top">x²−1</span><span class="math-frac-bar"></span><span class="math-frac-bot">x−1</span></span>
+                <span>=</span>
+                <span class="math-frac-line math-frac-tight math-frac-small"><span class="math-frac-top">4−1</span><span class="math-frac-bar"></span><span class="math-frac-bot">2−1</span></span>
+                <span>=</span>
+                <span class="math-frac-line math-frac-tight math-frac-small"><span class="math-frac-top">3</span><span class="math-frac-bar"></span><span class="math-frac-bot">1</span></span>
+                <span>= <strong>3</strong> ✓</span>
+              </div>
+            </div>
+            <div class="no-use-note">Sustitución directa: sin indeterminación, el resultado es inmediato.</div>
           </div>
         </div>
       </div>
     </div>
 
-    <div style="height:24px;"></div>
+    <div style="display:none;height:0;"></div>
   </div>
 </div>
 
@@ -985,20 +309,23 @@ body{min-height:100vh;overflow-y:auto;}
         </div>
         <div class="speed-arc-wrap">
           <svg id="speed-svg" width="180" height="100" viewBox="0 0 180 100">
-            <!-- Track arc -->
-            <path id="speed-track" d="" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="10" stroke-linecap="round"/>
-            <!-- Colored fill arc -->
-            <path id="speed-fill" d="" fill="none" stroke="#3b82f6" stroke-width="10" stroke-linecap="round"/>
-            <!-- Needle -->
-            <line id="speed-needle" x1="90" y1="90" x2="90" y2="30"
-              stroke="#fff" stroke-width="2.5" stroke-linecap="round"
-              transform="rotate(0, 90, 90)" style="transition:stroke .3s, transform .35s cubic-bezier(.4,0,.2,1)"/>
+            <!-- Track: semicircle from 180° to 0°, center=(90,90), r=70 -->
+            <!-- Left tip: (20,90), Top: (90,20), Right tip: (160,90) -->
+            <path id="speed-track" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="8" stroke-linecap="round"
+              d="M 20 90 A 70 70 0 0 1 160 90"/>
+            <!-- Colored fill arc (updated by JS) -->
+            <path id="speed-fill" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round" d=""/>
+            <!-- Needle pivot at (90,90), tip points up toward (90,22) before rotation -->
+            <line id="speed-needle"
+              x1="90" y1="90" x2="90" y2="24"
+              stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
             <!-- Center cap -->
-            <circle cx="90" cy="90" r="5" fill="#fff" opacity=".9"/>
+            <circle cx="90" cy="90" r="7" fill="#1e293b" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
+            <circle cx="90" cy="90" r="3" fill="#fff" opacity=".9"/>
             <!-- Zone labels -->
-            <text x="18" y="96" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(255,255,255,.4)">−∞</text>
-            <text x="79" y="14" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(255,255,255,.4)">0</text>
-            <text x="150" y="96" font-family="JetBrains Mono,monospace" font-size="7" fill="rgba(255,255,255,.4)">+∞</text>
+            <text x="8"  y="96" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(255,255,255,.4)">−</text>
+            <text x="86" y="16" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(255,255,255,.4)">0</text>
+            <text x="164" y="96" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(255,255,255,.4)">+</text>
           </svg>
         </div>
         <div class="speed-readings">
@@ -1011,6 +338,36 @@ body{min-height:100vh;overflow-y:auto;}
             <div class="speed-val-num zero" id="spd-g">—</div>
           </div>
         </div>
+      </div>
+
+      <!-- Análisis de Orden -->
+      <span class="s-sec">Análisis de Orden</span>
+      <div class="order-analysis-wrap">
+        <div class="order-analysis-title">
+          <i class="bx bx-bar-chart-alt-2" style="font-size:.85rem;"></i>
+          Magnitud relativa — <em style="color:rgba(255,255,255,.6);font-style:normal;" id="order-point-label">x → a</em>
+        </div>
+        <div class="order-bar-row">
+          <div class="order-bar-item">
+            <div class="order-bar-label">
+              <span class="order-bar-fn">f(x)</span>
+              <span class="order-bar-val" id="order-f-val">—</span>
+            </div>
+            <div class="order-bar-track">
+              <div class="order-bar-fill f-bar" id="order-f-bar" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="order-bar-item">
+            <div class="order-bar-label">
+              <span class="order-bar-fn">g(x)</span>
+              <span class="order-bar-val" id="order-g-val">—</span>
+            </div>
+            <div class="order-bar-track">
+              <div class="order-bar-fill g-bar" id="order-g-bar" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="order-note" id="order-note">Mueve el slider para explorar la magnitud.</div>
       </div>
     </div>
 
@@ -1027,15 +384,6 @@ body{min-height:100vh;overflow-y:auto;}
         <span class="leg"><span class="leg-line" style="background:#2563eb"></span>f(x)/g(x)</span>
         <span class="leg"><span class="leg-line" style="background:#059669"></span>f'(x)/g'(x)</span>
         <span class="leg"><span class="leg-dash" style="border-color:#d97706"></span>Límite L</span>
-      </div>
-      <!-- Focus Mode Toggle -->
-      <div class="focus-toggle-wrap">
-        <i class="bx bx-brain" style="color:var(--muted);font-size:1rem;"></i>
-        <span class="focus-label" id="focus-label">Modo Examen</span>
-        <label class="focus-switch">
-          <input type="checkbox" id="focus-toggle" />
-          <div class="focus-track"><div class="focus-knob"></div></div>
-        </label>
       </div>
     </div>
 
@@ -1065,25 +413,6 @@ body{min-height:100vh;overflow-y:auto;}
       </div>
     </div>
 
-    <!-- Autoevaluación (visible only in Focus Mode) -->
-    <div class="autoval-panel" id="autoval-panel">
-      <div class="autoval-title">
-        <i class="bx bx-pencil" style="font-size:1rem;color:var(--blue);"></i>
-        Autoevaluación — ¿Cuál es el límite?
-      </div>
-      <div class="autoval-row">
-        <input type="text" class="autoval-input" id="autoval-input"
-          placeholder="Tu respuesta (ej: 1, 0, 1/2…)"
-          spellcheck="false" autocomplete="off"/>
-        <button class="autoval-btn autoval-check" id="autoval-check-btn">
-          <i class="bx bx-check-circle"></i> Verificar
-        </button>
-        <button class="autoval-btn autoval-reveal" id="autoval-reveal-btn">
-          <i class="bx bx-show"></i> Revelar
-        </button>
-      </div>
-      <div class="autoval-feedback" id="autoval-feedback"></div>
-    </div>
   </div>
 </div>
 
@@ -1099,1063 +428,6 @@ body{min-height:100vh;overflow-y:auto;}
     </div>
   </div>
 </div>
-
-<script>
-"use strict";
-
-/* ── Config ──────────────────────────────────────── */
-const MEMBERS = [
-  "Carlos Perez",
-  "Luis Martinez",
-];
-
-// Scope-level flag so updateSlider can read it
-let _foundLimit = false;
-
-/* ── Router ──────────────────────────────────────── */
-let chartInstance = null;
-
-function navigate(view) {
-  ["home","teoria","lab"].forEach(v => {
-    document.getElementById("view-"+v).classList.toggle("active", v===view);
-  });
-  
-  // Reset chart when navigating
-  if (chartInstance) {
-    chartInstance.destroy();
-    chartInstance = null;
-  }
-  
-  if (view==="lab") {
-    setTimeout(() => validateAndCalculate(), 100);
-  }
-  if (view==="teoria") renderTeoria();
-}
-
-/* ── Accordion ───────────────────────────────────── */
-function toggleAccordion(id) {
-  const card = document.querySelector(`[data-accordion="${id}"]`);
-  card.classList.toggle('expanded');
-}
-
-/* ── KaTeX ───────────────────────────────────────── */
-function waitK(fn) {
-  if (window.__katexReady && window.katex) fn();
-  else setTimeout(()=>waitK(fn), 50);
-}
-function K(tex, node, display) {
-  if (!node) return;
-  try { katex.render(tex, node, {throwOnError:false, displayMode:!!display}); }
-  catch(_) { node.textContent = tex; }
-}
-
-/* ── Members ─────────────────────────────────────── */
-function buildMembers() {
-  const wrap = document.getElementById("members-chips");
-  MEMBERS.forEach(m => {
-    const initials = m.split(" ").map(w=>w[0]).slice(0,2).join("");
-    const c = document.createElement("div");
-    c.className = "mchip";
-    c.innerHTML = `<div class="av">${initials}</div>${m}`;
-    wrap.appendChild(c);
-  });
-}
-
-/* ── Teoría render ───────────────────────────────── */
-let _teoriaRendered = false;
-function renderTeoria() {
-  if (_teoriaRendered) return;
-  waitK(()=>{
-    K("\\displaystyle\\lim_{x\\to a}\\frac{f(x)}{g(x)}=\\lim_{x\\to a}\\frac{f'(x)}{g'(x)}", document.getElementById("thm-formula"), true);
-    K("\\tfrac{0}{0}", document.getElementById("hypo-00"), false);
-    K("\\tfrac{\\infty}{\\infty}", document.getElementById("hypo-ii"), false);
-    K("g'(x)\\neq 0", document.getElementById("hypo-gp"), false);
-    K("\\displaystyle\\lim_{x\\to a}\\frac{f'(x)}{g'(x)}", document.getElementById("hypo-lim"), false);
-    K("\\displaystyle\\lim_{x\\to 0}\\frac{\\sin x}{x}", document.getElementById("ex-title-inline"), false);
-    K("\\dfrac{\\sin(0)}{0}=\\dfrac{0}{0}", document.getElementById("ex-step1"), true);
-    K("f(x)=\\sin x\\;\\Rightarrow\\;f'(x)=\\cos x\\qquad g(x)=x\\;\\Rightarrow\\;g'(x)=1", document.getElementById("ex-step2"), true);
-    K("\\lim_{x\\to 0}\\frac{\\sin x}{x}\\;=\\;\\lim_{x\\to 0}\\frac{\\cos x}{1}\\;=\\;\\frac{\\cos 0}{1}\\;=\\;1", document.getElementById("ex-step3"), true);
-    K("\\therefore\\quad\\lim_{x\\to 0}\\dfrac{\\sin x}{x}=1", document.getElementById("ex-concl"), true);
-    K("\\dfrac{0}{0}\\quad\\text{y}\\quad\\dfrac{\\infty}{\\infty}", document.getElementById("indet-direct"), true);
-    // No-use examples
-    K("\\lim_{x\\to 2}\\frac{x^2-1}{x-1}\\neq\\lim_{x\\to 2}\\frac{2x}{1}", document.getElementById("no-use-bad"), true);
-    K("\\lim_{x\\to 2}\\frac{x^2-1}{x-1}=\\frac{3}{1}=3", document.getElementById("no-use-good"), true);
-    _teoriaRendered = true;
-  });
-}
-
-/* ── Lab State ───────────────────────────────────── */
-const ST = {
-  ready:false, fRaw:"sin(x)", gRaw:"x",
-  aStr:"0", aNum:0, aIsInf:false,
-  xMin:-4, xMax:4,
-  fFn:null, gFn:null,
-  dfFns:[], dgFns:[],
-  dfSyms:[], dgSyms:[],
-  limitVal:null, hops:0,
-  detailSteps: [],
-};
-
-/* ── Modal Functions ───────────────────────────────── */
-let lastDiagSteps = []; // Guardar los últimos pasos del diagnóstico
-
-function openModal() {
-  if (!lastDiagSteps || lastDiagSteps.length === 0) {
-    document.getElementById('modal-body').innerHTML = '<p style="text-align:center;color:var(--muted);">No hay procedimiento disponible. Calcula un límite primero.</p>';
-  } else {
-    renderModalContent();
-  }
-  document.getElementById('modal-overlay').classList.add('active');
-}
-
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('active');
-}
-
-function renderModalContent() {
-  const modalBody = document.getElementById('modal-body');
-  let html = '';
-  
-  lastDiagSteps.forEach((step) => {
-    // Replicar exactamente el estilo del diagnóstico
-    let stepClass = 'ds ' + step.type;
-    let headerHtml = '<div class="ds-head">';
-    
-    if (step.num) {
-      headerHtml += '<span class="ds-num ' + (step.type === 'ok' ? 'g' : '') + '">' + step.num + '</span>';
-    } else if (step.icon) {
-      headerHtml += '<i class="bx ' + step.icon + ' ds-icon"></i>';
-    }
-    
-    headerHtml += '<span>' + step.title + '</span></div>';
-    
-    // Agregar líneas de texto
-    let linesHtml = '';
-    (step.lines || []).forEach(line => {
-      linesHtml += '<div class="ds-line">' + line + '</div>';
-    });
-    
-    // Agregar matemáticas
-    let mathHtml = '';
-    if (step.math) {
-      mathHtml += '<div class="ds-math" data-m="' + encodeURIComponent(step.math) + '"></div>';
-    }
-    (step.mlines || []).forEach(mline => {
-      mathHtml += '<div class="ds-math" data-m="' + encodeURIComponent(mline) + '"></div>';
-    });
-    
-    // Agregar conclusión
-    let conclHtml = '';
-    if (step.concl) {
-      conclHtml = '<div class="ds-concl">→ ' + step.concl + '</div>';
-    }
-    
-    html += '<div class="' + stepClass + '">' + headerHtml + linesHtml + mathHtml + conclHtml + '</div>';
-  });
-  
-  modalBody.innerHTML = html;
-  
-  // Renderizar matemáticas en el modal
-  waitK(() => {
-    modalBody.querySelectorAll('[data-m]').forEach(m => {
-      waitK(() => K(decodeURIComponent(m.getAttribute('data-m')), m, true));
-    });
-  });
-}
-
-/* ── Calculate Domain ───────────────────────────────── */
-function calculateDomain(a, isInf) {
-  if (isInf) {
-    return { min: -10, max: 10 };
-  }
-  
-  // Rango razonable alrededor del punto a
-  const range = 5;
-  let min = a - range;
-  let max = a + range;
-  
-  // Evitar dominios problemáticos para funciones comunes
-  if (Math.abs(a) < 0.1) {
-    min = -2;
-    max = 2;
-  }
-  
-  return { min, max };
-}
-
-/* ── Math helpers ────────────────────────────────── */
-function norm(s){ return (s||"").trim().replace(/\*\*/g,"^").replace(/\bln\s*\(/gi,"log("); }
-function parseA(str){
-  const s=(str||"").trim().toLowerCase();
-  if(["inf","+inf","infinity","+infinity","∞"].includes(s)) return {value:1e9,isInf:true};
-  const n=parseFloat(s.replace(",","."));
-  if(!isFinite(n)) throw new Error("Punto 'a' inválido. Usa un número o 'inf'.");
-  return {value:n,isInf:false};
-}
-function nEval(expr,x){
-  try{
-    const v=nerdamer(norm(expr),{x:String(x)}).evaluate().text();
-    const n=parseFloat(v);
-    if(isFinite(n)) return n;
-    
-    // Detectar infinitos explícitos de Nerdamer
-    if(v === 'Infinity' || v === '+Infinity' || v === '∞') return Infinity;
-    if(v === '-Infinity' || v === '-∞') return -Infinity;
-    
-    return NaN;
-  }catch(_){return NaN;}
-}
-function buildFn(expr){
-  try{const fn=nerdamer(norm(expr)).buildFunction(["x"]);return x=>{try{const v=fn(x);return isFinite(v)?v:NaN;}catch(_){return NaN;};};}
-  catch(_){return ()=>NaN;}
-}
-function diffStr(expr){
-  const e=norm(expr);
-  try{if(typeof nerdamer.diff==="function") return nerdamer.diff(nerdamer(e),"x").text();}catch(_){}
-  try{return nerdamer("diff("+e+",x)").text();}catch(err){throw new Error("No se pudo derivar '"+e+"'");}
-}
-function ratio(f,g){return x=>{const fv=f(x),gv=g(x);return(isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300)?fv/gv:NaN;};}
-function fmt(n,p=6){
-  if(n === null || n === undefined) return "—";
-  if(n === 0 || (typeof n === 'number' && Math.abs(n) < 1e-15)) return "0";
-  if(!isFinite(n)) return n > 0 ? "+∞" : "−∞";
-  if(Math.abs(n) < 1e-10) return "≈ 0";
-  if(Math.abs(n) > 5e7) return n>0?"+∞":"−∞";
-  return +n.toPrecision(p)+"";
-}
-
-/* ── Enhanced Infinity Detection ──────────────────────── */
-function detectInfinity(expr, x, isPositiveInfinity = true) {
-  try {
-    // Evaluar en puntos muy grandes para detectar comportamiento asintótico
-    const testPoints = isPositiveInfinity ? [1e6, 1e8, 1e10] : [-1e6, -1e8, -1e10];
-    const values = testPoints.map(t => nEval(expr, t));
-    
-    // Si todos los valores son consistentemente grandes en magnitud
-    const avgMagnitude = values.reduce((sum, v) => sum + Math.abs(v || 0), 0) / values.length;
-    
-    if (avgMagnitude > 1e4) {
-      // Determinar el signo
-      const positiveCount = values.filter(v => v > 0).length;
-      return positiveCount > values.length / 2 ? Infinity : -Infinity;
-    }
-    
-    return NaN;
-  } catch (_) {
-    return NaN;
-  }
-}
-
-function isInfinityValue(val) {
-  return val === Infinity || val === -Infinity || 
-         (typeof val === 'string' && (val.includes('Infinity') || val.includes('∞')));
-}
-
-/* ── Indetermination check ───────────────────────── */
-function checkIndet(F,G,a,isInf){
-  if(isInf){
-    const f = detectInfinity(F, a, true) || nEval(F, 1e8);
-    const g = detectInfinity(G, a, true) || nEval(G, 1e8);
-    return{ok:(isInfinityValue(f) || Math.abs(f)>1e4) && (isInfinityValue(g) || Math.abs(g)>1e4)};
-  }
-  const h=1e-6;
-  const f1=nEval(F,a+h),g1=nEval(G,a+h),f2=nEval(F,a-h),g2=nEval(G,a-h);
-  const sm=z=>Math.abs(z)<5e-4, bg=z=>Math.abs(z)>1e4 || isInfinityValue(z);
-  return{ok:(sm(f1)&&sm(g1))||(sm(f2)&&sm(g2))||(bg(f1)&&bg(g1))||(bg(f2)&&bg(g2))};
-}
-
-/* ── Diagnostic renderer ─────────────────────────── */
-function renderDiag(steps){
-  // Guardar los pasos para el modal
-  lastDiagSteps = steps;
-  
-  const out=document.getElementById("diag-out");
-  out.innerHTML="";
-  steps.forEach(s=>{
-    const d=document.createElement("div");
-    d.className="ds "+s.type;
-    let h=`<div class="ds-head">`;
-    if(s.num) h+=`<span class="ds-num ${s.type==="ok"?"g":""}">${s.num}</span>`;
-    else if(s.icon) h+=`<i class="bx ${s.icon} ds-icon"></i>`;
-    h+=`<span>${s.title}</span></div>`;
-    (s.lines||[]).forEach(l=>{h+=`<div class="ds-line">${l}</div>`;});
-    if(s.math) h+=`<div class="ds-math" data-m="${encodeURIComponent(s.math)}"></div>`;
-    (s.mlines||[]).forEach(m=>{h+=`<div class="ds-math" data-m="${encodeURIComponent(m)}"></div>`;});
-    if(s.concl) h+=`<div class="ds-concl">→ ${s.concl}</div>`;
-    d.innerHTML=h;
-    d.querySelectorAll("[data-m]").forEach(m=>{
-      waitK(()=>K(decodeURIComponent(m.getAttribute("data-m")),m,true));
-    });
-    out.appendChild(d);
-  });
-}
-
-/* ── Chart.js Setup ───────────────────────────────── */
-function createChart() {
-  // Destruir gráfica existente
-  if (chartInstance) {
-    chartInstance.destroy();
-    chartInstance = null;
-  }
-  
-  const ctx = document.getElementById('chart').getContext('2d');
-  
-  // Calcular dominio automáticamente
-  const domain = calculateDomain(ST.aNum, ST.aIsInf);
-  ST.xMin = domain.min;
-  ST.xMax = domain.max;
-  
-  // Generate data points
-  const points = [];
-  const derivPoints = [];
-  const limitLine = [];
-  
-  for (let i = 0; i <= 300; i++) {
-    const x = ST.xMin + (i / 300) * (ST.xMax - ST.xMin);
-    const fR = ST.fFn && ST.gFn ? ST.fFn(x) / ST.gFn(x) : NaN;
-    const dfFn = ST.dfFns[ST.dfFns.length - 1];
-    const dgFn = ST.dgFns[ST.dgFns.length - 1];
-    const dR = dfFn && dgFn ? dfFn(x) / dgFn(x) : NaN;
-    
-    if (isFinite(fR)) points.push({x, y: fR});
-    if (isFinite(dR)) derivPoints.push({x, y: dR});
-    
-    if (ST.limitVal !== null && isFinite(ST.limitVal)) {
-      limitLine.push({x, y: ST.limitVal});
-    }
-  }
-  
-  chartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      datasets: [
-        {
-          label: 'f(x)/g(x)',
-          data: points,
-          borderColor: '#2563eb',
-          backgroundColor: 'rgba(37, 99, 235, 0.05)',
-          borderWidth: 2.8,
-          tension: 0,
-          pointRadius: 0,
-          pointHoverRadius: 5,
-          spanGaps: false
-        },
-        {
-          label: "f'(x)/g'(x)",
-          data: derivPoints,
-          borderColor: '#059669',
-          backgroundColor: 'rgba(5, 150, 105, 0.05)',
-          borderWidth: 2,
-          tension: 0,
-          pointRadius: 0,
-          pointHoverRadius: 5,
-          spanGaps: false
-        },
-        ...(ST.limitVal !== null && isFinite(ST.limitVal) ? [{
-          label: 'Límite L',
-          data: limitLine,
-          borderColor: '#d97706',
-          borderWidth: 1.5,
-          borderDash: [5, 5],
-          pointRadius: 0,
-          pointHoverRadius: 0,
-          fill: false,
-          spanGaps: true
-        }] : [])
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: false,
-      interaction: {
-        mode: 'nearest',
-        intersect: false,
-        axis: 'x'
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#0f172a',
-          titleColor: '#94a3b8',
-          bodyColor: '#fff',
-          borderColor: '#334155',
-          borderWidth: 1,
-          padding: 10,
-          displayColors: true,
-          callbacks: {
-            title: function(items) {
-              return items.length ? `x = ${Number(items[0].parsed.x).toPrecision(5)}` : '';
-            },
-            label: function(context) {
-              // Skip the limit-line dataset in tooltip
-              if (context.datasetIndex === 2) return null;
-              const label = context.dataset.label || '';
-              const y = context.parsed.y;
-              if (y === null || y === undefined) return null;
-              return `${label}: ${fmt(y, 6)}`;
-            },
-            afterBody: function() {
-              if (ST.limitVal !== null && isFinite(ST.limitVal)) {
-                return [`Límite L: ${fmt(ST.limitVal, 6)}`];
-              }
-              return [];
-            }
-          }
-        },
-        // Vertical line at x = a
-        verticalLine: {}
-      },
-      scales: {
-        x: {
-          type: 'linear',
-          position: 'center',
-          grid: { color: '#f1f5f9' },
-          ticks: {
-            color: '#94a3b8',
-            font: { family: "'JetBrains Mono', monospace" },
-            maxTicksLimit: 10
-          }
-        },
-        y: {
-          type: 'linear',
-          position: 'center',
-          grid: { color: '#f1f5f9' },
-          ticks: {
-            color: '#94a3b8',
-            font: { family: "'JetBrains Mono', monospace" },
-            maxTicksLimit: 8
-          }
-        }
-      }
-    },
-    plugins: [{
-      id: 'overlays',
-      afterDraw: (chart) => {
-        const ctx2 = chart.ctx;
-        const xScale = chart.scales.x;
-        const yScale = chart.scales.y;
-        if (!xScale || !yScale) return;
-
-        // 1. Vertical dashed line at x = a
-        if (!ST.aIsInf) {
-          const xPos = xScale.getPixelForValue(ST.aNum);
-          ctx2.save();
-          ctx2.strokeStyle = 'rgba(100,116,139,0.4)';
-          ctx2.lineWidth = 1.5;
-          ctx2.setLineDash([5, 4]);
-          ctx2.beginPath();
-          ctx2.moveTo(xPos, chart.chartArea.top);
-          ctx2.lineTo(xPos, chart.chartArea.bottom);
-          ctx2.stroke();
-          ctx2.setLineDash([]);
-          ctx2.restore();
-        }
-
-        // 2. Slider x marker — vertical line + dot on f/g curve
-        const sliderX = parseFloat(document.getElementById('x_slider').value);
-        if (isFinite(sliderX) && ST.ready && ST.fFn && ST.gFn) {
-          const sliderPx = xScale.getPixelForValue(sliderX);
-          // Only draw if within chart area
-          if (sliderPx >= chart.chartArea.left && sliderPx <= chart.chartArea.right) {
-            // Vertical line at slider x
-            ctx2.save();
-            ctx2.strokeStyle = 'rgba(37,99,235,0.5)';
-            ctx2.lineWidth = 1.5;
-            ctx2.setLineDash([3, 3]);
-            ctx2.beginPath();
-            ctx2.moveTo(sliderPx, chart.chartArea.top);
-            ctx2.lineTo(sliderPx, chart.chartArea.bottom);
-            ctx2.stroke();
-            ctx2.setLineDash([]);
-            ctx2.restore();
-
-            // Dot on f(x)/g(x) curve at slider x
-            const fv = ST.fFn(sliderX), gv = ST.gFn(sliderX);
-            if (isFinite(fv) && isFinite(gv) && Math.abs(gv) > 1e-300) {
-              const y = fv / gv;
-              const yPx = yScale.getPixelForValue(y);
-              if (yPx >= chart.chartArea.top && yPx <= chart.chartArea.bottom) {
-                ctx2.save();
-                ctx2.fillStyle = '#2563eb';
-                ctx2.beginPath();
-                ctx2.arc(sliderPx, yPx, 6, 0, Math.PI * 2);
-                ctx2.fill();
-                ctx2.strokeStyle = '#fff';
-                ctx2.lineWidth = 2;
-                ctx2.stroke();
-                ctx2.restore();
-              }
-            }
-          }
-        }
-
-        // 3. Limit point dot at (a, L) — only for finite a
-        if (ST.limitVal !== null && isFinite(ST.limitVal) && !ST.aIsInf) {
-          const xPos = xScale.getPixelForValue(ST.aNum);
-          const yPos = yScale.getPixelForValue(ST.limitVal);
-          // Only draw if within chart area
-          if (xPos >= chart.chartArea.left && xPos <= chart.chartArea.right &&
-              yPos >= chart.chartArea.top && yPos <= chart.chartArea.bottom) {
-            ctx2.save();
-            ctx2.fillStyle = '#d97706';
-            ctx2.beginPath();
-            ctx2.arc(xPos, yPos, 7, 0, Math.PI * 2);
-            ctx2.fill();
-            ctx2.strokeStyle = '#fff';
-            ctx2.lineWidth = 2.5;
-            ctx2.stroke();
-            // Label
-            ctx2.fillStyle = '#92400e';
-            ctx2.font = 'bold 10px JetBrains Mono, monospace';
-            ctx2.fillText(`L=${fmt(ST.limitVal, 4)}`, xPos + 10, yPos - 6);
-            ctx2.restore();
-          }
-        }
-      }
-    }]
-  });
-  
-  // Chart drawn — slider marker will appear via plugin afterDraw
-}
-
-/* ── Main calculation ────────────────────────────── */
-function validateAndCalculate(){
-  const resStrip=document.getElementById("result-strip");
-  const errStrip=document.getElementById("err-strip");
-  resStrip.style.display="none";
-  errStrip.style.display="none";
-  document.getElementById("diag-out").innerHTML=`<div class="diag-idle">Analizando…</div>`;
-
-  ST.fRaw=norm(document.getElementById("f_input").value);
-  ST.gRaw=norm(document.getElementById("g_input").value);
-  ST.detailSteps = []; // Resetear pasos detallados
-  ST.ready=false; ST.limitVal=null; ST.hops=0;
-  ST.dfFns=[]; ST.dgFns=[]; ST.dfSyms=[]; ST.dgSyms=[];
-
-  try { nerdamer(ST.fRaw); nerdamer(ST.gRaw); }
-  catch(e){ showErr("Expresión inválida: "+e.message); return; }
-
-  let aInfo;
-  try { aInfo=parseA(document.getElementById("a_input").value); }
-  catch(e){ showErr(e.message); return; }
-  ST.aNum=aInfo.value; ST.aStr=document.getElementById("a_input").value.trim(); ST.aIsInf=aInfo.isInf;
-
-  ST.fFn=buildFn(ST.fRaw); ST.gFn=buildFn(ST.gRaw);
-
-  const a=ST.aNum, isInf=ST.aIsInf;
-  const lp=isInf?"\\infty":ST.aStr;
-  const steps=[];
-
-  // Evaluate f and g at a
-  let fVal,gVal;
-  if(isInf){
-    // Evaluación mejorada para infinito
-    fVal = detectInfinity(ST.fRaw, a, true);
-    gVal = detectInfinity(ST.gRaw, a, true);
-    
-    // Si no se detectó infinito, usar evaluación directa
-    if (!isInfinityValue(fVal)) fVal = nEval(ST.fRaw, 1e8);
-    if (!isInfinityValue(gVal)) gVal = nEval(ST.gRaw, 1e8);
-  }
-  else{
-    const h=1e-7;
-    const f1=nEval(ST.fRaw,a+h),f2=nEval(ST.fRaw,a-h);
-    const g1=nEval(ST.gRaw,a+h),g2=nEval(ST.gRaw,a-h);
-    fVal=(isFinite(f1)&&isFinite(f2))?(f1+f2)/2:(isFinite(f1)?f1:f2);
-    gVal=(isFinite(g1)&&isFinite(g2))?(g1+g2)/2:(isFinite(g1)?g1:g2);
-  }
-
-  // Detección mejorada de infinitos y ceros
-  const fSm=Math.abs(fVal)<5e-4, gSm=Math.abs(gVal)<5e-4;
-  const fBg=isInfinityValue(fVal) || Math.abs(fVal)>1e4;
-  const gBg=isInfinityValue(gVal) || Math.abs(gVal)>1e4;
-  const isZZ=fSm&&gSm, isII=fBg&&gBg, isInd=isZZ||isII;
-
-  steps.push({
-    type:"info", icon:"bx-search", title:`Evaluación en x → ${isInf?"∞":ST.aStr}`,
-    lines:[
-      `f(${isInf?"∞":ST.aStr}) → <strong>${isZZ?"0":(fBg?"∞":fmt(fVal))}</strong>`,
-      `g(${isInf?"∞":ST.aStr}) → <strong>${gSm?"0":(gBg?"∞":fmt(gVal))}</strong>`,
-    ]
-  });
-
-  if(!isInd){
-    const errorMsg = Math.abs(gVal)<1e-9 
-      ? "División por cero detectada — L'Hôpital no aplica"
-      : "Uso incorrecto de la Regla: El límite no es indeterminado";
-    
-    steps.push({
-      type:"err",icon:"bx-x-circle",title:errorMsg,
-      lines:[Math.abs(gVal)<1e-9 
-        ? "El denominador → 0 pero el numerador no. El límite es ±∞."
-        : "No se cumple 0/0 ni ∞/∞. L'Hôpital no es aplicable."]
-    });
-    
-    if (Math.abs(gVal) >= 1e-9) {
-      const direct=fVal/gVal;
-      steps.push({
-        type:"warn",icon:"bx-info-circle",title:"Evaluación directa",
-        math:`\\lim_{x\\to ${lp}}\\frac{f}{g}=\\frac{${fmt(fVal)}}{${fmt(gVal)}}=${fmt(direct)}`,
-        concl:`Límite directo = ${fmt(direct,8)}`
-      });
-      ST.limitVal=direct;
-    }
-    
-    ST.hops=0;
-    ST.dfFns=[()=>NaN]; ST.dgFns=[()=>NaN];
-    renderDiag(steps); createChart(); return;
-  }
-
-  steps.push({
-    type:"info", icon:"bx-bolt",
-    title:`Indeterminación ${isZZ?"0/0":"∞/∞"} confirmada`,
-    math:`\\lim_{x\\to ${lp}}\\frac{${ST.fRaw}}{${ST.gRaw}}=\\frac{${isZZ?"0":"\\infty"}}{${isZZ?"0":"\\infty"}}`,
-    lines:["Condición de L'Hôpital cumplida. Procedemos iterativamente."]
-  });
-
-  // Iterative derivation
-  let F=ST.fRaw, G=ST.gRaw, limitVal=NaN;
-  const MAX=8;
-  _foundLimit = false;
-
-  for(let k=0;k<MAX;k++){
-    let dF,dG;
-    try{dF=diffStr(F);dG=diffStr(G);}
-    catch(e){steps.push({type:"err",icon:"bx-x-circle",title:"Error al derivar",lines:[e.message]});break;}
-    if(dF==="0"&&dG==="0"){steps.push({type:"err",icon:"bx-x-circle",title:"Derivadas nulas",lines:["Imposible continuar."]});break;}
-
-    ST.dfSyms.push(dF); ST.dgSyms.push(dG);
-    const dfFn=buildFn(dF), dgFn=buildFn(dG);
-    ST.dfFns.push(dfFn); ST.dgFns.push(dgFn);
-
-    steps.push({
-      type:"info", num:k+1,
-      title:`Aplicación ${k+1} de L'Hôpital`,
-      mlines:[`f^{(${k+1})}(x)=${dF}`, `g^{(${k+1})}(x)=${dG}`]
-    });
-
-    F=dF; G=dG;
-
-    const nowIndet=checkIndet(F,G,a,isInf);
-
-    // Evaluate the new ratio to check convergence
-    // For infinity: use moderate values where JS floats still work (exp(50) ~ 5e21, exp(100) = Infinity in JS)
-    // We test at x=20 and x=50 which are reachable by buildFn
-    let r = NaN;
-    if (isInf) {
-      const candidates = [10, 20, 30, 50, 100];
-      for (const tx of candidates) {
-        const rv = dfFn(tx) / dgFn(tx);
-        if (isFinite(rv)) { r = rv; break; }
-      }
-      // If those fail, try nEval which uses nerdamer's symbolic evaluator
-      if (!isFinite(r)) {
-        for (const tx of [10, 20, 30]) {
-          const fv = nEval(dF, tx), gv = nEval(dG, tx);
-          if (isFinite(fv) && isFinite(gv) && Math.abs(gv) > 1e-300) {
-            r = fv / gv; break;
-          }
-        }
-      }
-    } else {
-      const sx = a + (a===0 ? 1e-7 : 1e-7*Math.abs(a));
-      r = dfFn(sx) / dgFn(sx);
-    }
-
-    if (!nowIndet.ok || isFinite(r)) {
-      if (isInf) {
-        // Evaluate limit numerically at increasing x values
-        // Use nEval (symbolic) rather than buildFn for stability at large x
-        let bestVal = NaN;
-        const xProbe = [5, 10, 20, 30, 50, 100];
-        for (const tx of xProbe) {
-          const fv = nEval(dF, tx), gv = nEval(dG, tx);
-          if (isFinite(fv) && isFinite(gv) && Math.abs(gv) > 1e-300) {
-            bestVal = fv / gv;
-          }
-        }
-        // Check trend: if values are converging to 0
-        const probe1 = (() => { const fv=nEval(dF,20),gv=nEval(dG,20); return isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300?fv/gv:NaN; })();
-        const probe2 = (() => { const fv=nEval(dF,50),gv=nEval(dG,50); return isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300?fv/gv:NaN; })();
-        const probe3 = (() => { const fv=nEval(dF,100),gv=nEval(dG,100); return isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300?fv/gv:NaN; })();
-
-        if (isFinite(probe1) && isFinite(probe2) && isFinite(probe3)) {
-          // Trend analysis: if |value| is shrinking towards 0
-          if (Math.abs(probe3) < 1e-6 || (Math.abs(probe3) < Math.abs(probe1) * 0.01)) {
-            bestVal = 0;
-          } else {
-            bestVal = probe3; // use largest probe as best estimate
-          }
-        } else if (isFinite(probe2)) {
-          bestVal = Math.abs(probe2) < 1e-6 ? 0 : probe2;
-        } else if (isFinite(probe1)) {
-          bestVal = Math.abs(probe1) < 1e-6 ? 0 : probe1;
-        }
-
-        limitVal = isFinite(bestVal) ? bestVal : NaN;
-      } else {
-        const h=1e-10;
-        const ra=dfFn(a+h)/dgFn(a+h), rb=dfFn(a-h)/dgFn(a-h);
-        limitVal=(isFinite(ra)&&isFinite(rb))?(ra+rb)/2:(isFinite(ra)?ra:rb);
-      }
-      ST.hops=k+1; _foundLimit = true; break;
-    }
-
-    // If still indeterminate but r is finite, use as best estimate and continue
-    if (isFinite(r)) {
-      limitVal = r;
-    }
-    ST.hops = k+1;
-  }
-
-  // Fallback: if we exhausted iterations without converging, use last finite ratio
-  if (!_foundLimit) {
-    const lastDFn = ST.dfFns[ST.dfFns.length-1];
-    const lastDGn = ST.dgFns[ST.dgFns.length-1];
-    if (lastDFn && lastDGn) {
-      if (isInf) {
-        for (const tx of [10, 20, 30, 50]) {
-          const fv = nEval(ST.dfSyms[ST.dfSyms.length-1], tx);
-          const gv = nEval(ST.dgSyms[ST.dgSyms.length-1], tx);
-          if (isFinite(fv) && isFinite(gv) && Math.abs(gv) > 1e-300) {
-            limitVal = fv / gv;
-            break;
-          }
-        }
-      } else {
-        const h = 1e-9;
-        const ra = lastDFn(a+h)/lastDGn(a+h), rb = lastDFn(a-h)/lastDGn(a-h);
-        limitVal = (isFinite(ra)&&isFinite(rb))?(ra+rb)/2:(isFinite(ra)?ra:rb);
-      }
-    }
-    if (!isFinite(limitVal)) {
-      limitVal = NaN;
-    }
-  }
-
-  ST.limitVal = limitVal;
-  
-  const fmtLimit = (limitVal === 0 || (isFinite(limitVal) && Math.abs(limitVal) < 1e-15)) ? "0" : fmt(limitVal, 8);
-  steps.push({
-    type:"ok", icon:"bx-target-lock",
-    title:`Resultado — ${ST.hops} iteración(es)`,
-    math:`\\lim_{x\\to ${lp}}\\frac{f(x)}{g(x)}=${fmtLimit}`,
-    concl:`Límite = ${fmtLimit}`
-  });
-
-  finalize(steps,lp);
-}
-
-function showErr(msg){
-  const e=document.getElementById("err-strip");
-  e.style.display="block";
-  e.innerHTML=`<div class="err-strip"><i class="bx bx-error-circle" style="vertical-align:middle;margin-right:5px;"></i>${msg}</div>`;
-  document.getElementById("diag-out").innerHTML=`<div class="diag-idle">Corrige el error y vuelve a intentarlo.</div>`;
-}
-
-function finalize(steps,lp){
-  renderDiag(steps);
-
-  const resStrip=document.getElementById("result-strip");
-  const lv = ST.limitVal;
-  if(lv !== null && (lv === 0 || isFinite(lv))){
-    resStrip.style.display="block";
-    resStrip.innerHTML=`
-      <div class="res-strip">
-        <div class="rs-lbl">Límite exacto</div>
-        <div class="rs-val">${fmt(lv,8)}</div>
-        <div class="rs-sub">${ST.hops>0?ST.hops+" aplicación(es) de L'Hôpital":"Evaluación directa"}</div>
-      </div>`;
-  } else {
-    resStrip.style.display="none";
-  }
-
-  ST.ready=true;
-  setupSlider();
-  createChart();
-  updateMetricLabels();
-  // Initialize speedometer at slider position
-  const initX = parseFloat(document.getElementById("x_slider").value);
-  updateSpeedometer(initX);
-  // Reset autoevaluacion when a new limit is computed
-  resetAutoval();
-}
-
-/* ── Slider ──────────────────────────────────────── */
-function setupSlider(){
-  const s=document.getElementById("x_slider");
-  const domain = calculateDomain(ST.aNum, ST.aIsInf);
-  s.min = domain.min;
-  s.max = domain.max;
-  
-  // Posición inicial cerca del punto a
-  const offset = ST.aIsInf ? 0 : 0.1;
-  const initialValue = ST.aIsInf ? 0 : ST.aNum + offset;
-  s.value = Math.max(domain.min, Math.min(domain.max, initialValue));
-  
-  updateSlider();
-}
-
-function updateSlider(){
-  if(!ST.ready) return;
-  const x=parseFloat(document.getElementById("x_slider").value);
-  document.getElementById("x_label").textContent=`x = ${x.toFixed(4)}`;
-
-  const fR=ST.fFn&&ST.gFn?ST.fFn(x)/ST.gFn(x):NaN;
-  const dfFn=ST.dfFns[ST.dfFns.length-1], dgFn=ST.dgFns[ST.dgFns.length-1];
-  const dR=dfFn&&dgFn?dfFn(x)/dgFn(x):NaN;
-
-  document.getElementById("val_orig").textContent=isFinite(fR)?fmt(fR,6):"Indefinido";
-  document.getElementById("val_deriv").textContent=isFinite(dR)?fmt(dR,6):"Indefinido";
-  const finalVal = ST.limitVal;
-  document.getElementById("val_limit").textContent =
-    (finalVal === 0) ? "0" :
-    (finalVal !== null && isFinite(finalVal) ? fmt(finalVal, 6) : "—");
-
-  // Update speedometer with current x
-  updateSpeedometer(x);
-
-  // Redraw chart so the slider marker updates position
-  if (chartInstance) chartInstance.update('none');
-}
-
-function updateMetricLabels(){
-  waitK(()=>{
-    K("\\tfrac{f}{g}", document.getElementById("mc0"), false);
-    K("\\tfrac{f'}{g'}", document.getElementById("mc1"), false);
-  });
-}
-
-/* ── Preset ──────────────────────────────────────── */
-document.getElementById("preset-sel").addEventListener("change",function(){
-  if(!this.value) return;
-  const [f,g,a,xmin,xmax]=this.value.split("|");
-  document.getElementById("f_input").value=f;
-  document.getElementById("g_input").value=g;
-  document.getElementById("a_input").value=a;
-});
-
-/* ══════════════════════════════════════════════════════
-   VELOCÍMETRO DE PENDIENTE
-══════════════════════════════════════════════════════ */
-// SVG arc path helper for a semi-circle (top half)
-// cx,cy = center; r = radius; startDeg = -180 (left) to 0 (right)
-// endDeg = angle where arc ends
-function arcPath(cx, cy, r, startAngle, endAngle) {
-  const toRad = d => (d * Math.PI) / 180;
-  const x1 = cx + r * Math.cos(toRad(startAngle));
-  const y1 = cy + r * Math.sin(toRad(startAngle));
-  const x2 = cx + r * Math.cos(toRad(endAngle));
-  const y2 = cy + r * Math.sin(toRad(endAngle));
-  const large = Math.abs(endAngle - startAngle) > 180 ? 1 : 0;
-  return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
-}
-
-// The gauge goes from -180deg (left, value=-∞) to 0deg (right, value=+∞)
-// Center at (90, 90), radius 68
-const ARC_CX = 90, ARC_CY = 90, ARC_R = 64;
-const ARC_START = -180, ARC_END = 0; // degrees
-
-// Draw the static track once
-(function initSpeedTrack() {
-  const track = document.getElementById("speed-track");
-  if (track) track.setAttribute("d", arcPath(ARC_CX, ARC_CY, ARC_R, ARC_START, ARC_END));
-})();
-
-// Map a derivative value to an angle between -180 and 0
-function valueToAngle(v) {
-  if (!isFinite(v)) return v > 0 ? ARC_END : ARC_START;
-  // Use atan so big values saturate gracefully
-  // atan(v) goes from -π/2 to +π/2
-  const norm = Math.atan(v / 3) / (Math.PI / 2); // -1..+1
-  return ARC_START + (norm + 1) / 2 * (ARC_END - ARC_START);
-}
-
-// Color based on |slope|
-function slopeColor(v) {
-  if (!isFinite(v)) return "#94a3b8";
-  const mag = Math.abs(v);
-  if (mag > 5)  return "#f87171"; // red
-  if (mag > 1.5) return "#fbbf24"; // amber
-  if (mag > 0.1) return "#34d399"; // green
-  return "#60a5fa"; // blue (near 0)
-}
-function slopeClass(v) {
-  if (!isFinite(v)) return "zero";
-  const mag = Math.abs(v);
-  if (mag > 5) return "high";
-  if (mag > 1.5) return "med";
-  if (mag > 0.1) return "low";
-  return "zero";
-}
-
-function updateSpeedometer(x) {
-  const needle  = document.getElementById("speed-needle");
-  const fill    = document.getElementById("speed-fill");
-  const spdF    = document.getElementById("spd-f");
-  const spdG    = document.getElementById("spd-g");
-  const badge   = document.getElementById("speed-badge");
-  if (!needle || !fill || !spdF || !spdG) return;
-
-  if (!ST.ready || !ST.dfFns.length || !ST.dgFns.length) {
-    needle.setAttribute("transform", `rotate(${-90}, ${ARC_CX}, ${ARC_CY})`);
-    fill.setAttribute("d", "");
-    spdF.textContent = "—"; spdF.className = "speed-val-num zero";
-    spdG.textContent = "—"; spdG.className = "speed-val-num zero";
-    badge.textContent = "Sin datos";
-    return;
-  }
-
-  // Get raw derivative values using the last-iteration functions
-  const dfFn = ST.dfFns[ST.dfFns.length - 1];
-  const dgFn = ST.dgFns[ST.dgFns.length - 1];
-  const dfVal = dfFn ? dfFn(x) : NaN;
-  const dgVal = dgFn ? dgFn(x) : NaN;
-
-  // Display readings
-  spdF.textContent  = isFinite(dfVal) ? fmt(dfVal, 5) : (dfVal > 0 ? "+∞" : "−∞");
-  spdG.textContent  = isFinite(dgVal) ? fmt(dgVal, 5) : (dgVal > 0 ? "+∞" : "−∞");
-  spdF.className    = "speed-val-num " + slopeClass(dfVal);
-  spdG.className    = "speed-val-num " + slopeClass(dgVal);
-
-  // Needle is driven by f'(x) — primary rate of change
-  const angle     = valueToAngle(dfVal);
-  const color     = slopeColor(dfVal);
-
-  // Rotate needle: SVG needle points up (−90° from horizontal)
-  const needleDeg = angle + 90; // offset because needle points up (90°)
-  needle.setAttribute("transform", `rotate(${needleDeg}, ${ARC_CX}, ${ARC_CY})`);
-  needle.setAttribute("stroke", color);
-
-  // Fill arc from start to angle
-  if (isFinite(dfVal)) {
-    fill.setAttribute("d", arcPath(ARC_CX, ARC_CY, ARC_R, ARC_START, angle));
-    fill.setAttribute("stroke", color);
-  } else {
-    fill.setAttribute("d", "");
-  }
-
-  // Badge
-  const mag = isFinite(dfVal) ? Math.abs(dfVal) : Infinity;
-  badge.textContent = mag > 5 ? "Alta" : mag > 1.5 ? "Media" : mag > 0.1 ? "Baja" : "Cero";
-  badge.style.background = `${color}22`;
-  badge.style.color = color;
-  badge.style.borderColor = `${color}44`;
-}
-
-/* ══════════════════════════════════════════════════════
-   FOCUS MODE
-══════════════════════════════════════════════════════ */
-let focusModeActive = false;
-
-document.getElementById("focus-toggle").addEventListener("change", function() {
-  focusModeActive = this.checked;
-  const lab = document.getElementById("view-lab");
-  const label = document.getElementById("focus-label");
-  lab.classList.toggle("focus-mode", focusModeActive);
-  label.classList.toggle("active", focusModeActive);
-
-  if (focusModeActive) {
-    // Reset autoevaluacion when entering focus mode
-    resetAutoval();
-    // In focus mode the slider is hidden — but if user had a position, keep it
-  } else {
-    // Leaving focus mode: redraw chart
-    if (chartInstance) setTimeout(() => chartInstance.update('none'), 50);
-  }
-});
-
-/* ══════════════════════════════════════════════════════
-   AUTOEVALUACIÓN
-══════════════════════════════════════════════════════ */
-function resetAutoval() {
-  const input    = document.getElementById("autoval-input");
-  const feedback = document.getElementById("autoval-feedback");
-  if (input)    { input.value = ""; }
-  if (feedback) { feedback.style.display = "none"; feedback.className = "autoval-feedback"; feedback.innerHTML = ""; }
-}
-
-document.getElementById("autoval-check-btn").addEventListener("click", function() {
-  const input    = document.getElementById("autoval-input");
-  const feedback = document.getElementById("autoval-feedback");
-  const raw      = (input.value || "").trim();
-  if (!raw) { input.focus(); return; }
-
-  if (ST.limitVal === null || !isFinite(ST.limitVal) && ST.limitVal !== 0) {
-    feedback.className = "autoval-feedback reveal";
-    feedback.style.display = "block";
-    feedback.innerHTML = `<i class="bx bx-info-circle"></i> Calcula un límite primero antes de autoevaluarte.`;
-    return;
-  }
-
-  // Parse the user's answer — allow fractions like "1/2"
-  let userVal = NaN;
-  try {
-    if (raw.includes("/")) {
-      const parts = raw.split("/");
-      userVal = parseFloat(parts[0]) / parseFloat(parts[1]);
-    } else {
-      userVal = parseFloat(raw);
-    }
-  } catch(_) {}
-
-  const correct = ST.limitVal;
-  const tolerance = Math.max(1e-4, Math.abs(correct) * 0.01); // 1% or 0.0001
-  const isCorrect = isFinite(userVal) && Math.abs(userVal - correct) < tolerance;
-
-  feedback.style.display = "block";
-  if (isCorrect) {
-    feedback.className = "autoval-feedback correct";
-    feedback.innerHTML = `
-      <i class="bx bx-check-circle" style="font-size:1.1rem;vertical-align:middle;margin-right:5px;"></i>
-      <strong>¡Correcto!</strong> El límite es <span style="font-family:monospace;font-weight:700;">${fmt(correct,8)}</span>.
-      Excelente comprensión del proceso de L'Hôpital.`;
-  } else {
-    feedback.className = "autoval-feedback wrong";
-    feedback.innerHTML = `
-      <i class="bx bx-x-circle" style="font-size:1.1rem;vertical-align:middle;margin-right:5px;"></i>
-      <strong>Incorrecto.</strong> Tu respuesta fue <span style="font-family:monospace;">${raw}</span>.
-      Revisa el diagnóstico paso a paso en el panel izquierdo y vuelve a intentarlo.`;
-  }
-});
-
-document.getElementById("autoval-reveal-btn").addEventListener("click", function() {
-  const feedback = document.getElementById("autoval-feedback");
-  const correct  = ST.limitVal;
-  feedback.style.display = "block";
-  if (correct === null || (!isFinite(correct) && correct !== 0)) {
-    feedback.className = "autoval-feedback reveal";
-    feedback.innerHTML = `<i class="bx bx-info-circle"></i> Calcula un límite primero.`;
-    return;
-  }
-  feedback.className = "autoval-feedback reveal";
-  feedback.innerHTML = `
-    <i class="bx bx-show" style="vertical-align:middle;margin-right:5px;"></i>
-    <strong>Resultado revelado:</strong>
-    <div class="autoval-result-reveal">${fmt(correct, 8)}</div>
-    <div style="font-size:.78rem;margin-top:6px;opacity:.75;">
-      ${ST.hops > 0 ? `Obtenido tras ${ST.hops} aplicación(es) de L'Hôpital.` : "Obtenido por evaluación directa."}
-    </div>`;
-});
-
-/* ── Events ──────────────────────────────────────── */
-document.getElementById("x_slider").addEventListener("input", updateSlider);
-document.getElementById("calc-btn").addEventListener("click", validateAndCalculate);
-document.getElementById("detail-btn").addEventListener("click", openModal);
-
-document.getElementById('modal-overlay').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
-/* ── Init ────────────────────────────────────────── */
-window.addEventListener("load",()=>{
-  buildMembers();
-  waitK(()=>{
-    renderTeoria();
-    validateAndCalculate();
-  });
-});
-</script>
+<script src="script.js"></script>
 </body>
 </html>
