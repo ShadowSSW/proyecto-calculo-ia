@@ -705,15 +705,37 @@ function validateAndCalculate(){
     const dfFn=buildFn(dF), dgFn=buildFn(dG);
     ST.dfFns.push(dfFn); ST.dgFns.push(dgFn);
 
+    // Build prime notation: f'(x), f''(x), f'''(x), f^{(n)}(x) for n>=4
+    const primes = k < 3 ? "'".repeat(k+1) : `^{(${k+1})}`;
+    // Clean up expression for display: remove unnecessary * multiplication signs
+    const cleanExpr = expr => expr.replace(/\*(?!\*)/g, " \\cdot ");
     steps.push({
       type:"info", num:k+1,
       title:`Aplicación ${k+1} de L'Hôpital`,
-      mlines:[`f^{(${k+1})}(x)=${dF}`, `g^{(${k+1})}(x)=${dG}`]
+      mlines:[`f${primes}(x) = ${cleanExpr(dF)}`, `g${primes}(x) = ${cleanExpr(dG)}`]
     });
 
     F=dF; G=dG;
 
     const nowIndet=checkIndet(F,G,a,isInf);
+
+    // Show intermediate check: is the new ratio still indeterminate at a?
+    if (nowIndet.ok) {
+      // Still 0/0 or ∞/∞ — show it so user knows why we iterate again
+      const h2 = 1e-6;
+      const nfv = nEval(F, a === 0 ? h2 : a + h2);
+      const ngv = nEval(G, a === 0 ? h2 : a + h2);
+      const fSm2 = Math.abs(nfv) < 5e-4, gSm2 = Math.abs(ngv) < 5e-4;
+      const fBg2 = Math.abs(nfv) > 1e4 || isInfinityValue(nfv);
+      const gBg2 = Math.abs(ngv) > 1e4 || isInfinityValue(ngv);
+      const indType2 = (fSm2 && gSm2) ? "0/0" : ((fBg2 && gBg2) ? "\\infty/\\infty" : "0/0");
+      steps.push({
+        type:"warn", icon:"bx-refresh",
+        title:`Sigue siendo indeterminado — se aplica L'Hôpital de nuevo`,
+        math:`\\lim_{x\\to ${lp}}\\frac{${F}}{${G}}=\\frac{${indType2.startsWith("0") ? "0" : "\\infty"}}{${indType2.startsWith("0") ? "0" : "\\infty"}}`,
+        lines:["El cociente de derivadas aún es indeterminado en x → " + (isInf ? "∞" : ST.aStr) + ". Se requiere otra iteración."]
+      });
+    }
 
     // Evaluate the new ratio to check convergence
     // For infinity: use moderate values where JS floats still work (exp(50) ~ 5e21, exp(100) = Infinity in JS)
@@ -739,7 +761,10 @@ function validateAndCalculate(){
       r = dfFn(sx) / dgFn(sx);
     }
 
-    if (!nowIndet.ok || isFinite(r)) {
+    // Only exit when the new ratio is truly NOT indeterminate at 'a'.
+    // isFinite(r) alone is NOT enough — near x=0, sin(x)/2x evaluates to ~0.5
+    // at x=1e-7 even though it's still 0/0 at x=0. We must confirm !nowIndet.ok.
+    if (!nowIndet.ok) {
       if (isInf) {
         // Evaluate limit numerically at increasing x values
         // Use nEval (symbolic) rather than buildFn for stability at large x
