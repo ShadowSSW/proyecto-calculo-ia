@@ -24,7 +24,20 @@ function navigate(view) {
   }
   
   if (view==="lab") {
-    setTimeout(() => validateAndCalculate(), 100);
+    setTimeout(() => {
+      validateAndCalculate();
+      // Inicializar controles del laboratorio después del cálculo
+      setTimeout(() => {
+        if (ST.ready) {
+          setupSlider();
+          createChart();
+          updateMetricLabels();
+          const initX = parseFloat(document.getElementById("x_slider").value);
+          updateSpeedometer(initX);
+          updateOrderAnalysis(initX);
+        }
+      }, 200);
+    }, 100);
   }
   if (view==="teoria") {
     renderTeoria();
@@ -247,6 +260,12 @@ function detectInfinity(expr, x, isPositiveInfinity = true) {
       // Determinar el signo
       const positiveCount = values.filter(v => v > 0).length;
       return positiveCount > values.length / 2 ? Infinity : -Infinity;
+    }
+    
+    // Si no se detecta infinito, verificar si el valor en x es infinito
+    const valueAtX = nEval(expr, x);
+    if (isInfinityValue(valueAtX)) {
+      return valueAtX;
     }
     
     return NaN;
@@ -841,14 +860,33 @@ function finalize(steps,lp){
 /* ── Slider ──────────────────────────────────────── */
 function setupSlider(){
   const s=document.getElementById("x_slider");
+  const input=document.getElementById("x_input");
   const domain = calculateDomain(ST.aNum, ST.aIsInf);
   s.min = domain.min;
   s.max = domain.max;
+  input.min = domain.min;
+  input.max = domain.max;
   
   // Posición inicial cerca del punto a
   const offset = ST.aIsInf ? 0 : 0.1;
   const initialValue = ST.aIsInf ? 0 : ST.aNum + offset;
   s.value = Math.max(domain.min, Math.min(domain.max, initialValue));
+  input.value = s.value;
+  
+  // Event listeners
+  s.addEventListener("input", function(){
+    input.value = s.value;
+    updateSlider();
+  });
+  
+  input.addEventListener("input", function(){
+    const x = parseFloat(input.value);
+    if (!isNaN(x) && isFinite(x)) {
+      const clampedX = Math.max(domain.min, Math.min(domain.max, x));
+      s.value = clampedX;
+      updateSlider();
+    }
+  });
   
   updateSlider();
 }
@@ -856,16 +894,25 @@ function setupSlider(){
 function updateSlider(){
   if(!ST.ready) return;
   const x=parseFloat(document.getElementById("x_slider").value);
-  document.getElementById("x_label").textContent=`x = ${x.toFixed(4)}`;
+  
+  // Actualizar elementos solo si existen
+  const xLabel = document.getElementById("x_label");
+  const xInput = document.getElementById("x_input");
+  const valOrig = document.getElementById("val_orig");
+  const valDeriv = document.getElementById("val_deriv");
+  const valLimit = document.getElementById("val_limit");
+  
+  if (xLabel) xLabel.textContent=`x = ${x.toFixed(4)}`;
+  if (xInput) xInput.value = x.toFixed(4);
 
   const fR=ST.fFn&&ST.gFn?ST.fFn(x)/ST.gFn(x):NaN;
   const dfFn=ST.dfFns[ST.dfFns.length-1], dgFn=ST.dgFns[ST.dgFns.length-1];
   const dR=dfFn&&dgFn?dfFn(x)/dgFn(x):NaN;
 
-  document.getElementById("val_orig").textContent=isFinite(fR)?fmt(fR,6):"Indefinido";
-  document.getElementById("val_deriv").textContent=isFinite(dR)?fmt(dR,6):"Indefinido";
+  if (valOrig) valOrig.textContent=isFinite(fR)?fmt(fR,6):"Indefinido";
+  if (valDeriv) valDeriv.textContent=isFinite(dR)?fmt(dR,6):"Indefinido";
   const finalVal = ST.limitVal;
-  document.getElementById("val_limit").textContent =
+  if (valLimit) valLimit.textContent =
     (finalVal === 0) ? "0" :
     (finalVal !== null && isFinite(finalVal) ? fmt(finalVal, 6) : "—");
 
@@ -1072,14 +1119,8 @@ function updateSpeedometer(x) {
 }
 
 /* ── Events ──────────────────────────────────────── */
-document.getElementById("x_slider").addEventListener("input", updateSlider);
 document.getElementById("calc-btn").addEventListener("click", validateAndCalculate);
 document.getElementById("detail-btn").addEventListener("click", openModal);
-
-document.getElementById('modal-overlay').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
 /* ── Init ────────────────────────────────────────── */
 window.addEventListener("load",()=>{
   buildMembers();
@@ -1087,6 +1128,5 @@ window.addEventListener("load",()=>{
   waitK(()=>{
     renderTeoria();
     renderTheoryMath();
-    validateAndCalculate();
   });
 });

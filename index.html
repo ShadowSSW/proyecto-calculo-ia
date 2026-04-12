@@ -394,7 +394,10 @@
     <div class="lab-bottom">
       <div class="sl-head">
         <span>Exploración en el entorno de <em>a</em></span>
-        <span id="x_label">x = —</span>
+        <div class="x-input-group">
+          <span>x =</span>
+          <input type="number" id="x_input" min="-4" max="4" step="0.001" value="0.5" class="x-number-input" />
+        </div>
       </div>
       <input type="range" id="x_slider" min="-4" max="4" step="0.001" value="0.5" />
       <div class="metrics-row">
