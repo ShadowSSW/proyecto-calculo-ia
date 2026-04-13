@@ -256,7 +256,12 @@ function detectInfinity(expr, x, isPositiveInfinity = true) {
     // Si todos los valores son consistentemente grandes en magnitud
     const avgMagnitude = values.reduce((sum, v) => sum + Math.abs(v || 0), 0) / values.length;
     
-    if (avgMagnitude > 1e4) {
+    // Umbral de crecimiento sostenido para funciones lentas (ln, log, etc.)
+    // Si el valor es grande pero representa crecimiento lento hacia infinito,
+    // normalizarlo a infinito para que L'Hôpital reconozca la indeterminación
+    const sustainedGrowthThreshold = 10; // Umbral para crecimiento sostenido
+    
+    if (avgMagnitude > sustainedGrowthThreshold) {
       // Determinar el signo
       const positiveCount = values.filter(v => v > 0).length;
       return positiveCount > values.length / 2 ? Infinity : -Infinity;
@@ -281,14 +286,15 @@ function isInfinityValue(val) {
 
 /* ── Indetermination check ───────────────────────── */
 function checkIndet(F,G,a,isInf){
+  const sustainedGrowthThreshold = 10; // Umbral para crecimiento sostenido
   if(isInf){
     const f = detectInfinity(F, a, true) || nEval(F, 1e8);
     const g = detectInfinity(G, a, true) || nEval(G, 1e8);
-    return{ok:(isInfinityValue(f) || Math.abs(f)>1e4) && (isInfinityValue(g) || Math.abs(g)>1e4)};
+    return{ok:(isInfinityValue(f) || Math.abs(f)>sustainedGrowthThreshold) && (isInfinityValue(g) || Math.abs(g)>sustainedGrowthThreshold)};
   }
   const h=1e-6;
   const f1=nEval(F,a+h),g1=nEval(G,a+h),f2=nEval(F,a-h),g2=nEval(G,a-h);
-  const sm=z=>Math.abs(z)<5e-4, bg=z=>Math.abs(z)>1e4 || isInfinityValue(z);
+  const sm=z=>Math.abs(z)<5e-4, bg=z=>Math.abs(z)>sustainedGrowthThreshold || isInfinityValue(z);
   return{ok:(sm(f1)&&sm(g1))||(sm(f2)&&sm(g2))||(bg(f1)&&bg(g1))||(bg(f2)&&bg(g2))};
 }
 
@@ -642,9 +648,10 @@ function validateAndCalculate(){
   }
 
   // Detección mejorada de infinitos y ceros
+  const sustainedGrowthThreshold = 10; // Umbral para crecimiento sostenido
   const fSm=Math.abs(fVal)<5e-4, gSm=Math.abs(gVal)<5e-4;
-  const fBg=isInfinityValue(fVal) || Math.abs(fVal)>1e4;
-  const gBg=isInfinityValue(gVal) || Math.abs(gVal)>1e4;
+  const fBg=isInfinityValue(fVal) || Math.abs(fVal)>sustainedGrowthThreshold;
+  const gBg=isInfinityValue(gVal) || Math.abs(gVal)>sustainedGrowthThreshold;
   const isZZ=fSm&&gSm, isII=fBg&&gBg, isInd=isZZ||isII;
 
   steps.push({
@@ -726,8 +733,8 @@ function validateAndCalculate(){
       const nfv = nEval(F, a === 0 ? h2 : a + h2);
       const ngv = nEval(G, a === 0 ? h2 : a + h2);
       const fSm2 = Math.abs(nfv) < 5e-4, gSm2 = Math.abs(ngv) < 5e-4;
-      const fBg2 = Math.abs(nfv) > 1e4 || isInfinityValue(nfv);
-      const gBg2 = Math.abs(ngv) > 1e4 || isInfinityValue(ngv);
+      const fBg2 = Math.abs(nfv) > sustainedGrowthThreshold || isInfinityValue(nfv);
+      const gBg2 = Math.abs(ngv) > sustainedGrowthThreshold || isInfinityValue(ngv);
       const indType2 = (fSm2 && gSm2) ? "0/0" : ((fBg2 && gBg2) ? "\\infty/\\infty" : "0/0");
       steps.push({
         type:"warn", icon:"bx-refresh",
