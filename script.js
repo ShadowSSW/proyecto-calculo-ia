@@ -183,15 +183,17 @@ function renderModalContent() {
 
 /* ── Calculate Domain ───────────────────────────────── */
 function calculateDomain(a, isInf) {
+  // Si hay un preset predefinido válido, usarlo
   if (Number.isFinite(ST.presetXMin) && Number.isFinite(ST.presetXMax)) {
     return { min: ST.presetXMin, max: ST.presetXMax };
   }
 
+  // Dominio para infinito - rango mucho más amplio
   if (isInf) {
-    return { min: -10, max: 10 };
+    return { min: 0, max: 100 }; // Rango optimizado para funciones que tienden a infinito
   }
   
-  // Rango razonable alrededor del punto a
+  // Rango razonable alrededor del punto a para valores finitos
   const range = 5;
   let min = a - range;
   let max = a + range;
@@ -200,6 +202,14 @@ function calculateDomain(a, isInf) {
   if (Math.abs(a) < 0.1) {
     min = -2;
     max = 2;
+  }
+  
+  // Asegurar que el dominio no sea demasiado pequeño
+  const domainSize = max - min;
+  if (domainSize < 4) {
+    const center = (min + max) / 2;
+    min = center - 2;
+    max = center + 2;
   }
   
   return { min, max };
@@ -613,6 +623,20 @@ function validateAndCalculate(){
   ST.detailSteps = []; // Resetear pasos detallados
   ST.ready=false; ST.limitVal=null; ST.hops=0;
   ST.dfFns=[]; ST.dgFns=[]; ST.dfSyms=[]; ST.dgSyms=[];
+  
+  // Limpiar estado del gráfico para funciones personalizadas
+  // Esto asegura que el dominio se recalcule basado en la nueva función
+  const currentPreset = document.getElementById("preset-sel").value;
+  if (currentPreset) {
+    const [presetF, presetG] = currentPreset.split("|");
+    // Si las funciones actuales no coinciden con el preset, limpiar el dominio
+    if (ST.fRaw !== presetF || ST.gRaw !== presetG) {
+      ST.presetXMin = null;
+      ST.presetXMax = null;
+      // También limpiar el selector para evitar confusión
+      document.getElementById("preset-sel").value = "";
+    }
+  }
 
   try { nerdamer(ST.fRaw); nerdamer(ST.gRaw); }
   catch(e){ showErr("Expresión inválida: "+e.message); return; }
