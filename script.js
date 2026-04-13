@@ -714,12 +714,74 @@ function validateAndCalculate(){
 
     // Build prime notation: f'(x), f''(x), f'''(x), f^{(n)}(x) for n>=4
     const primes = k < 3 ? "'".repeat(k+1) : `^{(${k+1})}`;
-    // Clean up expression for display: remove unnecessary * multiplication signs
-    const cleanExpr = expr => expr.replace(/\*(?!\*)/g, " \\cdot ");
+
+    // Función de formateo LaTeX académico profesional mejorada
+    const formatAcademicLatex = (expr) => {
+      let formatted = String(expr).trim();
+      
+      // 1. Sustitución de logaritmos: log -> ln (contexto de Cálculo)
+      formatted = formatted.replace(/\blog\b/g, 'ln');
+      
+      // 2. Transformar potencias negativas a fracciones (casos específicos)
+      // Caso simple: x^-n -> \frac{1}{x^n}
+      formatted = formatted.replace(/([a-zA-Z])\^(-\d+)/g, (match, base, exp) => {
+        const absExp = exp.replace('-', '');
+        return `\\frac{1}{${base}^{${absExp}}}`;
+      });
+      
+      // Caso complejo: (expr)^-n -> \frac{1}{(expr)^n}
+      formatted = formatted.replace(/\(([^)]+)\)\^(-\d+)/g, (match, inner, exp) => {
+        const absExp = exp.replace('-', '');
+        return `\\frac{1}{(${inner})^{${absExp}}}`;
+      });
+      
+      // Caso especial: x^(-1) -> \frac{1}{x}
+      formatted = formatted.replace(/x\^\(-1\)/g, '\\frac{1}{x}');
+      
+      // 3. Manejar casos específicos de derivadas de logaritmos
+      // 1/x -> \frac{1}{x}
+      formatted = formatted.replace(/1\/x/g, '\\frac{1}{x}');
+      formatted = formatted.replace(/1\/\s*x/g, '\\frac{1}{x}');
+      
+      // Caso: número·1/x -> número·\frac{1}{x}
+      formatted = formatted.replace(/(\d+)\s*\\cdot\s*1\/x/g, '$1\\cdot\\frac{1}{x}');
+      formatted = formatted.replace(/(\d+)\s*\\cdot\s*1\/\s*x/g, '$1\\cdot\\frac{1}{x}');
+      
+      // Caso general: cualquier cosa·1/x -> cualquier cosa·\frac{1}{x}
+      formatted = formatted.replace(/(.+?)\\cdot\s*1\/x/g, '$1\\cdot\\frac{1}{x}');
+      formatted = formatted.replace(/(.+?)\\cdot\s*1\/\s*x/g, '$1\\cdot\\frac{1}{x}');
+      
+      // 4. Limpieza de LaTeX: eliminar paréntesis vacíos y espacios después de ^
+      formatted = formatted.replace(/\(\s*\)/g, ''); // Paréntesis vacíos
+      formatted = formatted.replace(/\^(\s+)/g, '^'); // Espacios después de ^
+      formatted = formatted.replace(/\^(\s+)([a-zA-Z])/g, '^$2'); // ^ seguido de espacio y letra
+      
+      // 5. Reemplazar multiplicación con \cdot para claridad académica
+      formatted = formatted.replace(/\*(?!\*)/g, ' \\cdot ');
+      
+      // 6. Estandarizar funciones trigonométricas y exponenciales
+      formatted = formatted.replace(/\bsin\b/g, '\\sin');
+      formatted = formatted.replace(/\bcos\b/g, '\\cos');
+      formatted = formatted.replace(/\btan\b/g, '\\tan');
+      formatted = formatted.replace(/\bexp\b/g, 'e^');
+      
+      // 7. Limpieza final de espacios múltiples
+      formatted = formatted.replace(/\s+/g, ' ').trim();
+      
+      // 8. Validación básica: asegurar que las fracciones estén balanceadas
+      const openFracs = (formatted.match(/\\frac\{/g) || []).length;
+      const closeBraces = (formatted.match(/}/g) || []).length;
+      if (openFracs > closeBraces) {
+        formatted += '}'.repeat(openFracs - closeBraces);
+      }
+      
+      return formatted;
+    };
+    
     steps.push({
       type:"info", num:k+1,
       title:`Aplicación ${k+1} de L'Hôpital`,
-      mlines:[`f${primes}(x) = ${cleanExpr(dF)}`, `g${primes}(x) = ${cleanExpr(dG)}`]
+      mlines:[`f${primes}(x) = ${formatAcademicLatex(dF)}`, `g${primes}(x) = ${formatAcademicLatex(dG)}`]
     });
 
     F=dF; G=dG;
@@ -776,29 +838,40 @@ function validateAndCalculate(){
         // Evaluate limit numerically at increasing x values
         // Use nEval (symbolic) rather than buildFn for stability at large x
         let bestVal = NaN;
-        const xProbe = [5, 10, 20, 30, 50, 100];
-        for (const tx of xProbe) {
+        const probeValues = [];
+        const xTestPoints = [20, 50, 100, 200, 500, 1000];
+        
+        for (const tx of xTestPoints) {
           const fv = nEval(dF, tx), gv = nEval(dG, tx);
           if (isFinite(fv) && isFinite(gv) && Math.abs(gv) > 1e-300) {
-            bestVal = fv / gv;
+            const ratio = fv / gv;
+            if (isFinite(ratio)) {
+              probeValues.push({x: tx, value: ratio});
+            }
           }
         }
-        // Check trend: if values are converging to 0
-        const probe1 = (() => { const fv=nEval(dF,20),gv=nEval(dG,20); return isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300?fv/gv:NaN; })();
-        const probe2 = (() => { const fv=nEval(dF,50),gv=nEval(dG,50); return isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300?fv/gv:NaN; })();
-        const probe3 = (() => { const fv=nEval(dF,100),gv=nEval(dG,100); return isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300?fv/gv:NaN; })();
-
-        if (isFinite(probe1) && isFinite(probe2) && isFinite(probe3)) {
-          // Trend analysis: if |value| is shrinking towards 0
-          if (Math.abs(probe3) < 1e-6 || (Math.abs(probe3) < Math.abs(probe1) * 0.01)) {
+        
+        if (probeValues.length >= 3) {
+          // Analyze trend across multiple points
+          const lastValue = probeValues[probeValues.length - 1].value;
+          const firstValue = probeValues[0].value;
+          
+          // Strong convergence to zero: very small value or decreasing trend
+          const isVerySmall = Math.abs(lastValue) < 1e-8;
+          const isDecreasing = probeValues.every((pv, i) => 
+            i === 0 || Math.abs(pv.value) <= Math.abs(probeValues[i-1].value) * 1.1
+          );
+          const strongDecrease = Math.abs(lastValue) < Math.abs(firstValue) * 0.1;
+          
+          if (isVerySmall || (isDecreasing && strongDecrease)) {
             bestVal = 0;
           } else {
-            bestVal = probe3; // use largest probe as best estimate
+            bestVal = lastValue;
           }
-        } else if (isFinite(probe2)) {
-          bestVal = Math.abs(probe2) < 1e-6 ? 0 : probe2;
-        } else if (isFinite(probe1)) {
-          bestVal = Math.abs(probe1) < 1e-6 ? 0 : probe1;
+        } else if (probeValues.length > 0) {
+          // Fallback: use last available value
+          const lastValue = probeValues[probeValues.length - 1].value;
+          bestVal = Math.abs(lastValue) < 1e-6 ? 0 : lastValue;
         }
 
         limitVal = isFinite(bestVal) ? bestVal : NaN;
