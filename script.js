@@ -900,7 +900,10 @@ function setupSlider(){
   
   // Event listeners
   s.addEventListener("input", function(){
-    input.value = s.value;
+    // Solo actualizar el input si no está enfocado
+    if (document.activeElement !== input) {
+      input.value = s.value;
+    }
     updateSlider();
   });
   
@@ -910,6 +913,17 @@ function setupSlider(){
       const clampedX = Math.max(domain.min, Math.min(domain.max, x));
       s.value = clampedX;
       updateSlider();
+    }
+  });
+
+  // Permitir edición completa del input sin interferencia
+  input.addEventListener("keydown", function(e){
+    // Permitir todas las teclas de edición
+    if (e.key === "Backspace" || e.key === "Delete" || 
+        e.key === "ArrowLeft" || e.key === "ArrowRight" || 
+        e.key === "Home" || e.key === "End" ||
+        e.key === "Tab" || e.key === "." || e.key === ",") {
+      return;
     }
   });
   
@@ -928,7 +942,10 @@ function updateSlider(){
   const valLimit = document.getElementById("val_limit");
   
   if (xLabel) xLabel.textContent=`x = ${x.toFixed(4)}`;
-  if (xInput) xInput.value = x.toFixed(4);
+  // Solo actualizar el input si no está enfocado (usuario no está escribiendo)
+  if (xInput && document.activeElement !== xInput) {
+    xInput.value = x.toFixed(4);
+  }
 
   const fR=ST.fFn&&ST.gFn?ST.fFn(x)/ST.gFn(x):NaN;
   const dfFn=ST.dfFns[ST.dfFns.length-1], dgFn=ST.dgFns[ST.dgFns.length-1];
