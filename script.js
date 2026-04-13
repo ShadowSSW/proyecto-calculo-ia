@@ -216,7 +216,7 @@ function calculateDomain(a, isInf) {
 }
 
 /* ── Math helpers ────────────────────────────────── */
-function norm(s){ return (s||"").trim().replace(/\*\*/g,"^").replace(/\bln\s*\(/gi,"log("); }
+function norm(s){ return (s||"").trim().replace(/\*\*/g,"^"); }
 function parseA(str){
   const s=(str||"").trim().toLowerCase();
   if(["inf","+inf","infinity","+infinity","∞"].includes(s)) return {value:1e9,isInf:true};
@@ -224,16 +224,48 @@ function parseA(str){
   if(!isFinite(n)) throw new Error("Punto 'a' inválido. Usa un número o 'inf'.");
   return {value:n,isInf:false};
 }
+
+/* Convierte expresión del usuario al formato de nerdamer:
+   ln(x)  → log(x)           [log natural de nerdamer]
+   log(x) → (log(x)/log(10)) [log base 10 via cambio de base]
+   Se procesa izquierda a derecha para respetar precedencia y anidamiento. */
+function _replaceLogInner(e) {
+  let result = '';
+  let i = 0;
+  while (i < e.length) {
+    // ln( → log(  (logaritmo natural)
+    if (e.slice(i, i+3) === 'ln(' && (i === 0 || !/[a-zA-Z0-9_]/.test(e[i-1]))) {
+      result += 'log(';
+      i += 3;
+    }
+    // log( → (log(...)/log(10))  (logaritmo base 10)
+    else if (e.slice(i, i+4) === 'log(' && (i === 0 || !/[a-zA-Z0-9_]/.test(e[i-1]))) {
+      let depth = 1, j = i + 4;
+      while (j < e.length && depth > 0) {
+        if (e[j] === '(') depth++;
+        else if (e[j] === ')') depth--;
+        j++;
+      }
+      const inner = e.slice(i + 4, j - 1);
+      result += '(log(' + _replaceLogInner(inner) + ')/log(10))';
+      i = j;
+    }
+    else {
+      result += e[i];
+      i++;
+    }
+  }
+  return result;
+}
+function toNerdamerExpr(expr) { return _replaceLogInner(norm(expr)); }
+
 function nEval(expr,x){
   try{
     const v=nerdamer(norm(expr),{x:String(x)}).evaluate().text();
     const n=parseFloat(v);
     if(isFinite(n)) return n;
-    
-    // Detectar infinitos explícitos de Nerdamer
     if(v === 'Infinity' || v === '+Infinity' || v === '∞') return Infinity;
     if(v === '-Infinity' || v === '-∞') return -Infinity;
-    
     return NaN;
   }catch(_){return NaN;}
 }
@@ -244,7 +276,7 @@ function buildFn(expr){
 function diffStr(expr){
   const e=norm(expr);
   try{if(typeof nerdamer.diff==="function") return nerdamer.diff(nerdamer(e),"x").text();}catch(_){}
-  try{return nerdamer("diff("+e+",x)").text();}catch(err){throw new Error("No se pudo derivar '"+e+"'");}
+  try{return nerdamer("diff("+e+",x)").text();}catch(err){throw new Error("No se pudo derivar '"+expr+"'");}
 }
 function ratio(f,g){return x=>{const fv=f(x),gv=g(x);return(isFinite(fv)&&isFinite(gv)&&Math.abs(gv)>1e-300)?fv/gv:NaN;};}
 function fmt(n,p=6){
@@ -623,50 +655,56 @@ function validateAndCalculate(){
   ST.detailSteps = []; // Resetear pasos detallados
   ST.ready=false; ST.limitVal=null; ST.hops=0;
   ST.dfFns=[]; ST.dgFns=[]; ST.dfSyms=[]; ST.dgSyms=[];
-  
-  // Limpiar estado del gráfico para funciones personalizadas
-  // Esto asegura que el dominio se recalcule basado en la nueva función
+
+  // Convertir UNA sola vez a formato nerdamer (ln→log natural, log→base 10)
+  const fNerd = toNerdamerExpr(ST.fRaw);
+  const gNerd = toNerdamerExpr(ST.gRaw);
+
+  // Limpiar dominio si el usuario modificó f, g o a respecto al preset activo
   const currentPreset = document.getElementById("preset-sel").value;
   if (currentPreset) {
-    const [presetF, presetG] = currentPreset.split("|");
-    // Si las funciones actuales no coinciden con el preset, limpiar el dominio
-    if (ST.fRaw !== presetF || ST.gRaw !== presetG) {
+    const [presetF, presetG, presetA] = currentPreset.split("|");
+    const aRaw = document.getElementById("a_input").value.trim();
+    if (ST.fRaw !== presetF || ST.gRaw !== presetG || aRaw !== presetA) {
       ST.presetXMin = null;
       ST.presetXMax = null;
-      // También limpiar el selector para evitar confusión
       document.getElementById("preset-sel").value = "";
     }
   }
 
-  try { nerdamer(ST.fRaw); nerdamer(ST.gRaw); }
-  catch(e){ showErr("Expresión inválida: "+e.message); return; }
+  // Validar que las expresiones sean parseables por nerdamer
+  try {
+    nerdamer(fNerd);
+    nerdamer(gNerd);
+  }
+  catch(e){
+    showErr("Expresión inválida: "+e.message);
+    return;
+  }
 
   let aInfo;
   try { aInfo=parseA(document.getElementById("a_input").value); }
   catch(e){ showErr(e.message); return; }
   ST.aNum=aInfo.value; ST.aStr=document.getElementById("a_input").value.trim(); ST.aIsInf=aInfo.isInf;
 
-  ST.fFn=buildFn(ST.fRaw); ST.gFn=buildFn(ST.gRaw);
+  ST.fFn=buildFn(fNerd); ST.gFn=buildFn(gNerd);
 
   const a=ST.aNum, isInf=ST.aIsInf;
   const lp=isInf?"\\infty":ST.aStr;
   const steps=[];
 
-  // Evaluate f and g at a
+  // Evaluate f and g at a (usando expresiones en formato nerdamer)
   let fVal,gVal;
   if(isInf){
-    // Evaluación mejorada para infinito
-    fVal = detectInfinity(ST.fRaw, a, true);
-    gVal = detectInfinity(ST.gRaw, a, true);
-    
-    // Si no se detectó infinito, usar evaluación directa
-    if (!isInfinityValue(fVal)) fVal = nEval(ST.fRaw, 1e8);
-    if (!isInfinityValue(gVal)) gVal = nEval(ST.gRaw, 1e8);
+    fVal = detectInfinity(fNerd, a, true);
+    gVal = detectInfinity(gNerd, a, true);
+    if (!isInfinityValue(fVal)) fVal = nEval(fNerd, 1e8);
+    if (!isInfinityValue(gVal)) gVal = nEval(gNerd, 1e8);
   }
   else{
     const h=1e-7;
-    const f1=nEval(ST.fRaw,a+h),f2=nEval(ST.fRaw,a-h);
-    const g1=nEval(ST.gRaw,a+h),g2=nEval(ST.gRaw,a-h);
+    const f1=nEval(fNerd,a+h),f2=nEval(fNerd,a-h);
+    const g1=nEval(gNerd,a+h),g2=nEval(gNerd,a-h);
     fVal=(isFinite(f1)&&isFinite(f2))?(f1+f2)/2:(isFinite(f1)?f1:f2);
     gVal=(isFinite(g1)&&isFinite(g2))?(g1+g2)/2:(isFinite(g1)?g1:g2);
   }
@@ -721,8 +759,8 @@ function validateAndCalculate(){
     lines:["Condición de L'Hôpital cumplida. Procedemos iterativamente."]
   });
 
-  // Iterative derivation
-  let F=ST.fRaw, G=ST.gRaw, limitVal=NaN;
+  // Iterative derivation (F y G ya están en formato nerdamer)
+  let F=fNerd, G=gNerd, limitVal=NaN;
   const MAX=8;
   _foundLimit = false;
 
@@ -743,7 +781,9 @@ function validateAndCalculate(){
     const formatAcademicLatex = (expr) => {
       let formatted = String(expr).trim();
       
-      // 1. Sustitución de logaritmos: log -> ln (contexto de Cálculo)
+      // 1. Mantener logaritmos naturales como ln y convertir log a ln para consistencia académica
+      // Si el usuario escribió ln, mantenerlo como ln
+      // Si el sistema genera log, convertirlo a ln para rigor matemático
       formatted = formatted.replace(/\blog\b/g, 'ln');
       
       // 2. Transformar potencias negativas a fracciones (casos específicos)
@@ -1093,6 +1133,8 @@ document.getElementById("preset-sel").addEventListener("change",function(){
   const max = parseFloat(xmax);
   ST.presetXMin = Number.isFinite(min) ? min : null;
   ST.presetXMax = Number.isFinite(max) ? max : null;
+  // Auto-calcular al seleccionar preset para que la gráfica se actualice de inmediato
+  setTimeout(validateAndCalculate, 50);
 });
 
 /* ══════════════════════════════════════════════════════
